@@ -595,7 +595,7 @@
         </option>
         <option>
           <name>XclFile</name>
-          <state>$TOOLKIT_DIR$\CONFIG\lnkR32C.xcl</state>
+          <state>$TOOLKIT_DIR$\CONFIG\lnkR5F64112.xcl</state>
         </option>
         <option>
           <name>XclFileSlave</name>
@@ -1632,6 +1632,21 @@
   </file>
   <file>
     <name>$PROJ_DIR$\main.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\SPI0.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\SPI2.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\SPI3.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\SPI4.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\SPI5.c</name>
   </file>
 </project>
 

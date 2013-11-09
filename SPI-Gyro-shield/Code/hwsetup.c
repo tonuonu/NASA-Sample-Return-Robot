@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include "main.h"
-#include "gyro.h"
+#include "SPI.h"
 
 
 volatile struct statuses status;
@@ -401,6 +401,15 @@ HardwareSetup(void) {
     LED3d  = PD_OUTPUT;
     LED4d  = PD_OUTPUT;
     LED5d  = PD_OUTPUT;
+
+    /* Four motor ports, masters */
+    SPI0_Init(); 
+    SPI2_Init(); 
+    SPI3_Init(); 
+    SPI4_Init();
+
+    /* Interface to Arduino, slave */
+    SPI5_Init();
 
     //Buzzer_Init();
     Heartbeat_Init();

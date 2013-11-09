@@ -1,21 +1,21 @@
 /*
- *  Copyright (c) 2011,2012 Tonu Samuel
+ *  Copyright (c) 2013 Tonu Samuel
  *  All rights reserved.
  *
- *  This file is part of TYROS.
+ *  This file is part of robot "Kuukulgur".
  *
- *  TYROS is free software: you can redistribute it and/or modify
+ *  This is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  TYROS is distributed in the hope that it will be useful,
+ *  This is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with TYROS.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this software.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -24,11 +24,17 @@
 #include "hwsetup.h"
 #include "main.h"
 #include "SPI.h"
-#include "mma7455l.h"
+
+#pragma vector = UART3_RX
+__interrupt void _uart3_receive(void) {
+
+    /* Clear the 'reception complete' flag.	*/
+    ir_s3ric = 0;
+}
 
 
 void
-SPI3_Init(void) { // OLED 
+SPI3_Init(void) { 
     OLED_DATACOMMANDd = PD_OUTPUT;
     OLED_RESETd = PD_OUTPUT;
   
@@ -75,75 +81,3 @@ SPI3_Init(void) { // OLED
     s3tic = 0x0;
 }
 
-void
-SPI0_send_data(unsigned char c) {
-    while (ti_u0c1 == 0) {
-        NOP();
-    }
-    uDelay(200);
-    u0tb = c;
-    uDelay(200);
-}
-
-unsigned short 
-SPI0_receive(void) {
-    unsigned short r;
-    uDelay(200);
-    while (ri_u0c1 == 0) {
-        NOP();
-    }
-    r=u0rb;    
-    ri_u0c1=0;
-    uDelay(200);
-
-    return r;
-}
-
-void
-SPI3_send_data(unsigned char c) {
-    OLED_DATACOMMAND = 1;
-    uDelay(SPI_DELAY);
-    u3tb = c;
-    uDelay(12);
-}
-
-void
-SPI3_send_cmd(unsigned char c) {
-    OLED_DATACOMMAND = 0;
-    uDelay(SPI_DELAY);
-    u3tb = c;
-    uDelay(12);
-}
-
-void
-SPI6_send(unsigned short c) {
-    while (ti_u6c1 == 0) {
-        NOP();
-    }
-    uDelay(SPI_DELAY);
-    ti_u6c1=0;
-    u6tb = c;
-}
-
-short unsigned
-SPI6_receive(void) {
-    short unsigned r;
-    SPI6_send(0xFF);
-    uDelay(SPI_DELAY);  
-    uDelay(SPI_DELAY);  
-    while (ri_u6c1 == 0) {
-        NOP();
-    }  
-    r=u6rb;
-    ri_u6c1=0;
-    return r;
-}
-
-void
-SPI7_send(unsigned short c) {
-    while (ti_u7c1 == 0)
-        NOP();
-    uDelay(SPI_DELAY);
-    ti_u7c1=0;
-    u7tb = c;
-}

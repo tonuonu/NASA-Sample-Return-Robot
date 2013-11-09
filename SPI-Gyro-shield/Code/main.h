@@ -15,51 +15,16 @@
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with TYROS.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this software.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 #include <stdlib.h>
 #include "intrinsics.h"
 #define PI 3.1415926535897932384626433832795028841971693993751058
 
 extern volatile unsigned short ticks;
 
-void uart0_init(void);
-void SPI3_send_cmd(unsigned char c);
-void SPI3_send_data(unsigned char c);
-
-short unsigned SPI6_receive(void) ;
-extern double twist[6];
-extern int pwm[2];
-extern int pwmtarget[2];
-extern int accok, accwhoami; 
-extern int accstatus;
-
-extern unsigned char gyrowhoami;
-extern signed int gyrox,gyroy,gyroz;
-extern signed int gyrorawx,gyrorawy,gyrorawz;
-extern int gyromaxx,gyromaxy,gyromaxz;
-extern int gyrominx,gyrominy,gyrominz;
-
-extern signed char gyrotemp;
-extern int gyrowhoamistatus;
-extern int buzzer;
-extern float bat, capacitor, leftmotorcurrent , rightmotorcurrent ;
-
-extern signed int MLXaccumulatorL;
-extern signed int MLXaccumulatorR;
-extern float turnsincetwist[3];
-extern char text[8][150];
-extern int lineno;
-extern int textpos;
-
-enum {
-  MODE_MANUAL,
-  MODE_COMPETITION,
-  MODE_DEBUG_ACCSENSOR,
-  MODE_DEBUG_POSSENSOR,
-  MODE_DEBUG_GYRO,
-};
 /*
  * IAR-HEW compatibility 
  */
@@ -92,12 +57,4 @@ Delay(unsigned char n);
 size_t __write(int, unsigned const char*, size_t);
 size_t __read(int Handle, unsigned char *Buf, size_t BufSize);
 
-extern int twistcmdage;
-//extern int xxx;
-/* 
- * Next constant is from 
- * http://www.wolframalpha.com/input/?i=8.75millidegrees+per+second
- */
-#define GYRORATE (0.0001527)
-extern float yaw;
 

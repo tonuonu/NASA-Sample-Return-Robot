@@ -15,9 +15,10 @@
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with TYROS.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this software.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 #define PD_INPUT    (0)
 #define PD_OUTPUT   (1)
 #define PF_TIMER    (1)
@@ -116,12 +117,9 @@ void HardwareSetup(void);
 #define OLED_CS       p5_7
 #define OLED_CSd      pd5_7
 
-// Melexis LDO enable
-#define MELEXIS_EN   p3_0
-#define MELEXIS_ENd  pd3_0
-
-// Serial 4, melexis rotation sensor
+// Serial 4
 #define CS4         p9_4
+#define CS4d        pd9_4
 #define CLOCK4      p9_5
 #define CLOCK4s     p9_5s
 #define CLOCK4d     pd9_5
@@ -132,7 +130,14 @@ void HardwareSetup(void);
 #define RX4         p9_7
 #define RX4s        p9_7s
 
-// Serial 5, old panda interface, unused
+// Serial 5
+
+#define CS5         p8_3
+#define CS5d        pd8_3
+#define CLOCK5      p7_7
+#define CLOCK5d     pd7_7
+#define CLOCK5s     p7_7s
+
 #define TX5         p7_6
 #define TX5s        p7_6s
 #define TX5d        pd7_6
