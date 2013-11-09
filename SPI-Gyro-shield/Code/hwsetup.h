@@ -42,7 +42,6 @@ void HardwareSetup(void);
 #define ERRORLEDd    pd1_4
 #define ERRORLED     p1_4
 
-
 #define LEFT_PWMd    pd3_2
 #define LEFT_PWMs    p3_2s
 #define LEFT_PWM     p3_2
@@ -68,7 +67,7 @@ void HardwareSetup(void);
 #define LEFT_ENAd      pd2_6
 #define LEFT_ENBd      pd2_7
 
-// Serial 0, USB interface to panda
+// SPI0, motor 1
 #define CS0d         pd6_0
 #define CS0          p6_0
 #define CS0s         p6_0s
@@ -82,7 +81,7 @@ void HardwareSetup(void);
 #define TX0s         p6_3s
 #define TX0d         pd6_3
 
-// Serial 2, acceleration sensor
+// SPI2, motor 2
 #define CS2d         pd7_7
 #define CS2          p7_7
 #define CS2s         p7_7s
@@ -96,28 +95,17 @@ void HardwareSetup(void);
 #define CLOCK2d      pd7_2
 #define CLOCK2s      p7_2s
 
-// Serial 3, OLED
-#define OLED_DATACOMMAND p4_0
-#define OLED_DATACOMMANDd pd4_0
-
+// SPI3, motor 3
 #define CLOCK3       p4_1
 #define CLOCK3d      pd4_1
 #define CLOCK3s      p4_1s
-
-#define OLED_RESET   p4_2
-#define OLED_RESETd  pd4_2
 
 #define TX3          p4_3
 #define TX3s         p4_3s
 #define TX3d         pd4_3
 
-#define OLED_ENABLE  p4_4
-#define OLED_ENABLEd pd4_4
 
-#define OLED_CS       p5_7
-#define OLED_CSd      pd5_7
-
-// Serial 4
+// SPI4, motor 4
 #define CS4         p9_4
 #define CS4d        pd9_4
 #define CLOCK4      p9_5
@@ -148,85 +136,6 @@ void HardwareSetup(void);
 #define TX5d        pd7_6
 #define TX5s        p7_6s
 
-#if 0
-
-// Serial 6, gyroscope
-#define CLOCK6      p4_5
-#define CLOCK6s     p4_5s
-#define CLOCK6d     pd4_5
-#define RX6         p4_6
-#define RX6s        p4_6s
-#define RX6d        pd4_6
-#define TX6         p4_7
-#define TX6s        p4_7s
-#define TX6d        pd4_7
-#define CS6         p5_1
-#define CS6d        pd5_1
-#define GYRO_INT1   p8_3
-#define GYRO_INT2   p8_4
-
-// Serial 7, melexis rotational
-#define CS7         p5_3
-#define CS7d        pd5_3
-
-#define TX7         p5_4
-#define TX7s        p5_4s
-#define TX7d        pd5_4
-
-#define RX7         p5_6
-#define RX7s        p5_6s
-#define RX7d        pd5_6
-
-#define CLOCK7      p5_5
-#define CLOCK7s     p5_5s
-#define CLOCK7d     pd5_5
-
-// Coilgun
-#define BALL_DETECT p7_3
-#define KICK        p7_5
-#define KICKd       pd7_5
-
-// Capacitor charger
-#define CHARGE      p1_2
-#define CHARGEd     pd1_2
-
-#define CHARGE_DONE p3_7
-
-// 5v power supply for Pandaboard
-#define PANDA       p3_5
-#define PANDAd      pd3_5
-
-// Joystick
-#define JOY_UP      p1_3
-#define JOY_DOWN    p1_4
-#define JOY_RIGHT   p1_5
-#define JOY_LEFT    p1_6
-#define JOY_CENTER  p1_7
-
-#define JOY_UPd     pd1_3
-#define JOY_DOWNd   pd1_4
-#define JOY_LEFTd   pd1_5
-#define JOY_RIGHTd  pd1_6
-#define JOY_CENTERd pd1_7
-
-// Analog
-#define AN00         p10_0
-#define AN01         p10_1
-#define AN02         p10_2
-#define AN03         p10_3
-#define AN00d        pd10_0
-#define AN01d        pd10_1
-#define AN02d        pd10_2
-#define AN03d        pd10_3
-#define AN00s        p10_0s
-#define AN01s        p10_1s
-#define AN02s        p10_2s
-#define AN03s        p10_3s
-
-// Buzzer
-#define BUZZERd     pd3_6
-#define BUZZERs     p3_6s
-#endif
 
 #define TIMERB2COUNT	2000 // about 12,5kHz
 

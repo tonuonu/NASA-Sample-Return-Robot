@@ -35,8 +35,6 @@ __interrupt void _uart3_receive(void) {
 
 void
 SPI3_Init(void) { 
-    OLED_DATACOMMANDd = PD_OUTPUT;
-    OLED_RESETd = PD_OUTPUT;
   
     CLOCK3d = PD_OUTPUT;
     CLOCK3s = PF_UART;

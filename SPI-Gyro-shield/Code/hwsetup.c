@@ -99,12 +99,6 @@ ConfigureOperatingFrequency(char mode) {
     cnt3_tcspr = 1; // f2n is 24Mhz / 16
 }
 
-/*
-void 
-OLED_On(void) {
-}
-*/
-
 static void 
 PWM_Init(void) {
     /* 
@@ -229,26 +223,6 @@ PWM_Init(void) {
 
     /* Configure outputs */
     
-    LEFT_INAd    = PD_OUTPUT;
-    LEFT_INBd    = PD_OUTPUT;
-    RIGHT_INAd   = PD_OUTPUT;
-    RIGHT_INBd   = PD_OUTPUT;
-
-    LEFT_INA    = 0;
-    LEFT_INB    = 0;
-    RIGHT_INA   = 0;
-    RIGHT_INB   = 0;
-
-    LEFT_ENAd  = PD_OUTPUT;
-    LEFT_ENBd  = PD_OUTPUT;
-    RIGHT_ENAd = PD_OUTPUT;
-    RIGHT_ENBd = PD_OUTPUT;
-
-    LEFT_ENA   = 0;
-    LEFT_ENB   = 0;
-    RIGHT_ENA  = 0;
-    RIGHT_ENB  = 0;
-
     LEFT_PWMd    = PD_OUTPUT;
     LEFT_PWMs    = PF_TIMER;
     RIGHT_PWMd   = PD_OUTPUT;
@@ -257,7 +231,7 @@ PWM_Init(void) {
     RIGHT_PWM    = 0;
 
     // FIXME, timer3 start into right place
-//    TABSR_bit.TA3S = 1;
+    // TABSR_bit.TA3S = 1;
 }
 
 static void 
@@ -269,91 +243,10 @@ Heartbeat_Init(void) {
     tb5s = 1;
     ticks = 0;
 }
-#if 0
-static void 
-Buzzer_Init(void) {
-    BUZZERs = PF_MOTOR;
-    BUZZERd = PD_OUTPUT; 
-}
-
-static void 
-Panda_Init(void) {
-    PANDAd = PD_OUTPUT; 
-    PANDA  = 0;
-}
-
-static void 
-Coilgun_Init(void) {
-    KICKd = PD_OUTPUT; 
-    KICK = 1; // Drive it up for normal mode
-    pu22 = 1; // ball detect p7_3 pullup on
-}
-
-static void 
-CapacitorCharger_Init(void) {
-    CHARGE = 0;
-    CHARGEd = PD_OUTPUT; 
-}
-
-static void 
-Analog_Init(void) {
-    ch0_ad0con0  = 0; // does not matter in sweep mode       
-    ch1_ad0con0  = 0; // does not matter in sweep mode           
-    ch2_ad0con0  = 0; // does not matter in sweep mode
-    md0_ad0con0  = 1; // repeat sweep mode          
-    md1_ad0con0  = 1; // repeat sweep mode
-    trg_ad0con0  = 0; // software tells when to start, not HW            
-    adst_ad0con0 = 1; // we set this later to 1 when we start AD conversion to start
-    cks0_ad0con0 = 0; // divide by 8   
-    
-    scan0_ad0con1 = 1; // read AN_0 to AN_3
-    scan1_ad0con1 = 1; // read AN_0 to AN_3   
-    bits_ad0con1  = 1; // 10 bit resolution
-    vcut_ad0con1  = 1; // Disable reference voltage to save power
-    md2_ad0con1   = 1; // repeat sweep mode         
-    cks1_ad0con1  = 0; // divide by 8
-    opa0_ad0con1  = 0; // External op amp not used
-    opa1_ad0con1  = 0; // External op amp not used
-
-    smp_ad0con2  = 0; // with sample and hold
-    aps0_ad0con2 = 0; // an_0 to an_7
-    aps1_ad0con2 = 0; // an_0 to an_7
-    trg0_ad0con2 = 0; // does not matter
-
-    dus_ad0con3    = 0; // no DMA
-    mss_ad0con3    = 0; // not multi-port sweep mode
-    cks2_ad0con3   = 1; // divide by 8
-    msf0_ad0con3   = 0; // multi port sweep status flag. Disabled.
-    msf1_ad0con3   = 0; // multi port sweep status flag. Disabled.
-
-    ad0con4 = 0;     
-    AN00s = PF_ANALOG;
-    AN01s = PF_ANALOG;
-    AN02s = PF_ANALOG;
-    AN03s = PF_ANALOG;
-
-    AN00d = PD_INPUT;
-    AN01d = PD_INPUT;
-    AN02d = PD_INPUT;
-    AN03d = PD_INPUT;
-
-    AN00 = 0;
-    AN01 = 0;
-    AN02 = 0;
-    AN03 = 0;
-
-}
-
-static void 
-Joy_Init(void) {
-    pu02 = 1; // P1_0 to P1_3 Pull-up Control Bit
-    pu03 = 1; // P1_4 to P1_7 Pull-up Control Bit
-}
-#endif
 
 static void
 Oneshot_Init(void) {
-    // Timer 0 for SPI7
+    // Timer 0 for ..?
   
     tmod0_ta0mr = 0; // One shot timer mode
     tmod1_ta0mr = 1; // One shot timer mode
@@ -371,7 +264,7 @@ Oneshot_Init(void) {
     ir_ta0ic    = 0;            
     ENABLE_IRQ
       
-    // Timer 3 for SPI4
+    // Timer 3 for ...?
     tmod0_ta3mr = 0; // One shot timer mode
     tmod1_ta3mr = 1; // One shot timer mode
     tck0_ta3mr  = 0; // f1 clock source    
@@ -402,6 +295,8 @@ HardwareSetup(void) {
     LED4d  = PD_OUTPUT;
     LED5d  = PD_OUTPUT;
 
+    Heartbeat_Init();
+
     /* Four motor ports, masters */
     SPI0_Init(); 
     SPI2_Init(); 
@@ -411,29 +306,8 @@ HardwareSetup(void) {
     /* Interface to Arduino, slave */
     SPI5_Init();
 
-    //Buzzer_Init();
-    Heartbeat_Init();
-//    ERRORLEDd=PD_OUTPUT; // error LED
-//    MELEXIS_ENd=PD_OUTPUT;
-//    MELEXIS_EN=0; // Low is ON, This is 5V LDO
-    //CapacitorCharger_Init();
-    //Coilgun_Init();
-    //Panda_Init();
-    //Joy_Init();
-    // OLED init must be before gyro or OLED does not init properly
-    // Pullup pm p4_4, pu11 tries to  make it high while initializing gyro 
-    // and messes up our OLED init later.    OLED_Init(); 
-
-#if 0
-    SPI2_Init();  // Accel sensor
-    SPI3_Init();  // OLED
-    SPI4_Init();  // Melexis sensor left
-    SPI6_Init();  // gyro
-    SPI7_Init();  // Melexis sensor right
-#endif
     ENABLE_IRQ;
 
-    //Analog_Init();
     PWM_Init();
     Oneshot_Init();
 }
