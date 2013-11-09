@@ -27,11 +27,19 @@
 
 void HardwareSetup(void);
 
-#define LED1         p3_3
-#define LED1d        pd3_3
+#define LED1         p1_0
+#define LED1d        pd1_0
+#define LED2         p1_1
+#define LED2d        pd1_1
+#define LED3         p1_2
+#define LED3d        pd1_2
+#define LED4         p1_3
+#define LED4d        pd1_3
+#define LED5         p1_4
+#define LED5d        pd1_4
 
-#define ERRORLEDd    pd5_2
-#define ERRORLED     p5_2
+#define ERRORLEDd    pd1_4
+#define ERRORLED     p1_4
 
 
 #define LEFT_PWMd    pd3_2
@@ -135,6 +143,8 @@ void HardwareSetup(void);
 #define TX5d        pd7_6
 #define TX5s        p7_6s
 
+#if 0
+
 // Serial 6, gyroscope
 #define CLOCK6      p4_5
 #define CLOCK6s     p4_5s
@@ -211,6 +221,7 @@ void HardwareSetup(void);
 // Buzzer
 #define BUZZERd     pd3_6
 #define BUZZERs     p3_6s
+#endif
 
 #define TIMERB2COUNT	2000 // about 12,5kHz
 

@@ -1,21 +1,21 @@
 /*
- *  Copyright (c) 2011,2012 Tonu Samuel
+ *  Copyright (c) 2013 Tonu Samuel
  *  All rights reserved.
  *
- *  This file is part of TYROS.
+ *  This file is part of robot "Kuukulgur".
  *
- *  TYROS is free software: you can redistribute it and/or modify
+ *  This is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  TYROS is distributed in the hope that it will be useful,
+ *  This is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with TYROS.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this software.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -99,10 +99,11 @@ ConfigureOperatingFrequency(char mode) {
     cnt3_tcspr = 1; // f2n is 24Mhz / 16
 }
 
+/*
 void 
 OLED_On(void) {
 }
-
+*/
 
 static void 
 PWM_Init(void) {
@@ -267,9 +268,8 @@ Heartbeat_Init(void) {
     tb5ic = 1;                          // level 1 interrupt
     tb5s = 1;
     ticks = 0;
-    LED1d  = PD_OUTPUT;
 }
-
+#if 0
 static void 
 Buzzer_Init(void) {
     BUZZERs = PF_MOTOR;
@@ -349,6 +349,7 @@ Joy_Init(void) {
     pu02 = 1; // P1_0 to P1_3 Pull-up Control Bit
     pu03 = 1; // P1_4 to P1_7 Pull-up Control Bit
 }
+#endif
 
 static void
 Oneshot_Init(void) {
@@ -395,16 +396,21 @@ HardwareSetup(void) {
      */
     DISABLE_IRQ;
     ConfigureOperatingFrequency(1);
+    LED1d  = PD_OUTPUT;
+    LED2d  = PD_OUTPUT;
+    LED3d  = PD_OUTPUT;
+    LED4d  = PD_OUTPUT;
+    LED5d  = PD_OUTPUT;
 
-    Buzzer_Init();
+    //Buzzer_Init();
     Heartbeat_Init();
-    ERRORLEDd=PD_OUTPUT; // error LED
-    MELEXIS_ENd=PD_OUTPUT;
-    MELEXIS_EN=0; // Low is ON, This is 5V LDO
-    CapacitorCharger_Init();
-    Coilgun_Init();
-    Panda_Init();
-    Joy_Init();
+//    ERRORLEDd=PD_OUTPUT; // error LED
+//    MELEXIS_ENd=PD_OUTPUT;
+//    MELEXIS_EN=0; // Low is ON, This is 5V LDO
+    //CapacitorCharger_Init();
+    //Coilgun_Init();
+    //Panda_Init();
+    //Joy_Init();
     // OLED init must be before gyro or OLED does not init properly
     // Pullup pm p4_4, pu11 tries to  make it high while initializing gyro 
     // and messes up our OLED init later.    OLED_Init(); 
@@ -418,7 +424,7 @@ HardwareSetup(void) {
 #endif
     ENABLE_IRQ;
 
-    Analog_Init();
+    //Analog_Init();
     PWM_Init();
     Oneshot_Init();
 }

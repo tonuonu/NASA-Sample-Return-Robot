@@ -15,7 +15,7 @@
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with TYROS.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this software.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 #include "ior32c111.h"
@@ -38,34 +38,29 @@ float capacitor=0.0f;
 
 int
 main(void) {
-    int j;
-    //int autocharge=0;
     HardwareSetup();    
-    LED1=1;
-    u0tb=0;
+//    u0tb=0;
     //Delay(2);
 //    PANDA=1;
     /* 
      * Position sensors interrupt-driven state machine start  
      */
-    CS4=0;
-    CS7=0;
+    //CS4=0;
+    //CS7=0;
     // 300uS needed. On 48Mhz each cycle is ~21nS, so
     // 300 000nS/21=~1200
-    for(j=0;j<2;j++) {
-        uDelay(255); 
-    }
-    u4tb=0xAA;
-    u7tb=0xAA;
+    //for(j=0;j<2;j++) {
+    //    uDelay(255); 
+    //}
+    //u4tb=0xAA;
+    //u7tb=0xAA;
     /* 
      * Gyroscopic sensor interrupt-driven state machine start  
      */
-#if 0
-    CS6=0;
-    u6tb=L3G4200D_WHOAMI | 0x80;
-#endif
+    //CS6=0;
+    //u6tb=L3G4200D_WHOAMI | 0x80;
     while(1) {
-        __wait_for_interrupt();
-        
+        /* Code hangs here until some interrupt is done */
+        __wait_for_interrupt();        
     }
 }
