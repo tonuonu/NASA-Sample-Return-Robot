@@ -32,6 +32,12 @@ __interrupt void _uart4_receive(void) {
     ir_s4ric = 0;
 }
 
+#pragma vector = UART4_TX
+__interrupt void _uart4_send(void) {
+
+    /* Clear the 'reception complete' flag.	*/
+    ir_s4tic = 0;
+}
 
 void
 SPI4_Init(void) { 

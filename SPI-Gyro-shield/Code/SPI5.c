@@ -32,6 +32,12 @@ __interrupt void _uart5_receive(void) {
     ir_s5ric = 0;
 }
 
+#pragma vector = UART5_TX
+__interrupt void _uart5_send(void) {
+
+    /* Clear the 'reception complete' flag.	*/
+    ir_s5tic = 0;
+}
 
 void
 SPI5_Init(void) { 

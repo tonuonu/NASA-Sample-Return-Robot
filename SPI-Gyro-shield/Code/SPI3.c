@@ -32,6 +32,12 @@ __interrupt void _uart3_receive(void) {
     ir_s3ric = 0;
 }
 
+#pragma vector = UART3_TX
+__interrupt void _uart3_send(void) {
+
+    /* Clear the 'reception complete' flag.	*/
+    ir_s3tic = 0;
+}
 
 void
 SPI3_Init(void) { 

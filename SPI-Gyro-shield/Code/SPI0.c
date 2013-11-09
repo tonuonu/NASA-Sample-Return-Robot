@@ -32,6 +32,14 @@ __interrupt void _uart0_receive(void) {
     ir_s0ric = 0;
 }
 
+#pragma vector = UART0_TX
+__interrupt void _uart0_send(void) {
+
+    /* Clear the 'reception complete' flag.	*/
+    ir_s0tic = 0;
+}
+
+
 void
 SPI0_Init(void) { // Accel sensor
 #define f1_CLK_SPEED 24000000
