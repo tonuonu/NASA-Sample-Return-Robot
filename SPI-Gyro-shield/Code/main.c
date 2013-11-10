@@ -18,49 +18,28 @@
  *  along with this software.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 #include "ior32c111.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "main.h"
 #include "hwsetup.h"
-#include "gyro.h"
-#include "locking.h"
-
 
 extern int alarm;
 volatile unsigned short ticks;
-volatile unsigned short ticks2;
-
-float bat=0.0f;
-float capacitor=0.0f;
-        
 
 int
 main(void) {
-    HardwareSetup();    
-//    u0tb=0;
-    //Delay(2);
-//    PANDA=1;
-    /* 
-     * Position sensors interrupt-driven state machine start  
-     */
-    //CS4=0;
-    //CS7=0;
-    // 300uS needed. On 48Mhz each cycle is ~21nS, so
-    // 300 000nS/21=~1200
-    //for(j=0;j<2;j++) {
-    //    uDelay(255); 
-    //}
-    //u4tb=0xAA;
-    //u7tb=0xAA;
-    /* 
-     * Gyroscopic sensor interrupt-driven state machine start  
-     */
-    //CS6=0;
-    //u6tb=L3G4200D_WHOAMI | 0x80;
+    HardwareSetup();
+    u0tb=0xaa;
+    u2tb=0xaa;
+    u3tb=0xaa;
+    u4tb=0xaa;
+    u5tb=0x00;
     while(1) {
         /* Code hangs here until some interrupt is done */
-        __wait_for_interrupt();        
+        __wait_for_interrupt();
+
     }
 }

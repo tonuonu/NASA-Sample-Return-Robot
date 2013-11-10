@@ -38,15 +38,15 @@ ConfigureOperatingFrequency(char mode) {
     unsigned short i;
 
     prr = 0xAA;
-    ccr = 0x1F;
+    ccr = 0x1F; // 0001 1111
     prr = 0x00;
     prc0 = 1;
-    pm3 = 0x40;                                        // peripheral clock 24MHz
+    pm3 = 0x60; // peripheral clock 48MHz
     prc0 = 0;
     prc2 = 1;
-    *(unsigned short *) &plc0 = 0x0226;                // 48MHz, PLL = 96MHz
+    *(unsigned short *) &plc0 = 0x0226; // 48MHz, PLL = 96MHz
     prc2 = 0;
-    base_freq = 24000000;
+    base_freq = 48000000;
 
     for (i = 0; i < 0x8000u; i++);                         /* Add delay
                                                             * for PLL to
@@ -222,14 +222,14 @@ PWM_Init(void) {
     tabsr = 0x96;
 
     /* Configure outputs */
-    
+#if 0    
     LEFT_PWMd    = PD_OUTPUT;
     LEFT_PWMs    = PF_TIMER;
     RIGHT_PWMd   = PD_OUTPUT;
     RIGHT_PWMs   = PF_TIMER;
     LEFT_PWM     = 0;
     RIGHT_PWM    = 0;
-
+#endif
     // FIXME, timer3 start into right place
     // TABSR_bit.TA3S = 1;
 }
@@ -237,11 +237,11 @@ PWM_Init(void) {
 static void 
 Heartbeat_Init(void) {
     // Init_TMRB5 1 mS timer
+    ticks = 0;
     tb5mr = 0x80;                       // timer mode,fc/8 = 1,0 MHz
     tb5 = 5000;                         // 1MHz/5000 ; Fi = 200Hz
     tb5ic = 1;                          // level 1 interrupt
     tb5s = 1;
-    ticks = 0;
 }
 
 static void
@@ -282,6 +282,28 @@ Oneshot_Init(void) {
     ENABLE_IRQ
 }
 
+static void 
+Led_Init(void) {
+    LED1d  = PD_OUTPUT;
+    LED2d  = PD_OUTPUT;
+    LED3d  = PD_OUTPUT;
+    LED4d  = PD_OUTPUT;
+    LED5d  = PD_OUTPUT;
+    LED1=LED2=LED3=LED4=1;
+}
+
+static void 
+MotorIO_Init(void) {
+    RESET0d = PD_OUTPUT;
+    RESET1d = PD_OUTPUT;
+    RESET2d = PD_OUTPUT;
+    RESET3d = PD_OUTPUT;
+    
+    pu01 = 1; /* enable pullups on P0_4..p0_7 which are CDONE0..3 inputs
+               * Unsure if similar pullups are already in motor driver? 
+               */
+}
+
 void
 HardwareSetup(void) {
     /* 
@@ -289,14 +311,21 @@ HardwareSetup(void) {
      */
     DISABLE_IRQ;
     ConfigureOperatingFrequency(1);
-    LED1d  = PD_OUTPUT;
-    LED2d  = PD_OUTPUT;
-    LED3d  = PD_OUTPUT;
-    LED4d  = PD_OUTPUT;
-    LED5d  = PD_OUTPUT;
-
+    ENABLE_IRQ;
+    pu26=1; // Just to make sure unused P9_1 and P9_3 are not floating
+    Led_Init();
+    MotorIO_Init(); // Reset and DONE pins. SPI is separate
     Heartbeat_Init();
-
+    ifsr00=1; // INT0 in both edges
+    ifsr01=1; // INT1 in both edges
+    ifsr02=1; // INT2 in both edges
+    ifsr03=1; // INT3 in both edges
+    
+    pol_int0ic=0; // This should be 0, "falling edge" to make both edges work
+    pol_int1ic=0; // This should be 0, "falling edge" to make both edges work
+    pol_int2ic=0; // This should be 0, "falling edge" to make both edges work
+    pol_int3ic=0; // This should be 0, "falling edge" to make both edges work
+    
     /* Four motor ports, masters */
     SPI0_Init(); 
     SPI2_Init(); 
@@ -305,8 +334,6 @@ HardwareSetup(void) {
 
     /* Interface to Arduino, slave */
     SPI5_Init();
-
-    ENABLE_IRQ;
 
     PWM_Init();
     Oneshot_Init();

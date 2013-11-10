@@ -28,20 +28,32 @@
 #pragma vector = UART5_RX
 __interrupt void _uart5_receive(void) {
 
+    LED3 = 1; 
+    u5tb=0x00;
+    unsigned short kala;
+    kala=u5rb & 0xff;
+//    __delay_cycles(1ULL);
+    LED3 = 0; 
     /* Clear the 'reception complete' flag.	*/
     ir_s5ric = 0;
 }
 
 #pragma vector = UART5_TX
-__interrupt void _uart5_send(void) {
+__interrupt void _uart5_transmit(void) {
 
-    /* Clear the 'reception complete' flag.	*/
+    LED4 = 1; 
+    u5tb=0x00;
+    //__delay_cycles(1ULL);
+    LED4 = 0; 
+   /* Clear the 'reception complete' flag.	*/
     ir_s5tic = 0;
 }
 
+
 void
-SPI5_Init(void) { 
- 
+SPI5_Init(void) {
+    u5brg =  (unsigned char)(((base_freq)/(2*8000000))-1);
+
     CS5d = PD_OUTPUT;
     CS5=1;
     CLOCK5d = PD_OUTPUT;
@@ -50,41 +62,55 @@ SPI5_Init(void) {
     TX5s = PF_UART;
     RX5s = PF_UART;
 
-    
-    smd0_u5mr = 1;                                        // \ 
-    smd1_u5mr = 0;                                         // >    // Synchronous Serial Mode
-    smd2_u5mr = 0;                                         // /
-    ckdir_u5mr = 0;                                        // internal clock , 243
-    stps_u5mr = 0;                                         // 0 required
-    pry_u5mr = 0;                                          // 0 required
-    prye_u5mr = 0;                                         // 0 required
-    iopol_u5mr = 0;                                        // 0 required
-    clk0_u5c0 = 0;                                         // \ Clock
-    clk1_u5c0 = 0;                                         // /
-    txept_u5c0 = 0;                                        // Transmit
-    crd_u5c0 = 1;                                          // CTS disabled 
-    nch_u5c0 = 0;                                          // Output mode
-    ckpol_u5c0 = 0;                                        // CLK Polarity 0 rising edge, 1 falling edge (0 ok)
-    uform_u5c0 = 1;                                        // MSB first
-    te_u5c1 = 1;                                           // Transmission 
-    ti_u5c1 = 0;                                           // Must be 0 to 
-    re_u5c1 = 0;                                           // Reception is 
-    ri_u5c1 = 0;                                           // Receive
-    u5irs_u5c1 = 1;                                        // 1 when
-    u5rrm_u5c1 = 1;                                        // Continuous
-    u5lch_u5c1 = 0;                                        // Logical
-    u5smr = 0x00;                                          // Set 0
-    u5smr2 = 0x00;                                         // Set 0 
-    sse_u5smr3 = 0;                                        // SS is
-    ckph_u5smr3 = 0;                                       // Non clock
-    dinc_u5smr3 = 0;                                       // Master mode
-    nodc_u5smr3 = 0;                                       // Select a
-    err_u5smr3 = 0;                                        // Error flag,
-    dl0_u5smr3 = 0;                                        // Set 0 for no 
-    dl1_u5smr3 = 0;                                        // Set 0 for no 
-    dl2_u5smr3 = 0;                                        // Set 0 for no 
-    u5smr4 = 0x00;                                         // Set 0 (page
-    u5brg = 3;                                             
-    s5tic = 0x0;
+    smd0_u5mr  = 1;                                        // \ 
+    smd1_u5mr  = 0;                                        //  | Synchronous Serial Mode
+    smd2_u5mr  = 0;                                        // /
+
+    ckdir_u5mr = 1;                                        // 1=external clock   
+    stps_u5mr  = 0;                                        // 0=1 stop bit, 0 required
+    pry_u5mr   = 0;                                        // Parity, 0=odd, 0 required 
+    prye_u5mr  = 0;                                        // Parity Enable? 0=disable, 0 required 
+    iopol_u5mr = 0;                                        // IO Polarity, 0=not inverted, 0 required
+
+    clk0_u5c0 = 0;                                         // Clock source f1 for u4brg
+    clk1_u5c0 = 0;                                         // 
+    txept_u5c0 = 0;                                        // Transmit register empty flag 
+    crd_u5c0 = 1;                                          // CTS disabled when 1
+    nch_u5c0 = 1;                                          // 0=Output mode "push-pull" for TXD and CLOCK pin 
+    ckpol_u5c0 = 1;                                        // CLK Polarity 0 rising edge, 1 falling edge
+    uform_u5c0 = 1;                                        // 1=MSB first
+
+    te_u5c1 = 1;                                           // 1=Transmission Enable
+    ti_u5c1 = 0;                                           // Must be 0 to send or receive
+    re_u5c1 = 1;                                           // Reception Enable when 1
+    ri_u5c1 = 0;                                           // Receive complete flag - U2RB is empty.
+    u5irs_u5c1 = 1;                                        // Interrupt  when transmission is completed. 
+    u5rrm_u5c1 = 0;                                        // Continuous receive mode off
+    u5lch_u5c1 = 0;                                        // Logical inversion off 
+
+    u5smr = 0x00;
+    u5smr2 = 0x00;
+
+    sse_u5smr3 = 0;                                        // SS is disabled when 0
+    ckph_u5smr3 = 0;                                       // Non clock delayed 
+    dinc_u5smr3 = 1;                                       // Slave mode when 1. Unsure if should be unless SS is used too
+    nodc_u5smr3 = 0;                                       // Select a clock output  mode "push-pull" when 0 
+    err_u5smr3 = 0;                                        // Error flag, no error when 0 
+    dl0_u5smr3 = 0;                                        // Set 0 for no  delay 
+    dl1_u5smr3 = 0;                                        // Set 0 for no  delay 
+    dl2_u5smr3 = 0;                                        // Set 0 for no  delay 
+
+    u5smr4 = 0x00;
+
+    DISABLE_IRQ
+    /* 
+     * Middle interrupt priority
+     */
+    ilvl_s5ric =1;
+    ir_s5ric   =0;            
+    ilvl_s5tic =1;
+    ir_s5tic   =0;            
+    ENABLE_IRQ
 }
+
 

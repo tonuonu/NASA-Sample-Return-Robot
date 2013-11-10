@@ -39,6 +39,16 @@ void HardwareSetup(void);
 #define LED5         p1_4
 #define LED5d        pd1_4
 
+#define RESET0       p0_3
+#define RESET0d      pd0_3
+#define RESET1       p0_2
+#define RESET1d      pd0_2
+#define RESET2       p0_1
+#define RESET2d      pd0_1
+#define RESET3       p0_0
+#define RESET3d      pd0_0
+
+#if 0
 #define ERRORLEDd    pd1_4
 #define ERRORLED     p1_4
 
@@ -66,8 +76,9 @@ void HardwareSetup(void);
 #define RIGHT_ENBd     pd2_5
 #define LEFT_ENAd      pd2_6
 #define LEFT_ENBd      pd2_7
+#endif
 
-// SPI0, motor 1
+// SPI0, motor 0
 #define CS0d         pd6_0
 #define CS0          p6_0
 #define CS0s         p6_0s
@@ -81,10 +92,7 @@ void HardwareSetup(void);
 #define TX0s         p6_3s
 #define TX0d         pd6_3
 
-// SPI2, motor 2
-#define CS2d         pd7_7
-#define CS2          p7_7
-#define CS2s         p7_7s
+// SPI2, motor 1
 #define TX2          p7_0
 #define RX2          p7_1
 #define TX2s         p7_0s
@@ -94,18 +102,27 @@ void HardwareSetup(void);
 #define CLOCK2       p7_2
 #define CLOCK2d      pd7_2
 #define CLOCK2s      p7_2s
+#define CS2d         pd7_3
+#define CS2          p7_3
+#define CS2s         p7_3s
 
-// SPI3, motor 3
+// SPI3, motor 2
 #define CLOCK3       p4_1
 #define CLOCK3d      pd4_1
 #define CLOCK3s      p4_1s
+#define CS3d         pd4_0
+#define CS3          p4_0
+#define CS3s         p4_0s
 
 #define TX3          p4_3
 #define TX3s         p4_3s
 #define TX3d         pd4_3
+#define RX3          p4_2
+#define RX3s         p4_2s
+#define RX3d         pd4_2
 
 
-// SPI4, motor 4
+// SPI4, motor 3
 #define CS4         p9_4
 #define CS4d        pd9_4
 #define CLOCK4      p9_5
@@ -122,6 +139,7 @@ void HardwareSetup(void);
 
 #define CS5         p8_3
 #define CS5d        pd8_3
+#define CS5s        p8_3s
 #define CLOCK5      p7_7
 #define CLOCK5d     pd7_7
 #define CLOCK5s     p7_7s
@@ -147,3 +165,5 @@ struct statuses {
 void Read_AD(void);
 
 extern volatile struct statuses status;
+extern unsigned int base_freq;
+

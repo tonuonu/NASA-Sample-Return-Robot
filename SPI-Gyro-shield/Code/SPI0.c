@@ -28,22 +28,29 @@
 #pragma vector = UART0_RX
 __interrupt void _uart0_receive(void) {
 
-    /* Clear the 'reception complete' flag.	*/
+    LED1 = 1; 
+//    u0tb=0xaa;
+//    __delay_cycles(1ULL);
+    LED1 = 0; 
+   /* Clear the 'reception complete' flag.	*/
     ir_s0ric = 0;
 }
 
 #pragma vector = UART0_TX
-__interrupt void _uart0_send(void) {
+__interrupt void _uart0_transmit(void) {
 
-    /* Clear the 'reception complete' flag.	*/
+    LED2 = 1; 
+    u0tb=0xaa;
+    //__delay_cycles(1ULL);
+    LED2 = 0; 
+   /* Clear the 'reception complete' flag.	*/
     ir_s0tic = 0;
 }
 
 
 void
-SPI0_Init(void) { // Accel sensor
-#define f1_CLK_SPEED 24000000
-    u0brg =  (unsigned char)(((f1_CLK_SPEED)/(2*500000))-1);
+SPI0_Init(void) {
+    u0brg =  (unsigned char)(((base_freq)/(2*100000))-1);
 
     CS0d = PD_OUTPUT;
     CS0=1;
@@ -67,8 +74,8 @@ SPI0_Init(void) { // Accel sensor
     clk1_u0c0 = 0;                                         // 
     txept_u0c0 = 0;                                        // Transmit register empty flag 
     crd_u0c0 = 1;                                          // CTS disabled when 1
-    nch_u0c0 = 1;                                          // 0=Output mode "open drain" for TXD and CLOCK pin 
-    ckpol_u0c0 = 0;                                        // CLK Polarity 0 rising edge, 1 falling edge
+    nch_u0c0 = 0;                                          // 0=Output mode "push-pull" for TXD and CLOCK pin 
+    ckpol_u0c0 = 1;                                        // CLK Polarity 0 rising edge, 1 falling edge
     uform_u0c0 = 1;                                        // 1=MSB first
 
     te_u0c1 = 1;                                           // 1=Transmission Enable
@@ -83,7 +90,7 @@ SPI0_Init(void) { // Accel sensor
     u0smr2 = 0x00;
 
     sse_u0smr3 = 0;                                        // SS is disabled when 0
-    ckph_u0smr3 = 0;                                       // Non clock delayed 
+    ckph_u0smr3 = 1;                                       // Non clock delayed 
     dinc_u0smr3 = 0;                                       // Master mode when 0
     nodc_u0smr3 = 0;                                       // Select a clock output  mode "push-pull" when 0 
     err_u0smr3 = 0;                                        // Error flag, no error when 0 
@@ -98,8 +105,10 @@ SPI0_Init(void) { // Accel sensor
      * Lowest interrupt priority
      * we do not care about speed
      */
-    ilvl_s0ric =1;       
+    ilvl_s0ric =1;
     ir_s0ric   =0;            
+    ilvl_s0tic =1;
+    ir_s0tic   =0;            
     ENABLE_IRQ
 }
 

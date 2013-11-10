@@ -28,60 +28,88 @@
 #pragma vector = UART3_RX
 __interrupt void _uart3_receive(void) {
 
-    /* Clear the 'reception complete' flag.	*/
+    LED1 = 1; 
+//    u3tb=0xaa;
+//    __delay_cycles(1ULL);
+    LED1 = 0; 
+   /* Clear the 'reception complete' flag.	*/
     ir_s3ric = 0;
 }
 
 #pragma vector = UART3_TX
-__interrupt void _uart3_send(void) {
+__interrupt void _uart3_transmit(void) {
 
-    /* Clear the 'reception complete' flag.	*/
+    LED2 = 1; 
+    u3tb=0xaa;
+    //__delay_cycles(1ULL);
+    LED2 = 0; 
+   /* Clear the 'reception complete' flag.	*/
     ir_s3tic = 0;
 }
 
+
 void
-SPI3_Init(void) { 
-  
+SPI3_Init(void) {
+    u3brg =  (unsigned char)(((base_freq)/(2*100000))-1);
+
+    CS3d = PD_OUTPUT;
+    CS3=1;
     CLOCK3d = PD_OUTPUT;
     CLOCK3s = PF_UART;
-
     TX3d = PD_OUTPUT;
     TX3s = PF_UART;
-    
-    smd0_u3mr = 1;                                        // \ 
-    smd1_u3mr = 0;                                         // >    // Synchronous Serial Mode
-    smd2_u3mr = 0;                                         // /
-    ckdir_u3mr = 0;                                        // internal clock , 243
-    stps_u3mr = 0;                                         // 0 required
-    pry_u3mr = 0;                                          // 0 required
-    prye_u3mr = 0;                                         // 0 required
-    iopol_u3mr = 0;                                        // 0 required
-    clk0_u3c0 = 0;                                         // \ Clock
-    clk1_u3c0 = 0;                                         // /
-    txept_u3c0 = 0;                                        // Transmit
-    crd_u3c0 = 1;                                          // CTS disabled 
-    nch_u3c0 = 0;                                          // Output mode
-    ckpol_u3c0 = 0;                                        // CLK Polarity 0 rising edge, 1 falling edge (0 ok)
-    uform_u3c0 = 1;                                        // MSB first
-    te_u3c1 = 1;                                           // Transmission 
-    ti_u3c1 = 0;                                           // Must be 0 to 
-    re_u3c1 = 0;                                           // Reception is 
-    ri_u3c1 = 0;                                           // Receive
-    u3irs_u3c1 = 1;                                        // 1 when
-    u3rrm_u3c1 = 1;                                        // Continuous
-    u3lch_u3c1 = 0;                                        // Logical
-    u3smr = 0x00;                                          // Set 0
-    u3smr2 = 0x00;                                         // Set 0 
-    sse_u3smr3 = 0;                                        // SS is
-    ckph_u3smr3 = 0;                                       // Non clock
-    dinc_u3smr3 = 0;                                       // Master mode
-    nodc_u3smr3 = 0;                                       // Select a
-    err_u3smr3 = 0;                                        // Error flag,
-    dl0_u3smr3 = 0;                                        // Set 0 for no 
-    dl1_u3smr3 = 0;                                        // Set 0 for no 
-    dl2_u3smr3 = 0;                                        // Set 0 for no 
-    u3smr4 = 0x00;                                         // Set 0 (page
-    u3brg = 3;                                             
-    s3tic = 0x0;
+    RX3s = PF_UART;
+
+    smd0_u3mr  = 1;                                        // \ 
+    smd1_u3mr  = 0;                                        //  | Synchronous Serial Mode
+    smd2_u3mr  = 0;                                        // /
+
+    ckdir_u3mr = 0;                                        // 0=internal clock   
+    stps_u3mr  = 0;                                        // 0=1 stop bit, 0 required
+    pry_u3mr   = 0;                                        // Parity, 0=odd, 0 required 
+    prye_u3mr  = 0;                                        // Parity Enable? 0=disable, 0 required 
+    iopol_u3mr = 0;                                        // IO Polarity, 0=not inverted, 0 required
+
+    clk0_u3c0 = 0;                                         // Clock source f1 for u4brg
+    clk1_u3c0 = 0;                                         // 
+    txept_u3c0 = 0;                                        // Transmit register empty flag 
+    crd_u3c0 = 1;                                          // CTS disabled when 1
+    nch_u3c0 = 0;                                          // 0=Output mode "push-pull" for TXD and CLOCK pin 
+    ckpol_u3c0 = 1;                                        // CLK Polarity 0 rising edge, 1 falling edge
+    uform_u3c0 = 1;                                        // 1=MSB first
+
+    te_u3c1 = 1;                                           // 1=Transmission Enable
+    ti_u3c1 = 0;                                           // Must be 0 to send or receive
+    re_u3c1 = 1;                                           // Reception Enable when 1
+    ri_u3c1 = 0;                                           // Receive complete flag - U2RB is empty.
+    u3irs_u3c1 = 1;                                        // Interrupt  when transmission is completed. 
+    u3rrm_u3c1 = 0;                                        // Continuous receive mode off
+    u3lch_u3c1 = 0;                                        // Logical inversion off 
+
+    u3smr = 0x00;
+    u3smr2 = 0x00;
+
+    sse_u3smr3 = 0;                                        // SS is disabled when 0
+    ckph_u3smr3 = 1;                                       // Non clock delayed 
+    dinc_u3smr3 = 0;                                       // Master mode when 0
+    nodc_u3smr3 = 0;                                       // Select a clock output  mode "push-pull" when 0 
+    err_u3smr3 = 0;                                        // Error flag, no error when 0 
+    dl0_u3smr3 = 0;                                        // Set 0 for no  delay 
+    dl1_u3smr3 = 0;                                        // Set 0 for no  delay 
+    dl2_u3smr3 = 0;                                        // Set 0 for no  delay 
+
+    u3smr4 = 0x00;
+
+    DISABLE_IRQ
+    /* 
+     * Lowest interrupt priority
+     * we do not care about speed
+     */
+    ilvl_s3ric =1;
+    ir_s3ric   =0;            
+    ilvl_s3tic =1;
+    ir_s3tic   =0;            
+    ENABLE_IRQ
 }
+
 
