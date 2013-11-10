@@ -54,9 +54,9 @@ void
 SPI5_Init(void) {
     u5brg =  (unsigned char)(((base_freq)/(2*8000000))-1);
 
-    CS5d = PD_OUTPUT;
-    CS5=1;
-    CLOCK5d = PD_OUTPUT;
+    //CS5d = PD_OUTPUT; Input!!
+    //CS5=1;
+    //CLOCK5d = PD_OUTPUT;
     CLOCK5s = PF_UART;
     TX5d = PD_OUTPUT;
     TX5s = PF_UART;
@@ -72,7 +72,7 @@ SPI5_Init(void) {
     prye_u5mr  = 0;                                        // Parity Enable? 0=disable, 0 required 
     iopol_u5mr = 0;                                        // IO Polarity, 0=not inverted, 0 required
 
-    clk0_u5c0 = 0;                                         // Clock source f1 for u4brg
+    clk0_u5c0 = 0;                                         // Clock source f1 for u5brg
     clk1_u5c0 = 0;                                         // 
     txept_u5c0 = 0;                                        // Transmit register empty flag 
     crd_u5c0 = 1;                                          // CTS disabled when 1
@@ -84,7 +84,7 @@ SPI5_Init(void) {
     ti_u5c1 = 0;                                           // Must be 0 to send or receive
     re_u5c1 = 1;                                           // Reception Enable when 1
     ri_u5c1 = 0;                                           // Receive complete flag - U2RB is empty.
-    u5irs_u5c1 = 1;                                        // Interrupt  when transmission is completed. 
+    u5irs_u5c1 = 1;                                        // Interrupt when transmission is completed. 
     u5rrm_u5c1 = 0;                                        // Continuous receive mode off
     u5lch_u5c1 = 0;                                        // Logical inversion off 
 
@@ -106,7 +106,7 @@ SPI5_Init(void) {
     /* 
      * Middle interrupt priority
      */
-    ilvl_s5ric =1;
+    ilvl_s5ric =7;
     ir_s5ric   =0;            
     ilvl_s5tic =1;
     ir_s5tic   =0;            

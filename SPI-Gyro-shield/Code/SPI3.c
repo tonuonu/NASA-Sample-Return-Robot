@@ -50,7 +50,7 @@ __interrupt void _uart3_transmit(void) {
 
 void
 SPI3_Init(void) {
-    u3brg =  (unsigned char)(((base_freq)/(2*100000))-1);
+    u3brg =  (unsigned char)(((base_freq)/(2*MOTORS_SPI_SPEED))-1);
 
     CS3d = PD_OUTPUT;
     CS3=1;
@@ -70,7 +70,7 @@ SPI3_Init(void) {
     prye_u3mr  = 0;                                        // Parity Enable? 0=disable, 0 required 
     iopol_u3mr = 0;                                        // IO Polarity, 0=not inverted, 0 required
 
-    clk0_u3c0 = 0;                                         // Clock source f1 for u4brg
+    clk0_u3c0 = 0;                                         // Clock source f1 for u3brg
     clk1_u3c0 = 0;                                         // 
     txept_u3c0 = 0;                                        // Transmit register empty flag 
     crd_u3c0 = 1;                                          // CTS disabled when 1

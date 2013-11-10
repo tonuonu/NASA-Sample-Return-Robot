@@ -19,6 +19,7 @@
  *
  */
 
+#define MOTORS_SPI_SPEED 10000
 
 /* Four motor ports */
 void SPI0_Init(void); 
@@ -30,32 +31,3 @@ void SPI4_Init(void);
 void SPI5_Init(void);
 
 
-#if 0
-
-void
-gyro_send(unsigned char c);
-
-unsigned short 
-SPI2_receive(void);
-
-void
-SPI3_send_data(unsigned char c);
-
-void
-SPI3_send_cmd(unsigned char c);
-
-void
-SPI4_send(unsigned short c);
-
-short unsigned
-SPI4_receive(void);
-
-void
-SPI6_send(unsigned short c);
-
-short unsigned
-SPI6_receive(void);
-
-void
-SPI7_send(unsigned short c);
-#endif

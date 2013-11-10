@@ -50,7 +50,7 @@ __interrupt void _uart0_transmit(void) {
 
 void
 SPI0_Init(void) {
-    u0brg =  (unsigned char)(((base_freq)/(2*100000))-1);
+    u0brg =  (unsigned char)(((base_freq)/(2*MOTORS_SPI_SPEED))-1);
 
     CS0d = PD_OUTPUT;
     CS0=1;
@@ -70,7 +70,7 @@ SPI0_Init(void) {
     prye_u0mr  = 0;                                        // Parity Enable? 0=disable, 0 required 
     iopol_u0mr = 0;                                        // IO Polarity, 0=not inverted, 0 required
 
-    clk0_u0c0 = 0;                                         // Clock source f1 for u4brg
+    clk0_u0c0 = 0;                                         // Clock source f1 for u0brg
     clk1_u0c0 = 0;                                         // 
     txept_u0c0 = 0;                                        // Transmit register empty flag 
     crd_u0c0 = 1;                                          // CTS disabled when 1
