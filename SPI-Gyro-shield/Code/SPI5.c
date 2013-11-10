@@ -83,8 +83,8 @@ SPI5_Init(void) {
     te_u5c1 = 1;                                           // 1=Transmission Enable
     ti_u5c1 = 0;                                           // Must be 0 to send or receive
     re_u5c1 = 1;                                           // Reception Enable when 1
-    ri_u5c1 = 0;                                           // Receive complete flag - U2RB is empty.
-    u5irs_u5c1 = 1;                                        // Interrupt when transmission is completed. 
+    ri_u5c1 = 0;                                           // Receive complete flag - U5RB is empty.
+    u5irs_u5c1 = 1;                                        // Interrupt when transmission is completed.
     u5rrm_u5c1 = 0;                                        // Continuous receive mode off
     u5lch_u5c1 = 0;                                        // Logical inversion off 
 
@@ -93,7 +93,7 @@ SPI5_Init(void) {
 
     sse_u5smr3 = 0;                                        // SS is disabled when 0
     ckph_u5smr3 = 0;                                       // Non clock delayed 
-    dinc_u5smr3 = 1;                                       // Slave mode when 1. Unsure if should be unless SS is used too
+    dinc_u5smr3 = 0;                                       // Slave mode when 1. Unsure if should be unless SS is used too
     nodc_u5smr3 = 0;                                       // Select a clock output  mode "push-pull" when 0 
     err_u5smr3 = 0;                                        // Error flag, no error when 0 
     dl0_u5smr3 = 0;                                        // Set 0 for no  delay 
