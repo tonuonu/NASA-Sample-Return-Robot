@@ -36,7 +36,11 @@ main(void) {
     u2tb=0xaa;
     u3tb=0xaa;
     u4tb=0xaa;
-    u5tb=0x00;
+    //u5tb=0x00; // important.
+    
+    volatile unsigned short kala;
+    kala=u5rb & 0xff;
+    
     while(1) {
         /* Code hangs here until some interrupt is done */
         __wait_for_interrupt();

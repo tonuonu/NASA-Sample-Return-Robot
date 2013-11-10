@@ -325,6 +325,11 @@ HardwareSetup(void) {
     pol_int1ic=0; // This should be 0, "falling edge" to make both edges work
     pol_int2ic=0; // This should be 0, "falling edge" to make both edges work
     pol_int3ic=0; // This should be 0, "falling edge" to make both edges work
+
+    ilvl_int1ic = 1; // level 1 int
+    lvs_int1ic  = 0; // edge sensitive
+
+
     
     /* Four motor ports, masters */
     SPI0_Init(); 
