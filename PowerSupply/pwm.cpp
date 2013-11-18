@@ -25,6 +25,7 @@ User Includes (Project Level Includes)
 #include "switch.h"
 /* Declares function prototypes defined in this file */
 #include "pwm.h"
+#include <stdint.h>
 
 /******************************************************************************
 * Local Function Prototypes
@@ -255,12 +256,14 @@ void CB_Switch_Press(void)
 * Argument     : none
 * Return value : none
 *******************************************************************************/
+
 #pragma vector=VECT_MTU3_TGIA3
 __interrupt void Excep_MTU3_TGIA3(void)
 {  
+  static uint16_t counter=0;
   /* Stop the TCNT counter */  
   MTU.TSTR.BIT.CST3 = 0x0;
-      
+#if 1
   /* Update the duty cycle if SW1 hasn't been pressed. */
   if(gVaryDutyCycle == true)
   {  
@@ -273,22 +276,26 @@ __interrupt void Excep_MTU3_TGIA3(void)
     /* Check if the duty cycle equals 90% */
     if(gDutyPercentage > 43200)
     {
+#endif
       /* Reset the duty cyccle to 10% */
       MTU3.TGRB = 4800;
+#if 1
     }
   }
-  
-  static int counter=0;
+#endif
+  //unsigned char *p = (unsigned char *)0x07000000;
   switch(counter) {
   case 0:
       LED0 ^=1;
       /* Configure buzzer for peripheral function */
       PORT1.PMR.BIT.B7 = 1;
+
       counter++;
       break;
-  case 10:
+  case 2:
       /* Configure buzzer for NOT peripheral function */
       PORT1.PMR.BIT.B7 = 0;
+//      for(int i=0;i<10;i++) *p++  = i;      
       counter++;
       break;
   case 999:
@@ -297,9 +304,16 @@ __interrupt void Excep_MTU3_TGIA3(void)
   default:
       counter++;
   }
+  if(counter >= 999)
+     counter=0;
+#if 0
+  if(counter%2)  
+    OLED_DATA_PORT=0x55;
+  else
+    OLED_DATA_PORT=0xAA;
+#endif  
+  
+//  Init_OLED();
   /* Start the TCNT counter */  
   MTU.TSTR.BIT.CST3 = 0x1;    
 }
-/*******************************************************************************
-* End of function Excep_MTU3_TGIA3
-*******************************************************************************/

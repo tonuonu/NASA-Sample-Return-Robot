@@ -40,6 +40,8 @@ __interrupt void _uart5_receive(void) {
 __interrupt void _uart5_transmit(void) {
 
     LED4 = 1; 
+    //volatile unsigned short dummy = u5rb & 0xff;
+    
     u5tb=0x00;
     LED4 = 0; 
    /* Clear the 'reception complete' flag.	*/

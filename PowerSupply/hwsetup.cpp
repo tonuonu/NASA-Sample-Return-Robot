@@ -106,7 +106,9 @@ void ConfigureOperatingFrequency(void)
   Peripheral Module Clock B..........48MHz   
   FlashIF Clock......................48MHz
   External Bus Clock.................48MHz */       
-  SYSTEM.SCKCR.LONG = 0x21821211;    
+  SYSTEM.SCKCR.LONG = 0x21821211; 
+//  SYSTEM.SCKCR.BIT.BCK=6; // Change bus speed to lower, /64 divisor 
+//  SYSTEM.SCKCR.BIT.PSTOP1=1; // Disable BCLK pin, it is useless for us;
   
   /* Configure the clocks as follows -
   Clock Description              Frequency
@@ -138,31 +140,11 @@ void ConfigureOutputPorts(void)
     /* Configure the LED pins (LED0-LED3) as outputs */
   LED0_PORT_DIR = 0x1;
   LED1_PORT_DIR = 0x1;
-//  LED2_PORT_DIR = 0x1;
-//  LED3_PORT_DIR = 0x1;
 
   /* Set LED pin outputs as high (all LEDs off) */
   LED0 = LED_OFF;
   LED1 = LED_OFF;
-//  LED2 = LED_OFF;
-//  LED3 = LED_OFF;
-#if 0  
-    /* Configure the debug LCD data pins (DLCD7-DLCD4) as outputs */
-  LCD_DATA_DIR_PORT = 0xF0;
-      
-  /* Set debug LCD data pin (DLCD7-DLCD4) outputs as low */
-  LCD_DATA_PORT = 0x00;
-  
-  /* Configure the debug LCD control pin (DLCDRS) and enable pin (DLCDE)
-     as output */
-  RS_PIN_DIR = 0x1;
-  E_PIN_DIR  = 0x1;
-      
-  /* Set the debug LCD control pin (DLCDRS) and enable pin (DLCDE) as output
-     low */
-  RS_PIN = 0x0;
-  E_PIN  = 0x0;  
-#endif
+
 }
 /*******************************************************************************
 * End of function ConfigureOutputPorts

@@ -8,9 +8,10 @@ uDelay(unsigned char l) {
         __no_operation();
 
 }
-
-static inline void udelay(unsigned int usec) {
+/*
+static inline void udelay(const unsigned long usec) {
     // On 48 Mhz we do 48 000 000 cycles per second
     // or 48 cycles per microsecond
-    __delay_cycles(48UL*(unsigned long)usec);
+    __delay_cycles(48UL*(const unsigned long)usec);
 }
+*/

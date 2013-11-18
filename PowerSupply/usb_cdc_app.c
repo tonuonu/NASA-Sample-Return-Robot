@@ -91,7 +91,7 @@ static void CBDoneWrite(USB_ERR _err);
 extern volatile float adc[8];
 void USB_CDC_APP_Main(void)
 {    
-  USBCDC_Init();
+//  USBCDC_Init();
   
   __enable_interrupt();
   
@@ -100,11 +100,11 @@ void USB_CDC_APP_Main(void)
     volatile uint32_t DelayPreWrite = DELAY_VALUE_INITIAL;
     
     /*Wait for USB cable to be connected */
-    while(false == USBCDC_IsConnected());
-    while(0 != DelayPreWrite) {
+  //  while(false == USBCDC_IsConnected());
+   // while(0 != DelayPreWrite) {
       DelayPreWrite--;
       __no_operation();
-    }
+   // }
   
     /*Reset the application data for a new connection */
     InitialiseData();

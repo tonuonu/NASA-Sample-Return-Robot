@@ -7,14 +7,17 @@
 //#include "async.h"
 #include "usb_cdc_app.h"
 #include "adc12repeat.h"
+#include "low_voltage_detection.h"
 
 int main() {
     HardwareSetup();
-    //__enable_interrupt();
+    //Init_VoltageDetect();
+//__enable_interrupt();
 //    Init_OLED();
-    Init_RTC();
+//    Init_RTC();
+    Init_OLED();
     Init_PWM();
-    Init_ADC12Repeat();
+//    Init_ADC12Repeat();
     //Init_UART();  
     USB_CDC_APP_Main();    
     return 0;
