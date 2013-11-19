@@ -15,7 +15,7 @@
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with TYROS.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with TYROS.  If not, see <http://w.gnu.org/licenses/>.
  *
  */
 
@@ -27,25 +27,21 @@
 
 void Write_Data(unsigned char dat) {
     OLED_DC=1;
-    __delay_cycles(96UL*1UL); // 1us
     OLED_DATA_PORT=dat;
-    __delay_cycles(96UL*1UL); // 1us
     OLED_WR=0;
-    __delay_cycles(96UL*1UL); // 1us
+    __delay_cycles(24UL); // 0.250us
     OLED_WR=1;
-    __delay_cycles(96UL*1UL); // 1us
+    __delay_cycles(24UL); // 0.250us
     return;
 }
 
 void Write_Instruction(unsigned char cmd) {
     OLED_DC=0;
-    __delay_cycles(96UL*1UL); // 1us
     OLED_DATA_PORT=cmd;
-    __delay_cycles(96UL*1UL); // 1us
     OLED_WR=0;
-    __delay_cycles(96UL*1UL); // 1us
+    __delay_cycles(24UL); // 0.250us
     OLED_WR=1;
-    __delay_cycles(96UL*1UL); // 1us
+    __delay_cycles(24UL); // 0.250us
     return;
 }
 
@@ -268,99 +264,25 @@ OLED_Set_Command_Lock(unsigned char d) {
     //     0x16 => All Commands are locked except 0xFD.
     OLED_CS = 1;
 }
+const static unsigned int width = 256;
+const static unsigned int height = 64;
 
-//#include "phippi.h"
-const unsigned char phippi[] = 
-"                                                                                                         "
-"                                                                                                         "
-"                                                                                                         "
-"                               .                                                                         "
-"                               .                                          .                              "
-"                                .                                        .                               "
-"                                .                                       ..                               "
-"                                 .                                     ..                                "
-"                                  .                                   ..                                 "
-"                                   .   . .. ..  .  ...  . .  . .      .                                  "
-"                                   ..  .......  . ....... .. ...... ...                                  "
-"                                    .. .......... ....................                                   "
-"                                    .................................                                    "
-"                                   .....      ........     ...   ......                                  "
-"                                .. .........                     ......                                  "
-"                                 .... . .....                       ....                                 "
-"                                 ...    ...                          ...         .                       "
-"                            .   ....    . .                        33....      ..                        "
-"                             ......      3333     ...      33..    33.....   ..                          "
-"                              .....      333.    3333..   3333..  .... ......                            "
-"                             ........    ....   33333..  33333..   ... ...                               "
-"                              ........    ..    3333...  ........     .....                              "
-"                               ...              .......  .......       .....                             "
-"                   .      . ......               ......   ......       ......                            "
-"                   ..     ........                ....     ....         .......                          "
-"                    .     ......                                         ........  .                     "
-"             .      ..   .....                                            ........ .....                 "
-"             ..     ..  .....                                                 ..........                 "
-"             ...   . .....  . ..                                                ..  ..... ..             "
-"              ..    ...  ..  ... ..          .                      ..       ....  .. ....  .            "
-"        .     ..... .. ..... .....       .   .....              .... ..        ..  .........             "
-"         .    ..... . ...    ....       ..   .........     .  .....   .       ....   ... ...             "
-"          .  ...   ..      . .. ...   ..      ....................             ...       ....            "
-"           ....          .........  ...          ...............        ..      ...      ....            "
-"            ..  .....  ....   ...   .                  .   ....      . ....   .....      ......          "
-"       ....... ....  .        ..            .  .                     ......     ...      ....            "
-"      .......    .  ..         ...   .  . ...  .                   ........   .........  .....           "
-"          ...   .   ..       ...  ...    ....... .                  .... ..    .......... ....           "
-"          ..    .  ...     ........     ...........         .   . .........    .....      ......         "
-"         ...   .   . ..         ..... ....   ..... .         .   .... .....      ...      ....           "
-"      .....  ..  .. ....        ....   ...  ...  .            ..  ...    ...   ..... .   ...   ..        "
-"      ............  ....      ......  ......      . .  .   ... .. ..    ...     .....  .  .. . .         "
-"         .   ...   ......    ...... ..   ....      ....       ......    ..     .....    . .. . ...       "
-"             .     ......  ....   ...    ....      .....  .     .....  ...        ...    .....  .....    "
-"        .    .   ....  ... .      ..        ..    ......  ............ ...         ..    ....  ....      "
-" ........    . .....  ......       ....    ........ ...     ......  . ....      ....    .....  .. ..     "
-"     ...  ........   . .....        ..   .......... ...     .....     .......   ...     .....  .. ....   "
-"      .. .....       .........       .   .........  ....    .....     .....    ...     ..........  ..    "
-"       .          . . . . .....      ...     . ...   ..... .....     ...     ......   .... ......   .... "
-"       .          .. . .. .....       ..   .  ....   ...   ..... .......      ..............    ..   ... "
-"      ..    .    ... . .. ......     ....   .. . ..  ..      ............    ...   .........     .    .  "
-"      .     .    ....  .. .......   ... ..    . ........   .....   ..  ..   . ..    ... ....    . ..   . "
-"     ..     ......  .. .   . .........  ...  ..  ......   .  ..    ...  .   ...    ....  ...    .  ..  . "
-"    . .     ...  ...       . ........    ..      ..  ...    ....  ......     .    ...... ..    ...  .. . "
-"   .  .... ..    .....     .   .. ...    ..     ...  ...   .....  .....     .     ...    ..   .....   ..."
-"   .  ......     .......       .. .....   ..    ...   ..     ..........    ...   ....     .. ...         "
-"  .   .    .     ...           .. .........     ...   ...  .....  ....     .........      ....           "
-"      .    . ... .....         . ... .......    ...        .....  .....     ...... .      ..             "
-"          .........            . . . ....          .  ..   .. ..  ..         ..                          "
-"       ....     . ..           . .   ...           . .        ....                                       "
-"       .... .   .  .                                ..          .                                        "
-"       ... ......                                                                                        "
-"             ..                                                                                          "
-"             .                                                                                           ";
+
+#include "kuukulgur.h"
 
 void
 OLED_Show_Logo(void) {        
     unsigned char a=0;
-    unsigned char b=64-1;
-    unsigned char i, j;
-    unsigned int k=0;
+    unsigned char b=height-1;
+    unsigned int i, j;
     OLED_Set_Column_Address(OLED_Shift + a, OLED_Shift + b );
     OLED_Set_Row_Address(0,OLED_Max_Row );
     OLED_CS = 0;
     OLED_Set_Write_RAM();
-    for (i = 0; i <OLED_Max_Row+1 ; i++) { /* row */
-	for (j = 0; j < 11; j++) {
-	    Write_Data(0x00);
-	}
-        for (j = 0; j < 106; j++,k++) { /* col */
-           if(phippi[k]==' ')
-              Write_Data(0x00);
-            else if(phippi[k]=='.')
-              Write_Data(0xFF);
-            else 
-              Write_Data(phippi[k]);
-	}
-        k--;
-	for (j = 0; j < 11; j++) {
-	    Write_Data(0x00);
+
+    for (i = 0; i <height ; i++) { /* row */
+        for (j = 0; j < width/2; j++) { /* col */        
+              Write_Data(pic[i*(width/2)+j]);
 	}
     }
     OLED_CS = 1;
@@ -544,14 +466,14 @@ OLED_Show_Font57(unsigned char a, unsigned char b, unsigned char c,
 //    a: Database
 //    b: Start X Address
 //    c: Start Y Address
-//    * Must write "0" in the end...
+//    * Must write "0" in the end.
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 void
 OLED_Show_String(unsigned char a,  char *Data_Pointer, unsigned char b, unsigned char c) {
     char *Src_Pointer;
     Src_Pointer = Data_Pointer;
     OLED_Show_Font57(1, 32, b, c);			   // No-Break Space
-    //   Must be written first before the string start...
+    //   Must be written first before the string start.
     do {
 	OLED_Show_Font57(a, *Src_Pointer, b, c);
 	Src_Pointer++;
@@ -699,17 +621,11 @@ Init_OLED() {
     OLED_Set_VCOMH(0x07);				   // Set Common Pins Deselect Voltage Level as 0.86*VCC
     OLED_Set_Display_Mode(0x02);			   // Normal Display Mode (0x00/0x01/0x02/0x03)
     OLED_Set_Partial_Display(0x01, 0x00, 0x00);		   // Disable Partial Display
-    OLED_Fill_RAM(0x00);				   // Clear Screen
+    OLED_Fill_RAM(0x00);
     OLED_Set_Display_On_Off(0x01);			   // Display On (0x00/0x01)
     OLED_Show_Logo();
+    __delay_cycles(96UL*1000UL*1000UL); // 1s delay    
 
-#if 0
-    Write_Instruction(0xA4); /*normal display*/
-    __delay_cycles(96UL*1000000UL); // 1s delay
-    Write_Instruction(0xa7);//--set Inverse Display
-    __delay_cycles(96UL*1000000UL); // 1s delay
-#endif
-    OLED_Show_String(  1, "X", 0, 0*8);
 }
 
 

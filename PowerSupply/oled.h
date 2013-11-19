@@ -37,5 +37,13 @@
 #define OLED_RESET_PORT_DIR  PORT5.PDR.BIT.B1
 #define OLED_DATA_PORT_DIR   PORTD.PDR.BYTE
 
-void Init_OLED(void);
 
+void Init_OLED(void);
+#ifdef __cplusplus
+extern "C" {
+#endif
+void OLED_Show_String(unsigned char a,  char *Data_Pointer, unsigned char b, unsigned char c);
+void OLED_Fill_RAM(unsigned char Data);
+#ifdef __cplusplus
+}
+#endif

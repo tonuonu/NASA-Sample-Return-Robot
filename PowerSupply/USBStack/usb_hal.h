@@ -53,7 +53,7 @@ Defines
 #define USB_MODULE_0
 //#define USB_MODULE_1
 
-/*Set the priority of the USB interrupts according to your syastem.*/
+/*Set the priority of the USB interrupts according to your system.*/
 #define USB_HAL_INTERRUPT_PROIRITY 5
 
 /*USB packet sizes*/

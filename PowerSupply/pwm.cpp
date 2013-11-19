@@ -9,6 +9,7 @@
 *******************************************************************************/
 /* Following header file provides standard integer type definitions. */
 #include <stdint.h>
+#include <stdio.h>
 /* Following header file provides string type definitions. */
 #include <string.h>
 
@@ -19,11 +20,7 @@ User Includes (Project Level Includes)
 #include "rskrx630def.h"
 /* Defines RX630 port registers */
 #include "iorx630.h"
-/* LCD controlling function prototypes & macro defines */
-#include "oled.h"
-/* Switch handler function definitions */
 #include "switch.h"
-/* Declares function prototypes defined in this file */
 #include "pwm.h"
 #include <stdint.h>
 
@@ -263,7 +260,7 @@ __interrupt void Excep_MTU3_TGIA3(void)
   static uint16_t counter=0;
   /* Stop the TCNT counter */  
   MTU.TSTR.BIT.CST3 = 0x0;
-#if 1
+#if 0
   /* Update the duty cycle if SW1 hasn't been pressed. */
   if(gVaryDutyCycle == true)
   {  
@@ -279,11 +276,10 @@ __interrupt void Excep_MTU3_TGIA3(void)
 #endif
       /* Reset the duty cyccle to 10% */
       MTU3.TGRB = 4800;
-#if 1
+#if 0
     }
   }
 #endif
-  //unsigned char *p = (unsigned char *)0x07000000;
   switch(counter) {
   case 0:
       LED0 ^=1;
@@ -295,7 +291,6 @@ __interrupt void Excep_MTU3_TGIA3(void)
   case 2:
       /* Configure buzzer for NOT peripheral function */
       PORT1.PMR.BIT.B7 = 0;
-//      for(int i=0;i<10;i++) *p++  = i;      
       counter++;
       break;
   case 999:
@@ -306,14 +301,7 @@ __interrupt void Excep_MTU3_TGIA3(void)
   }
   if(counter >= 999)
      counter=0;
-#if 0
-  if(counter%2)  
-    OLED_DATA_PORT=0x55;
-  else
-    OLED_DATA_PORT=0xAA;
-#endif  
-  
-//  Init_OLED();
+
   /* Start the TCNT counter */  
   MTU.TSTR.BIT.CST3 = 0x1;    
 }

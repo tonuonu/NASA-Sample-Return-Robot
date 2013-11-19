@@ -115,19 +115,19 @@ void Init_RTC(void)
   
   /* Operate RTC in 24-hr mode */
   RTC.RCR2.BIT.HR24 = 0x1;
-
+#if 0
   /* Configure the clock as follows - 
     Initial time - 11:59:30   */
-  RTC.RSECCNT.BYTE = 0x30;
-  RTC.RMINCNT.BYTE = 0x59;
-  RTC.RHRCNT.BYTE = 0x11;
+  RTC.RSECCNT.BYTE = 0x00;
+  RTC.RMINCNT.BYTE = 0x03;
+  RTC.RHRCNT.BYTE = 0x00;
   
   /* Configure the date as follows -
     Initial date - 21/11/2011  */
-  RTC.RDAYCNT.BYTE = 0x21;
+  RTC.RDAYCNT.BYTE = 0x19;
   RTC.RMONCNT.BYTE = 0x11;
-  RTC.RYRCNT.WORD = 0x0011;
-  
+  RTC.RYRCNT.WORD = 0x0013;
+#endif  
   /* Configure the alarm as follows -
     Alarm time - 12:00:00
     Enable the hour, minutes and seconds alarm */

@@ -103,7 +103,7 @@ static void Init_Timer(void)
   SYSTEM.PRCR.WORD = 0xA500;
 
   /* Set CMT2 interrupt priority level to 5 */  
-  IPR(CMT2,CMI2) = 0x5;
+  IPR(CMT2,CMI2) = 0x8;
   /* Enable CMT2 interrupts */
   IEN(CMT2,CMI2) = 0x1;
   /* Clear CMT2 interrupt flag */
@@ -264,12 +264,6 @@ __interrupt void Excep_CMTU1_CMT2(void)
     adc[6] = ((float)S12AD.ADDR6-IZBASE)/ICOEFF; // IBAT2_AD
     adc[7] = ((float)S12AD.ADDR7-IZBASE)/ICOEFF; // IBAT3_AD
     
-#if 0
-    adc[4] = ((float)S12AD.ADDR4-IZBASE)*ICOEFF; // IBAT0_AD
-    adc[5] = ((float)S12AD.ADDR5-IZBASE)*ICOEFF; // IBAT1_AD
-    adc[6] = ((float)S12AD.ADDR6-IZBASE)*ICOEFF; // IBAT2_AD
-    adc[7] = ((float)S12AD.ADDR7-IZBASE)*ICOEFF; // IBAT3_AD
-#endif
     /* Convert ADC result into a character string, and store in the local
      string lcd_buffer */  
     
