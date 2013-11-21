@@ -148,7 +148,7 @@ void Init_RTC(void)
   
   /* Verify RCR1 register write */
   while(0xE5 != RTC.RCR1.BYTE);
-  
+#if 1 
   /* Enable RTC Alarm interrupts */  
   ICU.IPR[IPR_RTC_ALM].BYTE = 0x0A;
   ICU.IER[IER_RTC_ALM].BIT.IEN4 = 1;
@@ -158,7 +158,7 @@ void Init_RTC(void)
   ICU.IPR[IPR_RTC_PRD].BYTE = 0x07;
   ICU.IER[IER_RTC_PRD].BIT.IEN5 = 1;
   ICU.IR[IR_RTC_PRD].BIT.IR = 0;
-  
+#endif 
   /* Start the clock */
   RTC.RCR2.BIT.START = 0x1;
   
@@ -208,6 +208,8 @@ __interrupt void Excep_RTC_SLEEP(void)
   uint32_ToBCDString(oled_buffer, 0, time_data);
       
   /* Update time on the debug OLED */
+  OLED_Show_String(  1, (char*)oled_buffer, 0, 6*8);
+
   //Display_OLED(OLED_LINE2, oled_buffer);  
 }
 

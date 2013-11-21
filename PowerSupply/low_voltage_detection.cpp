@@ -67,7 +67,7 @@ void Init_VoltageDetect(void) {
 	ICU.NMIER.BIT.LVD1EN = 1u;
 
 	/* Re-enable write protection of the system registers */
-	SYSTEM.PRCR.BIT.PRC3 = 0xA50u;
+	//SYSTEM.PRCR.BIT.PRC3 = 0xA50u;
 }
 
 /*******************************************************************************

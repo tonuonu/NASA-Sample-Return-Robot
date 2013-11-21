@@ -11,12 +11,12 @@
 
 int main() {
     HardwareSetup();
-    Init_VoltageDetect();
+//    Init_VoltageDetect();
 //__enable_interrupt();
     Init_RTC();
     Init_OLED();
     Init_PWM();
-    Init_ADC12Repeat();
+    //Init_ADC12Repeat();
     //Init_UART();  
     __enable_interrupt();
     USB_CDC_APP_Main();    

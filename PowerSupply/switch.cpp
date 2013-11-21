@@ -507,4 +507,7 @@ __interrupt void Excep_CMTU0_CMT0(void)
   
   /* Call the switch debounce callback function */
   //SwitchDebounceCB();
+  /* Clear the interrupt flag */
+  ICU.IR[IR_CMT0_CMI0].BIT.IR = 0;
+
 }

@@ -1,28 +1,12 @@
 /* Copyright (C) 2012 Renesas Electronics Corporation. All rights reserved.   */
-/*******************************************************************************
-* File Name    : ADC12repeat.c
-* Version     : 1.00
-* Device     : R5F5630E
-* Tool Chain   : IAR Embedded Workbench
-* H/W Platform  : RSKRX630
-* Description   : Defines ADC repeat functions used for 12bit ADC unit.
-*******************************************************************************/
 /* Defines RX630 port registers */
 #include "iorx630.h"
-/* Defines macros relating to the RX630 user LEDs and switches */
 #include "rskrx630def.h"
-/* LCD controlling function prototypes & macro definitions */
 #include "oled.h"
-/* Defines switch functions and variables used in this file */
 #include "switch.h"
-/* LCD controlling function prototypes & macro definitions */
 #include "oled.h"
-/* Provides declarations of functions defined in this file */
 #include "adc12repeat.h"
 
-/*******************************************************************************
-* Global Variables
-*******************************************************************************/
 /* The variable gADC_Result is used to contain the value of the 12 bit ADC */
 volatile uint16_t gADC_Result;
 
@@ -45,8 +29,6 @@ static void Timer_Delay(uint32_t, uint8_t, uint8_t);
 * Description   : ADC initialisation function. This function configures the ADC
 *          unit for continuous scan operation, then configures a timer  
 *          for a periodic interrupt every 300 milliseconds.
-* Argument    : none
-* Return value  : none
 *******************************************************************************/
 void Init_ADC12Repeat(void)
 {
@@ -79,7 +61,7 @@ void Init_ADC12Repeat(void)
 
   /* Configure a 10 ms periodic delay used 
      to update the ADC result on to the LCD */
-  Timer_Delay(10, 'm', PERIODIC_MODE);
+  Timer_Delay(100, 'm', PERIODIC_MODE);
 }
 /*******************************************************************************
 * End of function Init_ADC12Repeat
@@ -102,8 +84,8 @@ static void Init_Timer(void)
   /* Protection on */
   SYSTEM.PRCR.WORD = 0xA500;
 
-  /* Set CMT2 interrupt priority level to 5 */  
-  IPR(CMT2,CMI2) = 0x8;
+  /* Set CMT2 interrupt priority level to 3 */  
+  IPR(CMT2,CMI2) = 0x3;
   /* Enable CMT2 interrupts */
   IEN(CMT2,CMI2) = 0x1;
   /* Clear CMT2 interrupt flag */
@@ -270,6 +252,3 @@ __interrupt void Excep_CMTU1_CMT2(void)
     /* Display the contents of the local string lcd_buffer */
     LED1 ^=1;
 }
-/******************************************************************************
-* End of function Excep_CMTU1_CMT2
-******************************************************************************/

@@ -1,45 +1,16 @@
 /* Copyright (C) 2012 Renesas Electronics Corporation. All rights reserved.   */
 /*******************************************************************************
 * File Name    : hwsetup.c
-* Version     : 1.00
-* Device     : R5F5630E
-* Tool-Chain   : Renesas RX Toolchain 1.2.0.0
-* H/W Platform  : RSKRX630
-* Description   : Defines the hardware initialisation routines used each time 
-*          the MCU is restarted. 
-*******************************************************************************/
-/*******************************************************************************
-* History     : 23 Jan. 2012  Ver. 1.00 First Release
-*******************************************************************************/
-
-/*******************************************************************************
-System Includes
-*******************************************************************************/
 /* Includes assembley level definitions */
 #include    <machine.h>
-/* Following header file provides C99 type definitions. */
 #include <stdint.h>
 
-/*******************************************************************************
-User Includes (Project Level Includes)
-*******************************************************************************/
-/* Defines RX630 port registers */
 #include "iorx630.h"
-/* Defines macros relating to the RX630 user LEDs and switches */
 #include "rskrx630def.h"
-/* LCD controlling function prototypes & macro definitions */
 #include "oled.h"
-/* Switch handler function definitions */
 #include "switch.h"
-/* Contains declarations for the functions defined in this file */
 #include "hwsetup.h"
 
-/*******************************************************************************
-* Outline     : HardwareSetup
-* Description   : Contains all the setup functions called at device restart
-* Argument      : none
-* Return value  : none
-*******************************************************************************/
 void HardwareSetup(void)
 {
   ConfigureOperatingFrequency();
@@ -47,9 +18,6 @@ void HardwareSetup(void)
   ConfigureInterrupts();
   EnablePeripheralModules();
 }
-/*******************************************************************************
-* End of function HardwareSetup
-*******************************************************************************/
 
 /*******************************************************************************
 * Outline     : ConfigureOperatingFrequency

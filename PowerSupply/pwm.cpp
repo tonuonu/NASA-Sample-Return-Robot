@@ -260,26 +260,8 @@ __interrupt void Excep_MTU3_TGIA3(void)
   static uint16_t counter=0;
   /* Stop the TCNT counter */  
   MTU.TSTR.BIT.CST3 = 0x0;
-#if 0
-  /* Update the duty cycle if SW1 hasn't been pressed. */
-  if(gVaryDutyCycle == true)
-  {  
-    /* Reset the duty cyccle to 10% */
-    MTU3.TGRB += 12;
-    
-    /* Read duty cycle */
-    gDutyPercentage = MTU3.TGRB;
-        
-    /* Check if the duty cycle equals 90% */
-    if(gDutyPercentage > 43200)
-    {
-#endif
-      /* Reset the duty cyccle to 10% */
-      MTU3.TGRB = 4800;
-#if 0
-    }
-  }
-#endif
+  /* Reset the duty cyccle to 10% */
+  MTU3.TGRB = 4800;
   switch(counter) {
   case 0:
       LED0 ^=1;
@@ -304,4 +286,16 @@ __interrupt void Excep_MTU3_TGIA3(void)
 
   /* Start the TCNT counter */  
   MTU.TSTR.BIT.CST3 = 0x1;    
+  /* Clear the interrupt flag */
+  ICU.IR[IR_MTU3_TGIA3].BIT.IR = 0;
+
+}
+
+#pragma vector=VECT_MTU3_TGIB3
+__interrupt void Excep_MTU3_TGIB3(void)
+{
+  
+  /* Clear the interrupt flag */
+  ICU.IR[IR_MTU3_TGIB3].BIT.IR = 0;
+
 }
