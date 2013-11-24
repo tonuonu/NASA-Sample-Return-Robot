@@ -585,11 +585,11 @@ Init_OLED() {
     OLED_WR_PORT_DIR=1;
     PORTD.PDR.BYTE=0xFF;
     OLED_RESET_PORT_DIR=1;
-    OLED_RESET=1;
+//    OLED_RESET=1;
     OLED_CS=1;
     OLED_WR=1;
 
-    __delay_cycles(96UL*2000UL); // 2000us delay
+//    __delay_cycles(96UL*2000UL); // 2000us delay
     OLED_RESET = 0;    
     __delay_cycles(96UL*2000UL); // 2000us delay - required in datasheet
     OLED_RESET = 1;
@@ -602,11 +602,6 @@ Init_OLED() {
     OLED_Set_Display_Offset(0x00);			   // OLED_Shift Mapping RAM Counter (0x00~0x3F)
     OLED_Set_Start_Line(0x00);				   // Set Mapping RAM Display Start Line (0x00~0x7F)
     OLED_Set_Remap_Format(0x14);			   // Set Horizontal Address Increment
-    //     Column Address 0 Mapped to SEG0
-    //     Disable Nibble Remap
-    //     Scan from COM[N-1] to COM0
-    //     Disable COM Split Odd Even
-    //     Enable Dual COM Line Mode
     //OLED_Set_GPIO(0x00);				   // Disable GPIO Pins Input
     OLED_Set_Function_Selection(0x01);			   // Enable Internal VDD Regulator
     OLED_Set_Display_Enhancement_A(0xA0, 0xFD);		   // Enable External VSL
@@ -616,8 +611,8 @@ Init_OLED() {
     OLED_Set_Gray_Scale_Table();			   // Set Pulse Width for Gray Scale Table
     OLED_Set_Phase_Length(0xE8);			   // Set Phase 1 as 5 Clocks & Phase 2 as 14 Clocks
     OLED_Set_Display_Enhancement_B(0x20);		   // Enhance Driving Scheme Capability (0x00/0x20)
-    OLED_Set_Precharge_Voltage(0x1F);			   // Set Pre-Charge Voltage Level as 0.60*VCC
-    OLED_Set_Precharge_Period(0x08);			   // Set Second Pre-Charge Period as 8 Clocks
+    OLED_Set_Precharge_Voltage(0x07);			   // Set Pre-Charge Voltage Level as 0.60*VCC
+    OLED_Set_Precharge_Period(0x28);			   // Set Second Pre-Charge Period as 8 Clocks
     OLED_Set_VCOMH(0x07);				   // Set Common Pins Deselect Voltage Level as 0.86*VCC
     OLED_Set_Display_Mode(0x02);			   // Normal Display Mode (0x00/0x01/0x02/0x03)
     OLED_Set_Partial_Display(0x01, 0x00, 0x00);		   // Disable Partial Display

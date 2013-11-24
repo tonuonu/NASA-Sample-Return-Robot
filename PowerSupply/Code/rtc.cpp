@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdio.h>
 
 /* Defines RX630 port registers */
 #include "iorx630.h"
@@ -17,7 +18,7 @@ uint32_t time_data = 0x0;
 uint32_t date_data = 0x0;
 
 /* Integer to string function prototype declaration */
-static void uint32_ToBCDString(uint8_t *, uint8_t, uint32_t);
+//static void uint32_ToBCDString(uint8_t *, uint8_t, uint32_t);
 
 /*******************************************************************************
 * Outline     : Init_RTC
@@ -115,18 +116,24 @@ void Init_RTC(void)
   
   /* Operate RTC in 24-hr mode */
   RTC.RCR2.BIT.HR24 = 0x1;
+  
+  RTC.RADJ.BIT.PMADJ=1; // Addition
+  RTC.RADJ.BIT.ADJ=1; // This is added once per minute to clock. 5...0 bits.
+  RTC.RCR2.BIT.AADJP=1;
+  RTC.RCR2.BIT.AADJE=1;
 #if 0
   /* Configure the clock as follows - 
     Initial time - 11:59:30   */
   RTC.RSECCNT.BYTE = 0x00;
-  RTC.RMINCNT.BYTE = 0x03;
-  RTC.RHRCNT.BYTE = 0x00;
+  RTC.RMINCNT.BYTE = 0x31;
+  RTC.RHRCNT.BYTE = 0x18;
   
   /* Configure the date as follows -
     Initial date - 21/11/2011  */
-  RTC.RDAYCNT.BYTE = 0x19;
+  RTC.RDAYCNT.BYTE = 0x21;
   RTC.RMONCNT.BYTE = 0x11;
   RTC.RYRCNT.WORD = 0x0013;
+  RTC.RWKCNT.BYTE = 0x04; // Thursday
 #endif  
   /* Configure the alarm as follows -
     Alarm time - 12:00:00
@@ -155,7 +162,24 @@ void Init_RTC(void)
   ICU.IR[IR_RTC_ALM].BIT.IR = 0;
     
   /* Enable RTC Periodic interrupts */  
-  ICU.IPR[IPR_RTC_PRD].BYTE = 0x07;
+  ICU.IPR[IPR_RTC_PRD].BYTE =  0x08 + 0x02  ; // 16 times in second
+  /*
+    b7 to b4 PES[3:0] Periodic Interrupt
+    0 1 1 0: A periodic interrupt is generated every 1/256 second.
+    (However, when the main clock is selected (RCR4.RCKSEL = 1) while
+    PES[3:0] = 0110b, a periodic interrupt is generated every 1/128
+    second.)
+    0 1 1 1: A periodic interrupt is generated every 1/128 second.
+    1 0 0 0: A periodic interrupt is generated every 1/64 second.
+    1 0 0 1: A periodic interrupt is generated every 1/32 second.
+    1 0 1 0: A periodic interrupt is generated every 1/16 second.
+    1 0 1 1: A periodic interrupt is generated every 1/8 second.
+    1 1 0 0: A periodic interrupt is generated every 1/4 second.
+    1 1 0 1: A periodic interrupt is generated every 1/2 second.
+    1 1 1 0: A periodic interrupt is generated every 1 second.
+    1 1 1 1: A periodic interrupt is generated every 2 seconds.
+    Other than above, no periodic interrupts are generated.
+  */
   ICU.IER[IER_RTC_PRD].BIT.IEN5 = 1;
   ICU.IR[IR_RTC_PRD].BIT.IR = 0;
 #endif 
@@ -183,6 +207,7 @@ __interrupt void Excep_RTC_ALM(void)
   /* Clear the interrupt flag */
   ICU.IR[IR_RTC_ALM].BIT.IR = 0;
 }
+extern volatile float adc[8];
 
 /*******************************************************************************
 * Outline     : CB_1HZ_RTC
@@ -194,23 +219,83 @@ __interrupt void Excep_RTC_ALM(void)
 * Return value  : none
 *******************************************************************************/
 #pragma vector=VECT_RTC_PRD
-__interrupt void Excep_RTC_SLEEP(void)
-{    
-  /* Read the time and status flags */
-  /* Read the seconds count register */
-  time_data  = (uint32_t)(RTC.RSECCNT.BYTE & 0x0000007F);
-  /* Read the minutes count register */
-  time_data |= (RTC.RMINCNT.BYTE & 0x0000007F) << 8;
-  /* Read the hours count register */
-  time_data |= (RTC.RHRCNT.BYTE  & 0x0000003F) << 16;
+__interrupt void Excep_RTC_SLEEP(void) {
+    /* Read the time and status flags */
+    /* Read the seconds count register */
+    time_data  = (uint32_t)(RTC.RSECCNT.BYTE & 0x0000007F);
+    /* Read the minutes count register */
+    time_data |= (RTC.RMINCNT.BYTE & 0x0000007F) << 8;
+    /* Read the hours count register */
+    time_data |= (RTC.RHRCNT.BYTE  & 0x0000003F) << 16;
   
-  /* Convert the data to string & display on the OLED */
-  uint32_ToBCDString(oled_buffer, 0, time_data);
-      
-  /* Update time on the debug OLED */
-  OLED_Show_String(  1, (char*)oled_buffer, 0, 6*8);
+    /* Convert the data to string & display on the OLED */
+    // uint32_ToBCDString(oled_buffer, 0, time_data);
+    /* Update time on the debug OLED */
+    // OLED_Show_String(  1, (char*)oled_buffer, 0, 6*8);
 
-  //Display_OLED(OLED_LINE2, oled_buffer);  
+    char buf[65];
+    char *dow;
+    switch(RTC.RWKCNT.BYTE & 0x07) {
+    case 0:
+        dow="Sun";
+         break;
+    case 1:
+        dow="Mon";
+         break;
+    case 2:
+        dow="Tue";
+         break;
+    case 3:
+        dow="Wed";
+         break;
+    case 4:
+        dow="Thu";
+         break;
+    case 5:
+        dow="Fri";
+         break;
+    case 6:
+        dow="Sat";
+         break;
+    }
+    
+    snprintf(buf,sizeof(buf),"%3s %2x/%02x/20%02x %2x:%02x:%02x",
+                 dow,
+                 RTC.RDAYCNT.BYTE,
+                 RTC.RMONCNT.BYTE,
+                 RTC.RYRCNT.WORD,
+                 RTC.RHRCNT.BYTE & 0x3F ,
+                 RTC.RMINCNT.BYTE & 0x7F,
+                 RTC.RSECCNT.BYTE & 0x7F
+    );
+    OLED_Show_String(  1,buf, 0, 7*8);
+#define BAT_MISSING_THRESHOLD (2.5f*3.f) 
+#define BAT_CRIT_THRESHOLD (3.3f*3.f) 
+#define BAT_LOW_THRESHOLD  (3.5f*3.f)
+#define BAT_FULL_THRESHOLD (4.2f*3.f)
+    
+    for(int i=0;i<4;i++) {
+        char *statustext;
+        float percent;
+        percent=(adc[i]-BAT_CRIT_THRESHOLD)/(BAT_FULL_THRESHOLD-BAT_CRIT_THRESHOLD)*100.0f;
+        if(adc[i]<=BAT_MISSING_THRESHOLD) {
+            statustext="Missing";
+            percent=0.0f;
+        } else if(adc[i]<=BAT_CRIT_THRESHOLD) {
+            statustext="Critical";
+            percent=0.0f;
+        } else if(adc[i]<=BAT_LOW_THRESHOLD) {
+            statustext="Low";
+        } else if(adc[i]>BAT_FULL_THRESHOLD) {
+            statustext="Overvoltage";
+            percent=0.0f;
+        } else {
+            statustext="Normal";
+        }
+        snprintf(buf,sizeof(buf),"%d: %4.1fV %6.2fA %11s %3.0f",i,adc[i],adc[i+4],statustext,percent);
+        OLED_Show_String(  1, buf, 0, (i+1)*8);
+
+    }
 }
 
 /*******************************************************************************
@@ -225,6 +310,7 @@ __interrupt void Excep_RTC_SLEEP(void)
 * Note       : No input validation is used, so output data can overflow the
 *         array passed.
 *******************************************************************************/
+#if 0
 static void uint32_ToBCDString(uint8_t * output_string, uint8_t pos, 
                  uint32_t number)
 {
@@ -271,3 +357,4 @@ static void uint32_ToBCDString(uint8_t * output_string, uint8_t pos,
     }
   }
 }
+#endif

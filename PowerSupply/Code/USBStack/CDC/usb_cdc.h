@@ -36,6 +36,10 @@
 
 #ifndef USB_CDC_H
 #define USB_CDC_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /******************************************************************************
 User Includes
@@ -55,6 +59,10 @@ USB_ERR USBCDC_Write_Async(uint32_t _NumBytes, const uint8_t* _Buffer, CB_DONE _
 USB_ERR USBCDC_Read(uint32_t _BufferSize, uint8_t* _Buffer, uint32_t* _pNumBytesRead);
 USB_ERR USBCDC_Read_Async(uint32_t _BufferSize, uint8_t* _Buffer, CB_DONE_OUT _cb);
 USB_ERR USBCDC_Cancel(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /*USB_HID_H*/
 #endif 

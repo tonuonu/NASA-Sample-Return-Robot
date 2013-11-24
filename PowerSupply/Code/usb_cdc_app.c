@@ -81,54 +81,6 @@ static void CBDoneRead(USB_ERR _err, uint32_t _NumBytes);
 /* Callback called when we have written some data. */
 static void CBDoneWrite(USB_ERR _err);
 
-/**********************************************************************************
-* Outline     : USB_CDC_APP_Main
-* Description   : Start the CDC USB sample application.
-*                 This function does not return.
-* Argument    : none
-* Return value  : none
-**********************************************************************************/
-extern volatile float adc[8];
-void USB_CDC_APP_Main(void) {    
-    char buf[65];
-#if 0
-  USBCDC_Init();  
-#endif
-
-  __delay_cycles(96UL*2000UL); // 2000us delay    
-  OLED_Fill_RAM(0x00);				   // Clear Screen
-  OLED_Show_String(  1, "Battery statuses", 0, 0*8);
-
-  while(1) {
-      __wait_for_interrupt();
-      snprintf(buf,sizeof(buf),"%2x/%02x/20%02x %2x:%02x:%02x",RTC.RDAYCNT.BYTE,RTC.RMONCNT.BYTE,RTC.RYRCNT.WORD,RTC.RHRCNT.BYTE,RTC.RMINCNT.BYTE,RTC.RSECCNT.BYTE);
-      OLED_Show_String(  1,buf, 0, 7*8);
-
-     
-    char *statustext[4];
-    for(int i=0;i<4;i++) {
-      switch(0) {
-      case 0:
-          statustext[i]="Idle";
-          break;
-      case 1:
-          statustext[i]="Consuming";
-          break;
-      case 2:
-          statustext[i]="Charging";
-          break;
-      }
-    }
-    snprintf(buf,sizeof(buf),"1: %4.1fV %6.2fA %10s",adc[0],adc[4],statustext[0]);
-    OLED_Show_String(  1, buf, 0, 1*8);
-    snprintf(buf,sizeof(buf),"2: %4.1fV %6.2fA %10s",adc[1],adc[5],statustext[1]);
-    OLED_Show_String(  1, buf, 0, 2*8);
-    snprintf(buf,sizeof(buf),"3: %4.1fV %6.2fA %10s",adc[2],adc[6],statustext[2]);
-    OLED_Show_String(  1, buf, 0, 3*8);
-    snprintf(buf,sizeof(buf),"4: %4.1fV %6.2fA %10s",adc[3],adc[7],statustext[3]);
-    OLED_Show_String(  1, buf, 0, 4*8);
-  }
-}
 /***********************************************************************************
 End of function USB_CDC_APP_Main
 ***********************************************************************************/
