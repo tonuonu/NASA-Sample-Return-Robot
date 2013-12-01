@@ -118,7 +118,7 @@ void Init_RTC(void)
   RTC.RCR2.BIT.HR24 = 0x1;
   
   RTC.RADJ.BIT.PMADJ=1; // Addition
-  RTC.RADJ.BIT.ADJ=1; // This is added once per minute to clock. 5...0 bits.
+  RTC.RADJ.BIT.ADJ=3; // This is added once per minute to clock. 5...0 bits.
   RTC.RCR2.BIT.AADJP=1;
   RTC.RCR2.BIT.AADJE=1;
 #if 0
@@ -208,6 +208,8 @@ __interrupt void Excep_RTC_ALM(void)
   ICU.IR[IR_RTC_ALM].BIT.IR = 0;
 }
 extern volatile float adc[8];
+extern volatile float temperature;
+extern volatile float adapter;
 
 /*******************************************************************************
 * Outline     : CB_1HZ_RTC
@@ -269,6 +271,8 @@ __interrupt void Excep_RTC_SLEEP(void) {
                  RTC.RSECCNT.BYTE & 0x7F
     );
     OLED_Show_String(  1,buf, 0, 7*8);
+    snprintf(buf,sizeof(buf),"Temperature: %.1f Adapter: %.1f",temperature,adapter);
+    OLED_Show_String(  1,buf, 0, 6*8);
 #define BAT_MISSING_THRESHOLD (2.5f*3.f) 
 #define BAT_CRIT_THRESHOLD (3.3f*3.f) 
 #define BAT_LOW_THRESHOLD  (3.5f*3.f)
@@ -294,7 +298,6 @@ __interrupt void Excep_RTC_SLEEP(void) {
         }
         snprintf(buf,sizeof(buf),"%d: %4.1fV %6.2fA %11s %3.0f",i,adc[i],adc[i+4],statustext,percent);
         OLED_Show_String(  1, buf, 0, (i+1)*8);
-
     }
 }
 

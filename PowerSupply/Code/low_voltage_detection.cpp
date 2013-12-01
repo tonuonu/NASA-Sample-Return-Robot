@@ -23,14 +23,11 @@
 #include "hwsetup.h"
 #include "oled.h"
 #include "tnroman.h"
-/* Defines RX630 port registers */
 #include "iorx630.h"
-/* Defines macros relating to the RX630 user LEDs and switches */
 #include "rskrx630def.h"
 #include "low_voltage_detection.h"
 
 bool gVCCAboveVdet = true;
-
 
 void Init_VoltageDetect(void) {	
 	/* Disable write protection of the system registers */

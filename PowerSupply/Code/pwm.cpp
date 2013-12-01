@@ -56,9 +56,11 @@ volatile bool gClearLCD = false;
 void Init_PWM(void)
 {  
   /* Configure pin 7 of port 1 as an output */
+  PORT1.PDR.BIT.B5 = 1;
   PORT1.PDR.BIT.B7 = 1;
   
   /* Configure pin 7 of port 1 for peripheral function */
+  PORT1.PMR.BIT.B5 = 1;
   PORT1.PMR.BIT.B7 = 1;
   
   /* Enable write to PFSWE bit */
@@ -68,6 +70,7 @@ void Init_PWM(void)
   MPC.PWPR.BYTE = 0x40;
   
   /* Configure pin 7 of port 1 for MTIOC3A outputs */
+  MPC.P15PFS.BIT.PSEL = 0x1;
   MPC.P17PFS.BIT.PSEL = 0x1;
   
   /* Enable write protection to PFS registers */
@@ -124,6 +127,116 @@ void Init_PWM(void)
 
   /* Start the TCNT counter */  
   MTU.TSTR.BIT.CST3 = 0x1;
+
+/***************/
+  SYSTEM.PRCR.WORD = 0xA502;
+  SYSTEM.MSTPCRA.BIT.MSTPA13=0; // Get module out of stop mode
+
+#if 1
+  /* Configure pins of port E for peripheral function */
+  PORTA.PMR.BIT.B0 = 1;
+  PORTA.PMR.BIT.B4 = 1;
+  PORTA.PMR.BIT.B6 = 1;
+  PORTB.PMR.BIT.B0 = 1;
+
+  /* Configure pins of port E as an output */
+  PORTA.PDR.BIT.B0 = 1;
+  PORTA.PDR.BIT.B4 = 1;
+  PORTA.PDR.BIT.B6 = 1;
+  PORTB.PDR.BIT.B0 = 1;
+#endif
+  MPC.PWPR.BIT.B0WI=0; // Enable writing to PFSWE
+  MPC.PWPR.BIT.PFSWE=1;// Enable writing to PFS registers
+
+  /* Configure pins of ports for MTIOCxA outputs */
+  MPC.PA0PFS.BIT.PSEL = 0x3;
+  MPC.PA4PFS.BIT.PSEL = 0x3;
+  MPC.PA6PFS.BIT.PSEL = 0x3;
+  MPC.PB0PFS.BIT.PSEL = 0x3;
+
+  MPC.PWPR.BIT.PFSWE=0;// Enable writing to PFS registers
+  MPC.PWPR.BIT.B0WI=1; // Enable writing to PFSWE
+
+  /* Protection off */
+  SYSTEM.PRCR.WORD = 0xA503;
+
+  TPUA.TSTR.BIT.CST0=0;// stop clock
+  TPUA.TSTR.BIT.CST1=0;// stop clock
+  TPUA.TSTR.BIT.CST2=0;// stop clock
+  TPUA.TSTR.BIT.CST3=0;// stop clock
+  
+  /* Protection on */
+  SYSTEM.PRCR.WORD = 0xA500;
+
+  TPUA.TSYR.BIT.SYNC0=1; // TCNT performs synchronous operation
+  TPUA.TSYR.BIT.SYNC1=1; // --""--
+  TPUA.TSYR.BIT.SYNC2=1; // --""--
+  TPUA.TSYR.BIT.SYNC3=1; // --""--
+  
+  TPU0.TCR.BIT.TPSC=1; // input PCLK/4
+  TPU1.TCR.BIT.TPSC=1; // --""--
+  TPU2.TCR.BIT.TPSC=1; // --""--
+  TPU3.TCR.BIT.TPSC=1; // --""--
+
+  TPU0.TCR.BIT.CKEG=0; // Count only falling edges
+  TPU1.TCR.BIT.CKEG=0; // --""--
+  TPU2.TCR.BIT.CKEG=0; // --""--
+  TPU3.TCR.BIT.CKEG=0; // --""--
+
+  // page 757
+  TPU0.TCR.BIT.CCLR=2; // TCNT counter cleared by TGRB compare match/input capture
+  TPU1.TCR.BIT.CCLR=3; // TCNT counter cleared by counter clearing for another channel performing synchronous clearing/synchronous operation
+  TPU2.TCR.BIT.CCLR=3; // --""--
+  TPU3.TCR.BIT.CCLR=3; // --""--
+  
+  TPU0.TIORH.BIT.IOA=2;// TGRA Initial output is low output; high output at compare match
+  TPU0.TIORH.BIT.IOB=5;// TGRB Initial output is high output; low output at compare match
+
+  TPU1.TIOR.BIT.IOA=2;
+  TPU1.TIOR.BIT.IOB=5;
+  
+  TPU2.TIOR.BIT.IOA=2;
+  TPU2.TIOR.BIT.IOB=5;
+  
+  TPU3.TIORH.BIT.IOA=2;
+  TPU3.TIORH.BIT.IOB=5;
+
+  // TPU0.TIER.BIT.TCIEU; // Cool interrupt stuff
+  
+  
+  // 48Mhz/4/400 == 30000Hz
+  /* Set a period */
+  
+#define length0 1
+#define length1 0
+#define length2 1
+#define length3 0
+  
+  TPU3.TGRA = 100-length3;
+  TPU3.TGRB = 100;
+
+  TPU2.TGRA = 200-length2;
+  TPU2.TGRB = 200;
+
+  TPU1.TGRA = 300-length1;
+  TPU1.TGRB = 300;
+
+  TPU0.TGRA = 400-length0;
+  TPU0.TGRB = 400;
+
+  TPU0.TMDR.BIT.MD = 2; // PWM mode 1  
+  TPU1.TMDR.BIT.MD = 2; // PWM mode 1  
+  TPU2.TMDR.BIT.MD = 2; // PWM mode 1
+  TPU3.TMDR.BIT.MD = 2; // PWM mode 1
+  
+  SYSTEM.PRCR.WORD = 0xA503;
+  TPUA.TSTR.BIT.CST0=1; // start counter
+  TPUA.TSTR.BIT.CST1=1; // start counter
+  TPUA.TSTR.BIT.CST2=1; // start counter
+  TPUA.TSTR.BIT.CST3=1; // start counter
+  /* Protection on */
+  SYSTEM.PRCR.WORD = 0xA500;
+
 }
 /*******************************************************************************
 * End of function Init_PWM
