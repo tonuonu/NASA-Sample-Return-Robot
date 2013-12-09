@@ -23204,6 +23204,8 @@ Source: 3M</description>
 <pinref part="SUPPLY6" gate="1" pin="GND"/>
 <wire x1="115.57" y1="82.55" x2="115.57" y2="83.82" width="0.1524" layer="91"/>
 <junction x="115.57" y="83.82"/>
+<junction x="119.38" y="83.82"/>
+<junction x="111.76" y="83.82"/>
 </segment>
 </net>
 <net name="5V" class="3">
@@ -23300,6 +23302,8 @@ Source: 3M</description>
 <wire x1="115.57" y1="96.52" x2="114.3" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="115.57" y1="96.52" x2="115.57" y2="99.06" width="0.1524" layer="91"/>
 <junction x="115.57" y="96.52"/>
+<junction x="111.76" y="96.52"/>
+<junction x="119.38" y="96.52"/>
 </segment>
 </net>
 <net name="VBUS" class="0">
