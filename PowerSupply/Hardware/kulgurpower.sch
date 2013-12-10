@@ -18224,7 +18224,7 @@ Source: 3M</description>
 <part name="R14" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
 <part name="C15" library="rcl" deviceset="CPOL-EU" device="C/6032-28R"/>
 <part name="C30" library="rcl" deviceset="CPOL-EU" device="C/6032-28R"/>
-<part name="PC1" library="con-phoenix-508" deviceset="MST2V" device=""/>
+<part name="19V" library="con-phoenix-508" deviceset="MST2V" device=""/>
 <part name="SUPPLY6" library="supply2" deviceset="+18V" device="" value="+19V"/>
 <part name="GND52" library="supply1" deviceset="GND" device=""/>
 </parts>
@@ -20025,8 +20025,8 @@ into !ON! pin which is droven by MCU.</text>
 <instance part="X5" gate="-1" x="101.6" y="154.94" rot="R180"/>
 <instance part="X5" gate="-2" x="101.6" y="157.48" rot="R180"/>
 <instance part="GND29" gate="1" x="106.68" y="149.86"/>
-<instance part="PC1" gate="-1" x="66.04" y="147.32"/>
-<instance part="PC1" gate="-2" x="66.04" y="154.94"/>
+<instance part="19V" gate="-1" x="66.04" y="147.32"/>
+<instance part="19V" gate="-2" x="66.04" y="154.94"/>
 <instance part="SUPPLY6" gate="+18V" x="73.66" y="160.02"/>
 <instance part="GND52" gate="1" x="73.66" y="142.24"/>
 </instances>
@@ -20182,7 +20182,7 @@ into !ON! pin which is droven by MCU.</text>
 <wire x1="73.66" y1="154.94" x2="73.66" y2="157.48" width="0.4064" layer="91"/>
 <pinref part="SUPPLY6" gate="+18V" pin="+18V"/>
 <label x="73.66" y="157.48" size="2.54" layer="95"/>
-<pinref part="PC1" gate="-2" pin="1"/>
+<pinref part="19V" gate="-2" pin="1"/>
 <wire x1="73.66" y1="154.94" x2="71.12" y2="154.94" width="0.4064" layer="91"/>
 </segment>
 </net>
@@ -20216,7 +20216,7 @@ into !ON! pin which is droven by MCU.</text>
 <pinref part="GND29" gate="1" pin="GND"/>
 </segment>
 <segment>
-<pinref part="PC1" gate="-1" pin="1"/>
+<pinref part="19V" gate="-1" pin="1"/>
 <pinref part="GND52" gate="1" pin="GND"/>
 <wire x1="71.12" y1="147.32" x2="73.66" y2="147.32" width="0.1524" layer="91"/>
 <wire x1="73.66" y1="147.32" x2="73.66" y2="144.78" width="0.1524" layer="91"/>
