@@ -4290,7 +4290,7 @@ design rules under a new name.</description>
 <element name="JP16" library="pinhead" package="1X09" value="" x="71" y="34.8" rot="R270"/>
 <element name="JP17" library="pinhead" package="1X09" value="" x="65.9" y="34.8" rot="R270"/>
 <element name="JP18" library="pinhead" package="1X09" value="" x="60.7" y="34.8" rot="R270"/>
-<element name="Y1" library="SmartPrj" package="RESONATOR" value="CSTCE16M0V53-R0 16MHZ" x="26.7983" y="20.9662"/>
+<element name="Y1" library="SmartPrj" package="RESONATOR" value="CSTCE8M00G15C99-R0" x="26.7983" y="20.9662"/>
 <element name="C1" library="SmartPrj" package="C0603-ROUND" value="100n" x="15.1915" y="29.5848" rot="R180"/>
 <element name="C5" library="SmartPrj" package="C0603-ROUND" value="100n" x="15.1883" y="27.5476" rot="R180"/>
 <element name="C4" library="SmartPrj" package="C0603-ROUND" value="100n" x="27.763" y="43.3692" rot="R180"/>
@@ -4490,7 +4490,7 @@ design rules under a new name.</description>
 <element name="C29" library="rcl" package="C/6032-28R" value="47uF/16V" x="27.7" y="12.4"/>
 <element name="C30" library="rcl" package="C/6032-28R" value="47uF/16V" x="2.8" y="12.5" rot="R90"/>
 <element name="C31" library="rcl" package="C/6032-28R" value="47uF/10V" x="90.7" y="48.3" rot="R90"/>
-<element name="R44" library="SmartPrj" package="R0603-ROUND" value="47k" x="0.8" y="-2.7"/>
+<element name="R44" library="SmartPrj" package="R0603-ROUND" value="47k" x="15.8" y="20.3" rot="R180"/>
 </elements>
 <signals>
 <signal name="+5V" class="1">
@@ -4925,7 +4925,7 @@ design rules under a new name.</description>
 <wire x1="14.2993" y1="27.5476" x2="14.2993" y2="29.5816" width="1.016" layer="1"/>
 <wire x1="14.2993" y1="29.5816" x2="14.3025" y2="29.5848" width="1.016" layer="1"/>
 <contactref element="R44" pad="2"/>
-<wire x1="1.689" y1="-2.7" x2="2.8369" y2="4.0752" width="0" layer="19" extent="1-1"/>
+<wire x1="11.45" y1="20.0048" x2="14.911" y2="20.3" width="0" layer="19" extent="1-16"/>
 </signal>
 <signal name="+3V3" class="1">
 <contactref element="R5" pad="1"/>
@@ -7858,7 +7858,7 @@ design rules under a new name.</description>
 <signal name="N$3">
 <contactref element="R44" pad="1"/>
 <contactref element="MCU" pad="4"/>
-<wire x1="-0.089" y1="-2.7" x2="22.2" y2="25" width="0" layer="19" extent="1-1"/>
+<wire x1="16.689" y1="20.3" x2="22.2" y2="25" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 </board>

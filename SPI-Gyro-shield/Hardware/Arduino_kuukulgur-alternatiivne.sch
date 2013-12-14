@@ -26454,7 +26454,7 @@ Source: http://focus.ti.com/lit/ds/symlink/tps77333.pdf</description>
 <part name="GND20" library="supply1" deviceset="GND" device=""/>
 <part name="JP18" library="pinhead" deviceset="PINHD-1X9" device=""/>
 <part name="GND21" library="supply1" deviceset="GND" device=""/>
-<part name="Y1" library="SmartPrj" deviceset="RESONATOR" device="MU" value="CSTCE16M0V53-R0 16MHZ"/>
+<part name="Y1" library="SmartPrj" deviceset="RESONATOR" device="MU" value="CSTCE8M00G15C99-R0"/>
 <part name="GND23" library="supply1" deviceset="GND" device=""/>
 <part name="C1" library="SmartPrj" deviceset="C-EU" device="0603-RND" value="100n"/>
 <part name="GND24" library="supply1" deviceset="GND" device=""/>
@@ -27947,28 +27947,28 @@ Source: http://focus.ti.com/lit/ds/symlink/tps77333.pdf</description>
 <net name="CDONE0" class="0">
 <segment>
 <wire x1="180.34" y1="162.56" x2="165.1" y2="162.56" width="0.1524" layer="91"/>
-<label x="165.1" y="162.56" size="1.778" layer="95"/>
+<label x="167.64" y="162.56" size="1.778" layer="95"/>
 <pinref part="MCU" gate="G$1" pin="P07/D7/AN17"/>
 </segment>
 </net>
 <net name="CDONE1" class="0">
 <segment>
 <wire x1="180.34" y1="165.1" x2="165.1" y2="165.1" width="0.1524" layer="91"/>
-<label x="165.1" y="165.1" size="1.778" layer="95"/>
+<label x="167.64" y="165.1" size="1.778" layer="95"/>
 <pinref part="MCU" gate="G$1" pin="P06/D6/AN16"/>
 </segment>
 </net>
 <net name="CDONE2" class="0">
 <segment>
 <wire x1="180.34" y1="167.64" x2="165.1" y2="167.64" width="0.1524" layer="91"/>
-<label x="165.1" y="167.64" size="1.778" layer="95"/>
+<label x="167.64" y="167.64" size="1.778" layer="95"/>
 <pinref part="MCU" gate="G$1" pin="P05/D5/AN15"/>
 </segment>
 </net>
 <net name="CDONE3" class="0">
 <segment>
 <wire x1="180.34" y1="170.18" x2="165.1" y2="170.18" width="0.1524" layer="91"/>
-<label x="165.1" y="170.18" size="1.778" layer="95"/>
+<label x="167.64" y="170.18" size="1.778" layer="95"/>
 <pinref part="MCU" gate="G$1" pin="P04/D4/AN14"/>
 </segment>
 </net>
