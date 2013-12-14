@@ -39,12 +39,13 @@ __interrupt void _uart2_receive(void) {
 #pragma vector = UART2_TX
 __interrupt void _uart2_transmit(void) {
 
+    CS2=1;
     LED2 = 1; 
-    u2tb=0xaa;
-    //__delay_cycles(1ULL);
-    LED2 = 0; 
-   /* Clear the 'reception complete' flag.	*/
+    u2tb=0xaf;
+    LED2 = 0;     
+    /* Clear the 'reception complete' flag.	*/
     ir_s2tic = 0;
+    CS2=0;
 }
 
 
@@ -68,14 +69,14 @@ SPI2_Init(void) {
     stps_u2mr  = 0;                                        // 0=1 stop bit, 0 required
     pry_u2mr   = 0;                                        // Parity, 0=odd, 0 required 
     prye_u2mr  = 0;                                        // Parity Enable? 0=disable, 0 required 
-    iopol_u2mr = 0;                                        // IO Polarity, 0=not inverted, 0 required
+    iopol_u2mr = myIOPOL;                                        // IO Polarity, 0=not inverted, 0 required
 
     clk0_u2c0 = 0;                                         // Clock source f1 for u2brg
     clk1_u2c0 = 0;                                         // 
     txept_u2c0 = 0;                                        // Transmit register empty flag 
     crd_u2c0 = 1;                                          // CTS disabled when 1
     nch_u2c0 = 0;                                          // 0=Output mode "push-pull" for TXD and CLOCK pin 
-    ckpol_u2c0 = 1;                                        // CLK Polarity 0 rising edge, 1 falling edge
+    ckpol_u2c0 = myCKPOL;                                        // CLK Polarity 0 rising edge, 1 falling edge
     uform_u2c0 = 1;                                        // 1=MSB first
 
     te_u2c1 = 1;                                           // 1=Transmission Enable
@@ -84,13 +85,13 @@ SPI2_Init(void) {
     ri_u2c1 = 0;                                           // Receive complete flag - U2RB is empty.
     u2irs_u2c1 = 1;                                        // Interrupt  when transmission is completed. 
     u2rrm_u2c1 = 0;                                        // Continuous receive mode off
-    u2lch_u2c1 = 0;                                        // Logical inversion off 
+    u2lch_u2c1 = 1;                                        // Logical inversion off 
 
     u2smr = 0x00;
     u2smr2 = 0x00;
 
     sse_u2smr3 = 0;                                        // SS is disabled when 0
-    ckph_u2smr3 = 1;                                       // Non clock delayed 
+    ckph_u2smr3 = myCKPH;                                       // Non clock delayed 
     dinc_u2smr3 = 0;                                       // Master mode when 0
     nodc_u2smr3 = 0;                                       // Select a clock output  mode "push-pull" when 0 
     err_u2smr3 = 0;                                        // Error flag, no error when 0 

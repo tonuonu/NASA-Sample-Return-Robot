@@ -19,6 +19,10 @@
  *
  */
 
+#define myCKPOL (0)
+#define myCKPH (1)
+#define myIOPOL (1)
+
 #define PD_INPUT    (0)
 #define PD_OUTPUT   (1)
 #define PF_TIMER    (1)

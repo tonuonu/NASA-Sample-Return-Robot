@@ -39,12 +39,13 @@ __interrupt void _uart4_receive(void) {
 #pragma vector = UART4_TX
 __interrupt void _uart4_transmit(void) {
 
+    CS4=1;
     LED2 = 1; 
-    u4tb=0xaa;
-    //__delay_cycles(1ULL);
-    LED2 = 0; 
-   /* Clear the 'reception complete' flag.	*/
+    u4tb=0xaf;
+    LED2 = 0;     
+    /* Clear the 'reception complete' flag.	*/
     ir_s4tic = 0;
+    CS4=0;
 }
 
 
@@ -75,14 +76,14 @@ SPI4_Init(void) {
     stps_u4mr  = 0;                                        // 0=1 stop bit, 0 required
     pry_u4mr   = 0;                                        // Parity, 0=odd, 0 required 
     prye_u4mr  = 0;                                        // Parity Enable? 0=disable, 0 required 
-    iopol_u4mr = 0;                                        // IO Polarity, 0=not inverted, 0 required
+    iopol_u4mr = myIOPOL;                                        // IO Polarity, 0=not inverted, 0 required
 
     clk0_u4c0 = 0;                                         // Clock source f1 for u4brg
     clk1_u4c0 = 0;                                         // 
     txept_u4c0 = 0;                                        // Transmit register empty flag 
     crd_u4c0 = 1;                                          // CTS disabled when 1
     nch_u4c0 = 0;                                          // 0=Output mode "push-pull" for TXD and CLOCK pin 
-    ckpol_u4c0 = 1;                                        // CLK Polarity 0 rising edge, 1 falling edge
+    ckpol_u4c0 = myCKPOL;                                        // CLK Polarity 0 rising edge, 1 falling edge
     uform_u4c0 = 1;                                        // 1=MSB first
 
     te_u4c1 = 1;                                           // 1=Transmission Enable
@@ -91,13 +92,13 @@ SPI4_Init(void) {
     ri_u4c1 = 0;                                           // Receive complete flag - U2RB is empty.
     u4irs_u4c1 = 1;                                        // Interrupt  when transmission is completed. 
     u4rrm_u4c1 = 0;                                        // Continuous receive mode off
-    u4lch_u4c1 = 0;                                        // Logical inversion off 
+    u4lch_u4c1 = 1;                                        // Logical inversion off 
 
     u4smr = 0x00;
     u4smr2 = 0x00;
 
     sse_u4smr3 = 0;                                        // SS is disabled when 0
-    ckph_u4smr3 = 1;                                       // Non clock delayed 
+    ckph_u4smr3 = myCKPH;                                       // Non clock delayed 
     dinc_u4smr3 = 0;                                       // Master mode when 0
     nodc_u4smr3 = 0;                                       // Select a clock output  mode "push-pull" when 0 
     err_u4smr3 = 0;                                        // Error flag, no error when 0 
