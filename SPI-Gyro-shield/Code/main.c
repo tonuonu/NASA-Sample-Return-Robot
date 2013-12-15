@@ -45,8 +45,9 @@ main(void) {
     while(1) {
         /* Code hangs here until some interrupt is done */
         __wait_for_interrupt();
-        
-//        if(recv_flag) { // some data is held in recv_buf. Main shield sent us byte!!          
+        LED1=p0_4;
+        LED2=p0_5;
+        if(recv_flag) { // some data is held in recv_buf. Main shield sent us byte!!          
           recv_flag=0; // clear it
           LED4=1;
           u0tb=recv_buf;          
@@ -54,6 +55,6 @@ main(void) {
           u3tb=recv_buf;          
           u4tb=recv_buf;          
           LED4=0;
-//        }
+        }
     }
 }

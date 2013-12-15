@@ -50,20 +50,20 @@ __interrupt void _uart5_transmit(void) {
 
 #pragma vector = INT0 // RESET pin is connected here
 __interrupt void _int0(void) {
-    LED2 = 1;
     // Copy INT0 pin to all four motor outputs
     RESET0=RESET1=RESET2=RESET3=p8_2;
-    LED2 = 0; 
     /* Clear the flag. */
     ir_int0ic = 0;
 }
 
 #pragma vector = INT2 // CS pin is connected here
 __interrupt void _int2(void) {
-    LED1 = 1;
+  
+    __delay_cycles(48UL*(unsigned long)2UL /*usec*/);
+
+  
     // Copy INT2 pin to all four motor outputs
     CS0=CS2=CS3=CS4=p8_4;
-    LED1 = 0;
     /* Clear the flag. */
     ir_int2ic = 0;
 }
@@ -131,7 +131,7 @@ SPI5_Init(void) {
     fsit_ripl1 = 1;
     fsit_ripl2 = 1;
     __set_VCT_register((unsigned long)&_uart5_receive);
-    ilvl_s5ric =7; // fast interrupt 
+    ilvl_s5ric =7; // fast interrupt
 #else
     ilvl_s5ric =5; 
 #endif
