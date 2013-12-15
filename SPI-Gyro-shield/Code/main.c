@@ -29,21 +29,31 @@
 extern int alarm;
 volatile unsigned short ticks;
 
+volatile int fpga_uploaded=0;
+
+
+extern volatile unsigned char recv_buf;
+extern volatile unsigned char recv_flag;
+
 int
 main(void) {
     HardwareSetup();
-    u0tb=0xaa;
-    u2tb=0xaa;
-    u3tb=0xaa;
-    u4tb=0xaa;
-    //u5tb=0x00; // important.
-    
+    // All CS* and RESET* are pulled up before in HW setups.
     volatile unsigned short kala;
     kala=u5rb & 0xff;
     
     while(1) {
         /* Code hangs here until some interrupt is done */
         __wait_for_interrupt();
-
+        
+//        if(recv_flag) { // some data is held in recv_buf. Main shield sent us byte!!          
+          recv_flag=0; // clear it
+          LED4=1;
+          u0tb=recv_buf;          
+          u2tb=recv_buf;          
+          u3tb=recv_buf;          
+          u4tb=recv_buf;          
+          LED4=0;
+//        }
     }
 }

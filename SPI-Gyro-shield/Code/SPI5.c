@@ -25,12 +25,18 @@
 #include "main.h"
 #include "SPI.h"
 
+volatile unsigned char recv_buf;
+volatile unsigned char recv_flag;
+
+#if 0
+__fast_interrupt void _uart5_receive(void) {
+#else
 #pragma vector = UART5_RX
 __interrupt void _uart5_receive(void) {
-
+#endif
     LED3 = 1; 
-    unsigned short kala;
-    kala=u5rb & 0xff;
+    recv_buf=u5rb & 0xff;
+    recv_flag=1;
     LED3 = 0; 
     /* Clear the 'reception complete' flag.	*/
     ir_s5ric = 0;
@@ -38,35 +44,40 @@ __interrupt void _uart5_receive(void) {
 
 #pragma vector = UART5_TX
 __interrupt void _uart5_transmit(void) {
-
-    LED4 = 1; 
-    //volatile unsigned short dummy = u5rb & 0xff;
-    
-    u5tb=0x00;
-    LED4 = 0; 
-   /* Clear the 'reception complete' flag.	*/
+    /* Clear the 'reception complete' flag.	*/
     ir_s5tic = 0;
 }
 
-#pragma vector = INT1 // CS pin is connected here
-__interrupt void _int1(void) {
-    LED3 = 1; 
-    //u5tb=0x00;
-    LED3 = 0; 
-
-   /* Clear the 'reception complete' flag.	*/
-    ir_int1ic = 0;
-
+#pragma vector = INT0 // RESET pin is connected here
+__interrupt void _int0(void) {
+    LED2 = 1;
+    // Copy INT0 pin to all four motor outputs
+    RESET0=RESET1=RESET2=RESET3=p8_2;
+    LED2 = 0; 
+    /* Clear the flag. */
+    ir_int0ic = 0;
 }
 
+#pragma vector = INT2 // CS pin is connected here
+__interrupt void _int2(void) {
+    LED1 = 1;
+    // Copy INT2 pin to all four motor outputs
+    CS0=CS2=CS3=CS4=p8_4;
+    LED1 = 0;
+    /* Clear the flag. */
+    ir_int2ic = 0;
+}
 
 void
 SPI5_Init(void) {
-    u5brg =  (unsigned char)(((base_freq)/(2*8000000))-1);
+    u5brg =  (unsigned char)(((base_freq)/(2*1000000))-1);
 
     //CS5d = PD_OUTPUT; Input!!
     //CS5=1;
     //CLOCK5d = PD_OUTPUT;
+    
+    //p7_1 (miso) has hardware pullup on board;
+    pu27=1; // Enable pullup to avoid floating pin noise on p7_7 (clock)
     CLOCK5s = PF_UART;
     TX5d = PD_OUTPUT;
     TX5s = PF_UART;
@@ -80,14 +91,14 @@ SPI5_Init(void) {
     stps_u5mr  = 0;                                        // 0=1 stop bit, 0 required
     pry_u5mr   = 0;                                        // Parity, 0=odd, 0 required 
     prye_u5mr  = 0;                                        // Parity Enable? 0=disable, 0 required 
-    iopol_u5mr = myIOPOL;                                        // IO Polarity, 0=not inverted, 0 required
+    iopol_u5mr = myIOPOL;                                  // IO Polarity, 0=not inverted, 0 required
 
     clk0_u5c0 = 0;                                         // Clock source f1 for u5brg
     clk1_u5c0 = 0;                                         // 
     txept_u5c0 = 0;                                        // Transmit register empty flag 
     crd_u5c0 = 1;                                          // CTS disabled when 1
-    nch_u5c0 = 1;                                          // 0=Output mode "push-pull" for TXD and CLOCK pin 
-    ckpol_u5c0 = myCKPOL;                                        // CLK Polarity 0 rising edge, 1 falling edge
+    nch_u5c0 = 0;                                          // 0=Output mode "push-pull" for TXD and CLOCK pin 
+    ckpol_u5c0 = myCKPOL;                                  // CLK Polarity 0 rising edge, 1 falling edge
     uform_u5c0 = 1;                                        // 1=MSB first
 
     te_u5c1 = 1;                                           // 1=Transmission Enable
@@ -102,7 +113,7 @@ SPI5_Init(void) {
     u5smr2 = 0x00;
 
     sse_u5smr3 = 0;                                        // SS is disabled when 0
-    ckph_u5smr3 = myCKPH;                                       // Non clock delayed 
+    ckph_u5smr3 = myCKPH;                                  // Non clock delayed 
     dinc_u5smr3 = 0;                                       // Slave mode when 1. Unsure if should be unless SS is used too
     nodc_u5smr3 = 0;                                       // Select a clock output  mode "push-pull" when 0 
     err_u5smr3 = 0;                                        // Error flag, no error when 0 
@@ -116,9 +127,16 @@ SPI5_Init(void) {
     /* 
      * Middle interrupt priority
      */
-    ilvl_s5ric =7;
+#if 0
+    fsit_ripl1 = 1;
+    fsit_ripl2 = 1;
+    __set_VCT_register((unsigned long)&_uart5_receive);
+    ilvl_s5ric =7; // fast interrupt 
+#else
+    ilvl_s5ric =5; 
+#endif
     ir_s5ric   =0;            
-    ilvl_s5tic =1;
+    ilvl_s5tic =4;
     ir_s5tic   =0;            
     ENABLE_IRQ
 }

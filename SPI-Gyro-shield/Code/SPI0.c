@@ -25,31 +25,6 @@
 #include "main.h"
 #include "SPI.h"
 
-#pragma vector = UART0_RX
-__interrupt void _uart0_receive(void) {
-
-    LED1 = 1; 
-//    u0tb=0xaa;
-//    __delay_cycles(1ULL);
-    LED1 = 0; 
-   /* Clear the 'reception complete' flag.	*/
-    ir_s0ric = 0;
-}
-
-#pragma vector = UART0_TX
-__interrupt void _uart0_transmit(void) {
-
-    CS0=1;
-    LED2 = 1; 
-    u0tb=0xaf;
-    LED2 = 0;     
-    /* Clear the 'reception complete' flag.	*/
-    ir_s0tic = 0;
-    CS0=0;
-
-}
-
-
 void
 SPI0_Init(void) {
     u0brg =  (unsigned char)(((base_freq)/(2*MOTORS_SPI_SPEED))-1);
@@ -107,9 +82,9 @@ SPI0_Init(void) {
      * Lowest interrupt priority
      * we do not care about speed
      */
-    ilvl_s0ric =1;
+    ilvl_s0ric =0;
     ir_s0ric   =0;            
-    ilvl_s0tic =1;
+    ilvl_s0tic =0;
     ir_s0tic   =0;            
     ENABLE_IRQ
 }

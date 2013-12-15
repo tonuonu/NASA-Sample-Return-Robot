@@ -25,30 +25,6 @@
 #include "main.h"
 #include "SPI.h"
 
-#pragma vector = UART2_RX
-__interrupt void _uart2_receive(void) {
-
-    LED1 = 1; 
-//    u2tb=0xaa;
-//    __delay_cycles(1ULL);
-    LED1 = 0; 
-   /* Clear the 'reception complete' flag.	*/
-    ir_s2ric = 0;
-}
-
-#pragma vector = UART2_TX
-__interrupt void _uart2_transmit(void) {
-
-    CS2=1;
-    LED2 = 1; 
-    u2tb=0xaf;
-    LED2 = 0;     
-    /* Clear the 'reception complete' flag.	*/
-    ir_s2tic = 0;
-    CS2=0;
-}
-
-
 void
 SPI2_Init(void) {
     u2brg =  (unsigned char)(((base_freq)/(2*MOTORS_SPI_SPEED))-1);
@@ -106,9 +82,9 @@ SPI2_Init(void) {
      * Lowest interrupt priority
      * we do not care about speed
      */
-    ilvl_s2ric =1;
+    ilvl_s2ric =0;
     ir_s2ric   =0;            
-    ilvl_s2tic =1;
+    ilvl_s2tic =0;
     ir_s2tic   =0;            
     ENABLE_IRQ
 }

@@ -78,7 +78,7 @@ s_int(void) {
      */
     switch(ticks % 100) {
         case 0:
-            LED5 ^= 1; 
+            //LED5 ^= 1; 
 
             break;
         case 99:
@@ -91,3 +91,4 @@ s_int(void) {
            break;
     }
 }
+

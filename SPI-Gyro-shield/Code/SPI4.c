@@ -25,30 +25,6 @@
 #include "main.h"
 #include "SPI.h"
 
-#pragma vector = UART4_RX
-__interrupt void _uart4_receive(void) {
-
-    LED1 = 1; 
-//    u4tb=0xaa;
-//    __delay_cycles(1ULL);
-    LED1 = 0; 
-   /* Clear the 'reception complete' flag.	*/
-    ir_s4ric = 0;
-}
-
-#pragma vector = UART4_TX
-__interrupt void _uart4_transmit(void) {
-
-    CS4=1;
-    LED2 = 1; 
-    u4tb=0xaf;
-    LED2 = 0;     
-    /* Clear the 'reception complete' flag.	*/
-    ir_s4tic = 0;
-    CS4=0;
-}
-
-
 void
 SPI4_Init(void) {
     u4brg =  (unsigned char)(((base_freq)/(2*MOTORS_SPI_SPEED))-1);
@@ -113,9 +89,9 @@ SPI4_Init(void) {
      * Lowest interrupt priority
      * we do not care about speed
      */
-    ilvl_s4ric =1;
+    ilvl_s4ric =0;
     ir_s4ric   =0;            
-    ilvl_s4tic =1;
+    ilvl_s4tic =0;
     ir_s4tic   =0;            
     ENABLE_IRQ
 }

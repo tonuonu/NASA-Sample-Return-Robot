@@ -260,7 +260,7 @@ Oneshot_Init(void) {
      * Lowest interrupt priority
      * we do not care about speed
      */
-    ilvl_ta0ic  = 1; 
+    //ilvl_ta0ic  = 1; 
     ir_ta0ic    = 0;            
     ENABLE_IRQ
       
@@ -277,7 +277,7 @@ Oneshot_Init(void) {
      * Lowest interrupt priority
      * we do not care about speed
      */
-    ilvl_ta3ic  = 1;
+    //ilvl_ta3ic  = 1;
     ir_ta3ic    = 0;            
     ENABLE_IRQ
 }
@@ -289,7 +289,7 @@ Led_Init(void) {
     LED3d  = PD_OUTPUT;
     LED4d  = PD_OUTPUT;
     LED5d  = PD_OUTPUT;
-    LED1=LED2=LED3=LED4=1;
+    LED1=LED2=LED3=LED4=0;
 }
 
 static void 
@@ -302,6 +302,10 @@ MotorIO_Init(void) {
     pu01 = 1; /* enable pullups on P0_4..p0_7 which are CDONE0..3 inputs
                * Unsure if similar pullups are already in motor driver? 
                */
+    RESET0=1;
+    RESET1=1;
+    RESET2=1;
+    RESET3=1;
 }
 
 void
@@ -315,22 +319,17 @@ HardwareSetup(void) {
     pu26=1; // Just to make sure unused P9_1 and P9_3 are not floating
     Led_Init();
     MotorIO_Init(); // Reset and DONE pins. SPI is separate
-    Heartbeat_Init();
-    ifsr00=1; // INT0 in both edges
-    ifsr01=1; // INT1 in both edges
-    ifsr02=1; // INT2 in both edges
-    ifsr03=1; // INT3 in both edges
+    //Heartbeat_Init();
     
-    pol_int0ic=0; // This should be 0, "falling edge" to make both edges work
-    pol_int1ic=0; // This should be 0, "falling edge" to make both edges work
-    pol_int2ic=0; // This should be 0, "falling edge" to make both edges work
-    pol_int3ic=0; // This should be 0, "falling edge" to make both edges work
+    ifsr00=1; // INT0 in both edges. RESET input from Atmega2560 for motors
+    ifsr02=1; // INT2 in both edges. CS pin for us
+    pol_int0ic  = 0; // This should be 0, "falling edge" to make both edges work
+    pol_int2ic  = 0; // This should be 0, "falling edge" to make both edges work
+    ilvl_int0ic = 6; // level 6 int, very high
+    ilvl_int2ic = 6; // level 6 int, very high
+    lvs_int0ic  = 0; // edge sensitive
+    lvs_int2ic  = 0; // edge sensitive
 
-    ilvl_int1ic = 1; // level 1 int
-    lvs_int1ic  = 0; // edge sensitive
-
-
-    
     /* Four motor ports, masters */
     SPI0_Init(); 
     SPI2_Init(); 

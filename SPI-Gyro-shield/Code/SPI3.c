@@ -25,30 +25,6 @@
 #include "main.h"
 #include "SPI.h"
 
-#pragma vector = UART3_RX
-__interrupt void _uart3_receive(void) {
-
-    LED1 = 1; 
-//    u3tb=0xaa;
-//    __delay_cycles(1ULL);
-    LED1 = 0; 
-   /* Clear the 'reception complete' flag.	*/
-    ir_s3ric = 0;
-}
-
-#pragma vector = UART3_TX
-__interrupt void _uart3_transmit(void) {
-
-    CS3=1;
-    LED2 = 1; 
-    u3tb=0xaf;
-    LED2 = 0;     
-    /* Clear the 'reception complete' flag.	*/
-    ir_s3tic = 0;
-    CS3=0;
-}
-
-
 void
 SPI3_Init(void) {
     u3brg =  (unsigned char)(((base_freq)/(2*MOTORS_SPI_SPEED))-1);
@@ -106,9 +82,9 @@ SPI3_Init(void) {
      * Lowest interrupt priority
      * we do not care about speed
      */
-    ilvl_s3ric =1;
+    ilvl_s3ric =0;
     ir_s3ric   =0;            
-    ilvl_s3tic =1;
+    ilvl_s3tic =0;
     ir_s3tic   =0;            
     ENABLE_IRQ
 }
