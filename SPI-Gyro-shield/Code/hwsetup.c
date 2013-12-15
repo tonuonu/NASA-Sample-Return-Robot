@@ -299,9 +299,6 @@ MotorIO_Init(void) {
     RESET2d = PD_OUTPUT;
     RESET3d = PD_OUTPUT;
     
-    pu01 = 1; /* enable pullups on P0_4..p0_7 which are CDONE0..3 inputs
-               * Unsure if similar pullups are already in motor driver? 
-               */
     RESET0=1;
     RESET1=1;
     RESET2=1;
