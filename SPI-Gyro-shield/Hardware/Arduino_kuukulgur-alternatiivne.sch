@@ -27840,11 +27840,11 @@ Source: http://focus.ti.com/lit/ds/symlink/tps77333.pdf</description>
 <label x="86.36" y="142.24" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="CS2_3V" class="0">
+<net name="CS_MOTOR_3V" class="0">
 <segment>
 <pinref part="MCU" gate="G$1" pin="P84/INT2"/>
-<wire x1="101.6" y1="127" x2="83.82" y2="127" width="0.1524" layer="91"/>
-<label x="86.36" y="127" size="1.778" layer="95"/>
+<wire x1="101.6" y1="127" x2="81.28" y2="127" width="0.1524" layer="91"/>
+<label x="81.28" y="127" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="_MISO0" class="0">
@@ -28095,7 +28095,7 @@ Source: http://focus.ti.com/lit/ds/symlink/tps77333.pdf</description>
 <net name="P8_1" class="0">
 <segment>
 <pinref part="MCU" gate="G$1" pin="P81/TA4IN/U/CTS5"/>
-<wire x1="101.6" y1="134.62" x2="83.82" y2="134.62" width="0.1524" layer="91"/>
+<wire x1="101.6" y1="134.62" x2="81.28" y2="134.62" width="0.1524" layer="91"/>
 <label x="86.36" y="134.62" size="1.778" layer="95"/>
 </segment>
 </net>
@@ -28221,18 +28221,18 @@ Source: http://focus.ti.com/lit/ds/symlink/tps77333.pdf</description>
 <wire x1="97.79" y1="121.92" x2="101.6" y2="121.92" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="INT2_3V" class="0">
+<net name="RESET_MOTOR_3V" class="0">
 <segment>
 <pinref part="MCU" gate="G$1" pin="P82/INT0"/>
-<wire x1="101.6" y1="132.08" x2="83.82" y2="132.08" width="0.1524" layer="91"/>
-<label x="86.36" y="132.08" size="1.778" layer="95"/>
+<wire x1="101.6" y1="132.08" x2="76.2" y2="132.08" width="0.1524" layer="91"/>
+<label x="76.2" y="132.08" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="CS_3V" class="0">
+<net name="CS_GYRO_3V" class="0">
 <segment>
 <pinref part="MCU" gate="G$1" pin="P83/INT1"/>
-<wire x1="101.6" y1="129.54" x2="83.82" y2="129.54" width="0.1524" layer="91"/>
-<label x="86.36" y="129.54" size="1.778" layer="95"/>
+<wire x1="101.6" y1="129.54" x2="81.28" y2="129.54" width="0.1524" layer="91"/>
+<label x="81.28" y="129.54" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="P7_5" class="0">
@@ -28511,11 +28511,11 @@ Source: http://focus.ti.com/lit/ds/symlink/tps77333.pdf</description>
 <wire x1="2.54" y1="80.01" x2="2.54" y2="81.28" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="INT_3V" class="0">
+<net name="INT_GYRO_3V" class="0">
 <segment>
 <pinref part="U1" gate="G$1" pin="INT"/>
-<wire x1="3.81" y1="68.58" x2="-8.89" y2="68.58" width="0.1524" layer="91"/>
-<label x="-8.89" y="68.58" size="1.778" layer="95"/>
+<wire x1="3.81" y1="68.58" x2="-13.97" y2="68.58" width="0.1524" layer="91"/>
+<label x="-13.97" y="68.58" size="1.778" layer="95"/>
 </segment>
 <segment>
 <wire x1="100.33" y1="66.04" x2="118.11" y2="66.04" width="0.1524" layer="91"/>
@@ -28625,17 +28625,17 @@ Source: http://focus.ti.com/lit/ds/symlink/tps77333.pdf</description>
 <pinref part="TP5" gate="G$1" pin="TP"/>
 </segment>
 </net>
-<net name="CS_3V" class="0">
+<net name="CS_GYRO_3V" class="0">
 <segment>
 <pinref part="U1" gate="G$1" pin="CS"/>
-<wire x1="39.37" y1="71.12" x2="52.07" y2="71.12" width="0.1524" layer="91"/>
+<wire x1="39.37" y1="71.12" x2="59.69" y2="71.12" width="0.1524" layer="91"/>
 <label x="41.91" y="71.12" size="1.778" layer="95"/>
 </segment>
 <segment>
 <wire x1="100.33" y1="73.66" x2="118.11" y2="73.66" width="0.1524" layer="91"/>
 <wire x1="128.27" y1="73.66" x2="118.11" y2="73.66" width="0.1524" layer="91"/>
 <pinref part="U2" gate="G$1" pin="A1"/>
-<label x="105.41" y="73.66" size="1.778" layer="95"/>
+<label x="100.33" y="73.66" size="1.778" layer="95"/>
 <pinref part="TP1" gate="G$1" pin="TP"/>
 </segment>
 </net>
@@ -28681,7 +28681,7 @@ Source: http://focus.ti.com/lit/ds/symlink/tps77333.pdf</description>
 <label x="163.83" y="68.58" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="CS2_3V" class="0">
+<net name="CS_MOTOR_3V" class="0">
 <segment>
 <pinref part="U2" gate="G$1" pin="A7"/>
 <wire x1="128.27" y1="58.42" x2="100.33" y2="58.42" width="0.1524" layer="91"/>
@@ -28696,7 +28696,7 @@ Source: http://focus.ti.com/lit/ds/symlink/tps77333.pdf</description>
 <label x="163.83" y="58.42" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="INT2_3V" class="0">
+<net name="RESET_MOTOR_3V" class="0">
 <segment>
 <pinref part="U2" gate="G$1" pin="A8"/>
 <wire x1="128.27" y1="55.88" x2="100.33" y2="55.88" width="0.1524" layer="91"/>

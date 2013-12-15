@@ -7028,7 +7028,7 @@ design rules under a new name.</description>
 <via x="21.2669" y="33.3282" extent="1-16" drill="0.4064" diameter="0.9144"/>
 <via x="30.4039" y="44.0114" extent="1-16" drill="0.4064" diameter="0.9144"/>
 </signal>
-<signal name="INT_3V">
+<signal name="INT_GYRO_3V">
 <contactref element="U1" pad="12"/>
 <contactref element="U2" pad="5"/>
 <contactref element="TP4" pad="TP"/>
@@ -7201,7 +7201,7 @@ design rules under a new name.</description>
 <via x="69.7895" y="13.2875" extent="1-16" drill="0.4064" diameter="0.9144"/>
 <via x="77.3413" y="20.8393" extent="1-16" drill="0.4064" diameter="0.9144"/>
 </signal>
-<signal name="CS_3V">
+<signal name="CS_GYRO_3V">
 <contactref element="U1" pad="8"/>
 <contactref element="U2" pad="1"/>
 <contactref element="MCU" pad="17"/>
@@ -7288,7 +7288,7 @@ design rules under a new name.</description>
 <wire x1="42.73" y1="32.337" x2="46.648" y2="32.337" width="0.2032" layer="1"/>
 <wire x1="46.648" y1="32.337" x2="48.211" y2="33.9" width="0.2032" layer="1"/>
 </signal>
-<signal name="CS2_3V">
+<signal name="CS_MOTOR_3V">
 <contactref element="U2" pad="8"/>
 <contactref element="MCU" pad="16"/>
 <contactref element="TP7" pad="TP"/>
@@ -7319,7 +7319,7 @@ design rules under a new name.</description>
 <via x="28.3978" y="26.6456" extent="1-16" drill="0.4064" diameter="0.9144"/>
 <via x="29.2014" y="5.8742" extent="1-16" drill="0.4064" diameter="0.9144"/>
 </signal>
-<signal name="INT2_3V">
+<signal name="RESET_MOTOR_3V">
 <contactref element="U2" pad="9"/>
 <contactref element="MCU" pad="18"/>
 <contactref element="TP8" pad="TP"/>
