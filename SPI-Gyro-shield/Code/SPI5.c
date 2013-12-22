@@ -28,7 +28,7 @@
 volatile unsigned char recv_buf;
 volatile unsigned char recv_flag;
 
-#if 0
+#if 1
 __fast_interrupt void _uart5_receive(void) {
 #else
 #pragma vector = UART5_RX
@@ -50,6 +50,19 @@ __interrupt void _uart5_transmit(void) {
 
 #pragma vector = INT0 // RESET pin is connected here
 __interrupt void _int0(void) {
+  
+   /*
+    * TXEPT (TX buffer EmPTy)
+    * 0: Data held in the transmit shift
+    * register (transmission in progress)
+    * 1: No data held in the transmit shift
+    * register (transmission completed)
+    */
+    while(txept_u0c0 == 0);
+    while(txept_u2c0 == 0);
+    while(txept_u3c0 == 0);
+    while(txept_u4c0 == 0);
+
     // Copy INT0 pin to all four motor outputs
     RESET0=RESET1=RESET2=RESET3=p8_2;
     /* Clear the flag. */
@@ -58,11 +71,22 @@ __interrupt void _int0(void) {
 
 #pragma vector = INT2 // CS pin is connected here
 __interrupt void _int2(void) {
-  
-    __delay_cycles(48UL*(unsigned long)2UL /*usec*/);
+//    __delay_cycles(48UL*(unsigned long)2UL /*usec*/);  
+    // Copy INT2 pin to all four motor outputs
 
   
-    // Copy INT2 pin to all four motor outputs
+   /*
+    * TXEPT (TX buffer EmPTy)
+    * 0: Data held in the transmit shift
+    * register (transmission in progress)
+    * 1: No data held in the transmit shift
+    * register (transmission completed)
+    */
+    while(txept_u0c0 == 0);
+    while(txept_u2c0 == 0);
+    while(txept_u3c0 == 0);
+    while(txept_u4c0 == 0);
+
     CS0=CS2=CS3=CS4=p8_4;
     /* Clear the flag. */
     ir_int2ic = 0;
@@ -127,7 +151,7 @@ SPI5_Init(void) {
     /* 
      * Middle interrupt priority
      */
-#if 0
+#if 1
     fsit_ripl1 = 1;
     fsit_ripl2 = 1;
     __set_VCT_register((unsigned long)&_uart5_receive);
