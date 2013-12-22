@@ -52,36 +52,6 @@ void HardwareSetup(void);
 #define RESET3       p0_0
 #define RESET3d      pd0_0
 
-#if 0
-#define ERRORLEDd    pd1_4
-#define ERRORLED     p1_4
-
-#define LEFT_PWMd    pd3_2
-#define LEFT_PWMs    p3_2s
-#define LEFT_PWM     p3_2
-#define RIGHT_PWMd   pd3_4
-#define RIGHT_PWMs   p3_4s
-#define RIGHT_PWM    p3_4
-
-#define RIGHT_INA        p2_0
-#define RIGHT_INB        p2_1
-#define LEFT_INA         p2_2
-#define LEFT_INB         p2_3
-#define RIGHT_INAd       pd2_0
-#define RIGHT_INBd       pd2_1
-#define LEFT_INAd        pd2_2
-#define LEFT_INBd        pd2_3
-
-#define RIGHT_ENA      p2_4
-#define RIGHT_ENB      p2_5
-#define LEFT_ENA       p2_6
-#define LEFT_ENB       p2_7
-#define RIGHT_ENAd     pd2_4
-#define RIGHT_ENBd     pd2_5
-#define LEFT_ENAd      pd2_6
-#define LEFT_ENBd      pd2_7
-#endif
-
 // SPI0, motor 0
 #define CS0d         pd6_0
 #define CS0          p6_0

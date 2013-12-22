@@ -31,7 +31,6 @@ volatile unsigned short ticks;
 
 volatile int fpga_uploaded=0;
 
-
 extern volatile unsigned char recv_buf;
 extern volatile unsigned char recv_flag;
 
