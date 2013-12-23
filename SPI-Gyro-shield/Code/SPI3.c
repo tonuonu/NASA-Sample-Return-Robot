@@ -27,8 +27,9 @@
 
 void
 SPI3_Init(void) {
-    u3brg =  (unsigned char)(((base_freq)/(2*MOTORS_SPI_SPEED))-1);
+    u3brg =  (unsigned char)(((base_freq)/(1*MOTORS_SPI_SPEED))-1);
 
+    pu10=1; // enable pullups for p4_0..p4_3. p4_1 is CLK3
     CS3d = PD_OUTPUT;
     CS3=1;
     CLOCK3d = PD_OUTPUT;

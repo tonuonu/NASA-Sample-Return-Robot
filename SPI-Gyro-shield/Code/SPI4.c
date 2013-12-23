@@ -27,7 +27,7 @@
 
 void
 SPI4_Init(void) {
-    u4brg =  (unsigned char)(((base_freq)/(2*MOTORS_SPI_SPEED))-1);
+    u4brg =  (unsigned char)(((base_freq)/(1*MOTORS_SPI_SPEED))-1);
 
     prc2 = 1; // pd9 is protected. 
     CS4d = PD_OUTPUT;

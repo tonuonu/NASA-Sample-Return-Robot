@@ -26,7 +26,7 @@
 #include "SPI.h"
 
 volatile unsigned char recv_buf;
-volatile unsigned char recv_flag;
+volatile unsigned char recv_flag=0;
 
 #if 1
 __fast_interrupt void _uart5_receive(void) {
@@ -50,7 +50,8 @@ __interrupt void _uart5_transmit(void) {
 
 #pragma vector = INT0 // RESET pin is connected here
 __interrupt void _int0(void) {
-  
+//   LED1 ^= 1;
+   recv_flag = 0; // clear any receive buffers   
    /*
     * TXEPT (TX buffer EmPTy)
     * 0: Data held in the transmit shift
@@ -63,18 +64,15 @@ __interrupt void _int0(void) {
     while(txept_u3c0 == 0);
     while(txept_u4c0 == 0);
 
-    // Copy INT0 pin to all four motor outputs
-    RESET0=RESET1=RESET2=RESET3=p8_2;
-    /* Clear the flag. */
+    // Copy RESET5 pin to all four motor outputs
+    RESET0=RESET1=RESET2=RESET3 = RESET5;
+    /* Clear the interrupt flag. */
     ir_int0ic = 0;
 }
 
 #pragma vector = INT2 // CS pin is connected here
 __interrupt void _int2(void) {
-//    __delay_cycles(48UL*(unsigned long)2UL /*usec*/);  
-    // Copy INT2 pin to all four motor outputs
-
-  
+   recv_flag = 0; // clear any receive buffers 
    /*
     * TXEPT (TX buffer EmPTy)
     * 0: Data held in the transmit shift
@@ -87,16 +85,19 @@ __interrupt void _int2(void) {
     while(txept_u3c0 == 0);
     while(txept_u4c0 == 0);
 
-    CS0=CS2=CS3=CS4=p8_4;
-    /* Clear the flag. */
+    // Copy CS5 pin to all four motor outputs
+    LED1=CS0=CS2=CS3=CS4 = CS5;
+   
+    /* Clear the interrupt flag. */
     ir_int2ic = 0;
 }
 
 void
 SPI5_Init(void) {
-    u5brg =  (unsigned char)(((base_freq)/(2*1000000))-1);
-
-    //CS5d = PD_OUTPUT; Input!!
+    // u5brg =  (unsigned char)(((base_freq)/(1*MOTORS_SPI_SPEED))-1);
+    // u5brg does not matter because clock is external
+  
+  //CS5d = PD_OUTPUT; Input!!
     //CS5=1;
     //CLOCK5d = PD_OUTPUT;
     

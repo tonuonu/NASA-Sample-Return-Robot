@@ -29,8 +29,6 @@
 extern int alarm;
 volatile unsigned short ticks;
 
-volatile int fpga_uploaded=0;
-
 extern volatile unsigned char recv_buf;
 extern volatile unsigned char recv_flag;
 
@@ -38,15 +36,18 @@ int
 main(void) {
     HardwareSetup();
     // All CS* and RESET* are pulled up before in HW setups.
-    volatile unsigned short kala;
-    kala=u5rb & 0xff;
+//    volatile unsigned short kala;
+    volatile unsigned short dummy=u5rb & 0xff;
     
     while(1) {
         /* Code hangs here until some interrupt is done */
         __wait_for_interrupt();
-        LED1=p0_4;
-        LED2=p0_5;
-        if(recv_flag) { // some data is held in recv_buf. Main shield sent us byte!!          
+        LED2=p0_4; // CDONE pin
+        /* Check if some data is held in recv_buf. Main shield sent us byte!!          
+         * Also see if CS is down and RESET is up
+         */
+        
+        if(recv_flag && !CS5 && RESET5) { 
           recv_flag=0; // clear it
           LED4=1;
           u0tb=recv_buf;          

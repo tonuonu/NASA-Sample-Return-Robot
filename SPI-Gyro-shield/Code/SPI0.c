@@ -27,7 +27,7 @@
 
 void
 SPI0_Init(void) {
-    u0brg =  (unsigned char)(((base_freq)/(2*MOTORS_SPI_SPEED))-1);
+    u0brg =  (unsigned char)(((base_freq)/(1*MOTORS_SPI_SPEED))-1);
 
     CS0d = PD_OUTPUT;
     CS0=1;

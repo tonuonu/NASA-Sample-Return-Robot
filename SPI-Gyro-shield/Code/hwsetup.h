@@ -52,6 +52,10 @@ void HardwareSetup(void);
 #define RESET3       p0_0
 #define RESET3d      pd0_0
 
+#define RESET5       p8_2
+#define RESET5d      pd8_2
+
+
 // SPI0, motor 0
 #define CS0d         pd6_0
 #define CS0          p6_0
@@ -111,9 +115,9 @@ void HardwareSetup(void);
 
 // Serial 5
 
-#define CS5         p8_3
-#define CS5d        pd8_3
-#define CS5s        p8_3s
+#define CS5         p8_4
+#define CS5d        pd8_4
+#define CS5s        p8_4s
 #define CLOCK5      p7_7
 #define CLOCK5d     pd7_7
 #define CLOCK5s     p7_7s
@@ -127,7 +131,6 @@ void HardwareSetup(void);
 #define TX5         p7_6
 #define TX5d        pd7_6
 #define TX5s        p7_6s
-
 
 #define TIMERB2COUNT	2000 // about 12,5kHz
 
