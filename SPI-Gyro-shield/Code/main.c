@@ -26,35 +26,64 @@
 #include "main.h"
 #include "hwsetup.h"
 
-extern int alarm;
-volatile unsigned short ticks;
+//extern int alarm;
+//volatile unsigned short ticks;
 
-extern volatile unsigned char recv_buf;
-extern volatile unsigned char recv_flag;
+static void 
+complete_tx(void) {
+    /*
+     * TXEPT (TX buffer EmPTy)
+     * 0: Data held in the transmit shift
+     * register (transmission in progress)
+     * 1: No data held in the transmit shift
+     * register (transmission completed)
+     */
+    while((txept_u0c0 == 0) ||
+          (txept_u2c0 == 0) ||
+          (txept_u3c0 == 0) ||
+          (txept_u4c0 == 0));
+}
+
+void 
+set_steady_speed(unsigned char motor_idx) {
+    complete_tx();
+    CS0=CS2=CS3=CS4 = 0;
+
+    u0tb=u2tb=u3tb=u4tb=CMD_STEADY_SPEED | motor_idx;
+    complete_tx();
+
+    u0tb=u2tb=u3tb=u4tb=steady_speed[0];
+    complete_tx();
+    
+    //    u0tb=u2tb=u3tb=u4tb=100;
+    u0tb=u2tb=u3tb=u4tb=steady_speed[1];
+    complete_tx();
+
+    u0tb=u2tb=u3tb=u4tb=0;
+    complete_tx();
+
+    u0tb=u2tb=u3tb=u4tb=0;
+    complete_tx();
+
+    CS0=CS2=CS3=CS4 = 1;
+}
 
 int
 main(void) {
     HardwareSetup();
     // All CS* and RESET* are pulled up before in HW setups.
-//    volatile unsigned short kala;
     volatile unsigned short dummy=u5rb & 0xff;
     
     while(1) {
         /* Code hangs here until some interrupt is done */
-        __wait_for_interrupt();
-        LED2=p0_4; // CDONE pin
-        /* Check if some data is held in recv_buf. Main shield sent us byte!!          
-         * Also see if CS is down and RESET is up
-         */
-        
-        if(recv_flag && !CS5 && RESET5) { 
-          recv_flag=0; // clear it
-          LED4=1;
-          u0tb=recv_buf;          
-          u2tb=recv_buf;          
-          u3tb=recv_buf;          
-          u4tb=recv_buf;          
-          LED4=0;
+ //       __wait_for_interrupt();
+#if 1        
+        if(fpga_in==FPGA_LOADED) {
+//            set_steady_speed(0);
+            set_steady_speed(1);
+//            set_steady_speed(2);
+//            set_steady_speed(3);
         }
+#endif
     }
 }

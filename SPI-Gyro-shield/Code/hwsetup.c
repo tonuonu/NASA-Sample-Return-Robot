@@ -44,9 +44,10 @@ ConfigureOperatingFrequency(char mode) {
     pm3 = 0x60; // peripheral clock 48MHz
     prc0 = 0;
     prc2 = 1;
-    *(unsigned short *) &plc0 = 0x0226; // 48MHz, PLL = 96MHz
+//    *(unsigned short *) &plc0 = 0x0226; // 48MHz, PLL = 96MHz
+    *(unsigned short *) &plc0 = 0x0104; // 48MHz, PLL = 96MHz
     prc2 = 0;
-    base_freq = 48000000;
+    base_freq = 25000000;
 
     for (i = 0; i < 0x8000u; i++);                         /* Add delay
                                                             * for PLL to
@@ -99,6 +100,7 @@ ConfigureOperatingFrequency(char mode) {
     cnt3_tcspr = 1; // f2n is 24Mhz / 16
 }
 
+#if 0
 static void 
 PWM_Init(void) {
     /* 
@@ -234,6 +236,7 @@ PWM_Init(void) {
     // TABSR_bit.TA3S = 1;
 }
 
+
 static void 
 Heartbeat_Init(void) {
     // Init_TMRB5 1 mS timer
@@ -281,6 +284,7 @@ Oneshot_Init(void) {
     ir_ta3ic    = 0;            
     ENABLE_IRQ
 }
+#endif
 
 static void 
 Led_Init(void) {
@@ -336,7 +340,7 @@ HardwareSetup(void) {
     /* Interface to Arduino, slave */
     SPI5_Init();
 
-    PWM_Init();
-    Oneshot_Init();
+    //PWM_Init();
+    //Oneshot_Init();
 }
 

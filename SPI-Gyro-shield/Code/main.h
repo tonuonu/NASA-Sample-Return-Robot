@@ -23,6 +23,15 @@
 #include "intrinsics.h"
 #define PI 3.1415926535897932384626433832795028841971693993751058
 
+enum {FPGA_EMPTY,FPGA_LOADING,FPGA_LOADED};
+enum {CMD_NONE=0, CMD_STEADY_SPEED=0x04, CMD_TARGET_ACCELERATION=0x08, CMD_GET_CUR_TARGET_SPEED=0x10 };
+
+extern volatile unsigned char steady_speed[2];
+extern volatile unsigned char target_acceleration[2];
+
+extern volatile unsigned char recv_buf;
+//extern volatile unsigned char recv_flag;
+extern volatile unsigned char fpga_in;
 extern volatile unsigned short ticks;
 
 /*

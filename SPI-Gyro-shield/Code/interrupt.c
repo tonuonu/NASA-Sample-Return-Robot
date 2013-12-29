@@ -29,6 +29,8 @@
 #include "SPI.h"
 #include "intrinsics.h"
 
+#if 0
+
 /*
  * Timer A0 is used in "one shot" mode
  * to provide long delay waiting service for
@@ -92,3 +94,4 @@ s_int(void) {
     }
 }
 
+#endif

@@ -25,8 +25,17 @@
 #include "main.h"
 #include "SPI.h"
 
+unsigned char tmp_steady_speed;
+unsigned char tmp_target_acceleration;
+
+volatile unsigned char steady_speed[2]={0,0};
+volatile unsigned char target_acceleration[2]={0,0};
+
 volatile unsigned char recv_buf;
-volatile unsigned char recv_flag=0;
+//volatile unsigned char recv_flag=0;
+volatile unsigned char recv_bytenum=0;
+volatile unsigned char command=CMD_NONE;
+volatile unsigned char fpga_in=FPGA_EMPTY;
 
 #if 1
 __fast_interrupt void _uart5_receive(void) {
@@ -34,10 +43,85 @@ __fast_interrupt void _uart5_receive(void) {
 #pragma vector = UART5_RX
 __interrupt void _uart5_receive(void) {
 #endif
-    LED3 = 1; 
+    
     recv_buf=u5rb & 0xff;
-    recv_flag=1;
-    LED3 = 0; 
+    
+    /* Process this only if FPGA is loaded */
+    if(fpga_in == FPGA_LOADING) {
+LED4=1;
+        /* bypass byte transparently */
+        u0tb=
+        u2tb=
+        u3tb=
+        u4tb=recv_buf;
+LED4=0;
+    } else { // Probably FPGA_LOADED
+        switch(recv_bytenum) {
+        case 0:
+LED1=1;
+            command=recv_buf & 0xFC;
+            switch(command) {
+            case CMD_STEADY_SPEED:
+                break;
+            case CMD_TARGET_ACCELERATION:
+                break;
+            case CMD_GET_CUR_TARGET_SPEED:
+                break;
+            default:
+                LED5=1; // ERROR!!!
+                break;
+            }
+LED1=0;
+            break;
+        case 1:
+LED2=1;
+            switch(command) {
+            case CMD_STEADY_SPEED:
+                tmp_steady_speed=recv_buf;
+                break;
+            case CMD_TARGET_ACCELERATION:
+                tmp_target_acceleration=recv_buf;
+                break;
+            case CMD_GET_CUR_TARGET_SPEED:
+                /* ? */
+                break;
+            default:
+                LED5=1; // ERROR!!!
+                break;
+            }
+LED2=0;
+            break;
+        case 2:
+LED3=1;
+            switch(command) {
+            case CMD_STEADY_SPEED:
+                steady_speed[0]=tmp_steady_speed ;
+                steady_speed[1]=recv_buf;
+                break;
+            case CMD_TARGET_ACCELERATION:
+                target_acceleration[0]=tmp_target_acceleration;
+                target_acceleration[1]=recv_buf;
+                break;
+            case CMD_GET_CUR_TARGET_SPEED:
+                /* ? */
+                break;
+            default:
+                LED5=1; // ERROR!!!
+                break;
+            }
+LED3=0;
+            break;
+        default:
+            LED5=1;
+            __no_operation();
+            __no_operation();
+            __no_operation();
+            __no_operation();
+            LED5=0; 
+        }
+        recv_bytenum++;
+    }
+    
     /* Clear the 'reception complete' flag.	*/
     ir_s5ric = 0;
 }
@@ -48,21 +132,24 @@ __interrupt void _uart5_transmit(void) {
     ir_s5tic = 0;
 }
 
+
 #pragma vector = INT0 // RESET pin is connected here
 __interrupt void _int0(void) {
 //   LED1 ^= 1;
-   recv_flag = 0; // clear any receive buffers   
-   /*
-    * TXEPT (TX buffer EmPTy)
-    * 0: Data held in the transmit shift
-    * register (transmission in progress)
-    * 1: No data held in the transmit shift
-    * register (transmission completed)
-    */
-    while(txept_u0c0 == 0);
-    while(txept_u2c0 == 0);
-    while(txept_u3c0 == 0);
-    while(txept_u4c0 == 0);
+   //recv_flag = 0; // clear any receive buffers
+   recv_bytenum=0;
+   
+   if(RESET5==1) {
+       /* If reset just came up but CS is already low,
+        * FPGA code will be loaded in. 
+        */
+       if(CS5==0) {
+           LED5 = 1;
+           fpga_in=FPGA_LOADING;       
+       }
+   } else { // RESET is LOW, flush everything
+       fpga_in=FPGA_EMPTY;
+   }
 
     // Copy RESET5 pin to all four motor outputs
     RESET0=RESET1=RESET2=RESET3 = RESET5;
@@ -72,22 +159,33 @@ __interrupt void _int0(void) {
 
 #pragma vector = INT2 // CS pin is connected here
 __interrupt void _int2(void) {
-   recv_flag = 0; // clear any receive buffers 
-   /*
-    * TXEPT (TX buffer EmPTy)
-    * 0: Data held in the transmit shift
-    * register (transmission in progress)
-    * 1: No data held in the transmit shift
-    * register (transmission completed)
-    */
+    //recv_flag = 0; // clear any receive buffers
+    recv_bytenum=0;
+
+    /*
+     * TXEPT (TX buffer EmPTy)
+     * 0: Data held in the transmit shift
+     * register (transmission in progress)
+     * 1: No data held in the transmit shift
+     * register (transmission completed)
+     */
     while(txept_u0c0 == 0);
     while(txept_u2c0 == 0);
     while(txept_u3c0 == 0);
     while(txept_u4c0 == 0);
 
-    // Copy CS5 pin to all four motor outputs
-    LED1=CS0=CS2=CS3=CS4 = CS5;
-   
+    if(fpga_in != FPGA_LOADED) {
+        // Copy CS5 pin to all four motor outputs
+        CS0=CS2=CS3=CS4 = CS5;
+    }
+ 
+    
+    /* If we load FPGA bytes in and then CS goes up, code is loaded */
+    if(fpga_in==FPGA_LOADING && CS5==1) {
+        LED5 = 0;
+        fpga_in=FPGA_LOADED;
+    }
+
     /* Clear the interrupt flag. */
     ir_int2ic = 0;
 }
