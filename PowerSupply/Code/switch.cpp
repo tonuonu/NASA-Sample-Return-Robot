@@ -94,6 +94,12 @@ void InitialiseSwitchInterrupts(void)
   PORT3.PDR.BIT.B1 = 0;
   PORT3.PDR.BIT.B2 = 0;
   PORT3.PDR.BIT.B3 = 0;
+  
+  /* Enable pullups */
+  PORT3.PCR.BIT.B0 = 1;
+  PORT3.PCR.BIT.B1 = 1;
+  PORT3.PCR.BIT.B2 = 1;
+  PORT3.PCR.BIT.B3 = 1;
 
   /* Set detection direction as falling edge */
   ICU.IRQCR[0].BIT.IRQMD = 0x1;  
@@ -278,7 +284,7 @@ __interrupt void Excep_IRQ1(void)
 #pragma vector=VECT_ICU_IRQ2
 __interrupt void Excep_IRQ2(void)
 {    
-  /* Disable switch 1 interrupts */
+  /* Disable switch 3 interrupts */
   IEN(ICU, IRQ2) = 0x0;
   
   /* Set standby ready flag as false */
@@ -293,7 +299,7 @@ __interrupt void Excep_IRQ2(void)
     /* Set detection direction as rising edge */
     ICU.IRQCR[2].BIT.IRQMD = 0x2;
         
-    /* Set global switch flag to indicate SW1 is held down */
+    /* Set global switch flag to indicate SW3 is held down */
     gSwitchFlag |= SWITCHHOLD_3;
   }
   else
@@ -304,10 +310,10 @@ __interrupt void Excep_IRQ2(void)
     /* Set detection direction to falling edge */
     ICU.IRQCR[2].BIT.IRQMD = 0x1;
     
-    /* Clear SW1 held-down flag bit in switch flag */
+    /* Clear SW3 held-down flag bit in switch flag */
     gSwitchFlag &= (0xF0 | ~SWITCHHOLD_3);
     
-    /* Set global switch flag to indicate SW1 press complete */
+    /* Set global switch flag to indicate SW3 press complete */
     gSwitchFlag |= SWITCHPRESS_3;
   
     /* Check if switch release callback function is not NULL */
@@ -353,10 +359,10 @@ __interrupt void Excep_IRQ3(void)
     /* Set detection direction to falling edge */
     ICU.IRQCR[3].BIT.IRQMD = 0x1;
     
-    /* Clear SW1 held-down flag bit in switch flag */
+    /* Clear SW4 held-down flag bit in switch flag */
     gSwitchFlag &= (0xF0 | ~SWITCHHOLD_4);
     
-    /* Set global switch flag to indicate SW1 press complete */
+    /* Set global switch flag to indicate SW4 press complete */
     gSwitchFlag |= SWITCHPRESS_4;
   
     /* Check if switch release callback function is not NULL */
@@ -377,34 +383,35 @@ __interrupt void Excep_IRQ3(void)
 ******************************************************************************/
 void SwitchDebounceCB(void)
 {  
-#if 0
+  /* Clear IRQ0 interrupt flag */
+  IR(ICU, IRQ0) = 0;
+  /* Re-enable switch 1 interrupts */
+  IEN(ICU, IRQ0) = 0x1;
+
+  /* Clear IRQ1 interrupt flag */
+  IR(ICU, IRQ1) = 0;
+  /* Re-enable switch 2 interrupts */
+  IEN(ICU, IRQ1) = 0x1;
+
   /* Clear IRQ2 interrupt flag */
   IR(ICU, IRQ2) = 0;
-  
-  /* Re-enable switch 1 interrupts */
+  /* Re-enable switch 3 interrupts */
   IEN(ICU, IRQ2) = 0x1;
 
-  /* Clear IRQ12 interrupt flag */
-  IR(ICU, IRQ12) = 0;
-
-  /* Re-enable switch 2 interrupts */
-  IEN(ICU, IRQ12) = 0x1;
-
-  /* Clear IRQ15 interrupt flag */
-  IR(ICU, IRQ15) = 0;
-
+  /* Clear IRQ3 interrupt flag */
+  IR(ICU, IRQ3) = 0;
   /* Re-enable switch 3 interrupts */
-  IEN(ICU, IRQ15) = 0x1;
+  IEN(ICU, IRQ3) = 0x1;
   
   /* Check if switch 1 hold flag is set */ 
   if((gSwitchFlag & 0x0F) & SWITCHHOLD_1)
   {
     /* Check if switch 1 pin level is high (switch press duration
        less than debounce, invalid switch press) */
-    if(PORT3.PIDR.BIT.B2)
+    if(PORT3.PIDR.BIT.B0)
     {
       /* Reset detection direction to falling edge */
-      ICU.IRQCR[2].BIT.IRQMD = 0x1;
+      ICU.IRQCR[0].BIT.IRQMD = 0x1;
       
       /* Clear switch press flag */
       gSwitchFlag &= (0xF0 | ~SWITCHHOLD_1);
@@ -429,10 +436,10 @@ void SwitchDebounceCB(void)
   {
     /* Check if switch 2 pin level is high (switch press duration
        less than debounce, invalid switch press) */
-    if(PORT4.PIDR.BIT.B4)
+    if(PORT3.PIDR.BIT.B1)
     {
       /* Reset detection direction to falling edge */
-      ICU.IRQCR[12].BIT.IRQMD = 0x1;
+      ICU.IRQCR[1].BIT.IRQMD = 0x1;
       
       /* Clear switch press flag */
       gSwitchFlag &= (0xF0 | ~SWITCHHOLD_2);
@@ -457,10 +464,10 @@ void SwitchDebounceCB(void)
   {
     /* Check if switch 3 pin level is high (switch press duration
        less than debounce, invalid switch press) */
-    if(PORT0.PIDR.BIT.B7)
+    if(PORT3.PIDR.BIT.B2)
     {
       /* Reset detection direction to falling edge */
-      ICU.IRQCR[15].BIT.IRQMD = 0x1;
+      ICU.IRQCR[2].BIT.IRQMD = 0x1;
       
       /* Clear switch press flag */
       gSwitchFlag &= (0xF0 | ~SWITCHHOLD_3);
@@ -479,13 +486,40 @@ void SwitchDebounceCB(void)
       }
     }
   }
+
+  /* Check if switch 3 hold flag is set */ 
+  if((gSwitchFlag & 0x0F) & SWITCHHOLD_4)
+  {
+    /* Check if switch 4 pin level is high (switch press duration
+       less than debounce, invalid switch press) */
+    if(PORT3.PIDR.BIT.B3)
+    {
+      /* Reset detection direction to falling edge */
+      ICU.IRQCR[3].BIT.IRQMD = 0x1;
+      
+      /* Clear switch press flag */
+      gSwitchFlag &= (0xF0 | ~SWITCHHOLD_3);
+      
+      /* Increment detected switch faults counter */
+      gSwitchFaultsDetected++;
+    }
+    /* Switch 4 pin level is low (valid switch press) */
+    else
+    {
+      /* Check if switch press callback function is not NULL */
+      if(gSwitchPressCallbackFunc)
+      {
+        /* Execute user callback function */
+        gSwitchPressCallbackFunc();
+      }
+    }
+  }
   
   /* Check if any switches are held down */
   if(0x00 == (gSwitchFlag & 0x0F))
   {    
     gSwitchStandbyReady = true;
   }
-#endif
 }
 
 /******************************************************************************
@@ -554,7 +588,7 @@ __interrupt void Excep_CMTU0_CMT0(void)
   CMT.CMSTR0.BIT.STR0 = 0;
   
   /* Call the switch debounce callback function */
-  //SwitchDebounceCB();
+  SwitchDebounceCB();
   /* Clear the interrupt flag */
   ICU.IR[IR_CMT0_CMI0].BIT.IR = 0;
 
