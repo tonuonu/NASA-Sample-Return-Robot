@@ -9,8 +9,8 @@
 #include "iorx630.h"
 
 /* General Values */
-#define LED_ON      (0)
-#define LED_OFF      (1)
+#define LED_ON      (1)
+#define LED_OFF      (0)
 #define SET_BIT_HIGH  (1)
 #define SET_BIT_LOW    (0)
 #define SET_BYTE_HIGH  (0xFF)
@@ -22,16 +22,24 @@
 #define  SW3          PORT0.PIDR.BIT.7
 
 /* LED ouptut pin settings */
-#define  LED0      PORT0.PODR.BIT.B5
-#define  LED1      PORT0.PODR.BIT.B7
-//#define  LED2      PORTC.PODR.BIT.B2
-//#define  LED3      PORT1.PODR.BIT.B7
+#define  LED0      PORT2.PODR.BIT.B0
+#define  LED1      PORT2.PODR.BIT.B1
+#define  LED2      PORT2.PODR.BIT.B2
+#define  LED3      PORT2.PODR.BIT.B3
+#define  LED4      PORT2.PODR.BIT.B4
+#define  LED5      PORT2.PODR.BIT.B5
+#define  LED6      PORT2.PODR.BIT.B6
+#define  LED7      PORT2.PODR.BIT.B7
 
 /* LED data direction */
-#define LED0_PORT_DIR  PORT0.PDR.BIT.B5
-#define LED1_PORT_DIR  PORT0.PDR.BIT.B7
-//#define LED2_PORT_DIR  PORTC.PDR.BIT.B2
-//#define LED3_PORT_DIR  PORT1.PDR.BIT.B7
+#define LED0_PORT_DIR  PORT2.PDR.BIT.B0
+#define LED1_PORT_DIR  PORT2.PDR.BIT.B1
+#define LED2_PORT_DIR  PORT2.PDR.BIT.B2
+#define LED3_PORT_DIR  PORT2.PDR.BIT.B3
+#define LED4_PORT_DIR  PORT2.PDR.BIT.B4
+#define LED5_PORT_DIR  PORT2.PDR.BIT.B5
+#define LED6_PORT_DIR  PORT2.PDR.BIT.B6
+#define LED7_PORT_DIR  PORT2.PDR.BIT.B7
 
 /* Delay units */
 #define uS        'u'

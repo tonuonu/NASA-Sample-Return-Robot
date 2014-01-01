@@ -345,8 +345,8 @@ void Init_PWM(void)
    * TIOCAx function, output compare of TPUx.TGRB: 
    * Initial output is high output; low output at compare match
    */
-  TPU4.TIORH.BIT.IOA=2; 
-  TPU4.TIORH.BIT.IOB=5;
+  TPU4.TIOR.BIT.IOA=2; 
+  TPU4.TIOR.BIT.IOB=5;
   
   TPU5.TIOR.BIT.IOA=2;
   TPU5.TIOR.BIT.IOB=5;

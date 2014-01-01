@@ -105,14 +105,25 @@ void ConfigureOperatingFrequency(void)
 void ConfigureOutputPorts(void)
 {  
 
-    /* Configure the LED pins (LED0-LED3) as outputs */
-  LED0_PORT_DIR = 0x1;
-  LED1_PORT_DIR = 0x1;
+    /* Configure the LED pins (LED0-LED7) as outputs */
+    LED0_PORT_DIR = 0x1;
+    LED1_PORT_DIR = 0x1;
+    LED2_PORT_DIR = 0x1;
+    LED3_PORT_DIR = 0x1;
+    LED4_PORT_DIR = 0x1;
+    LED5_PORT_DIR = 0x1;
+    LED6_PORT_DIR = 0x1;
+    LED7_PORT_DIR = 0x1;
 
-  /* Set LED pin outputs as high (all LEDs off) */
-  LED0 = LED_OFF;
-  LED1 = LED_OFF;
-
+    /* Set LED pin outputs as high (all LEDs off) */
+    LED0 = LED_OFF;
+    LED1 = LED_OFF;
+    LED2 = LED_OFF;
+    LED3 = LED_OFF;
+    LED4 = LED_OFF;
+    LED5 = LED_OFF;
+    LED6 = LED_OFF;
+    LED7 = LED_OFF;
 }
 /*******************************************************************************
 * End of function ConfigureOutputPorts

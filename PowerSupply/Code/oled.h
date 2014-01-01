@@ -21,20 +21,20 @@
 
 #include "iorx630.h"
 
-
 /* OLED ouptut pin settings */
-#define  OLED_CS      PORTC.PODR.BIT.B6
-#define  OLED_DC      PORTC.PODR.BIT.B7
-#define  OLED_WR      PORT5.PODR.BIT.B0
+#define  OLED_CS      PORT5.PODR.BIT.B5
+#define  OLED_DC      PORT5.PODR.BIT.B4
+#define  OLED_RD      PORT5.PODR.BIT.B2
 #define  OLED_RESET   PORT5.PODR.BIT.B1
+#define  OLED_WR      PORT5.PODR.BIT.B0
 #define  OLED_DATA_PORT   PORTD.PODR.BYTE
 
-
 /* OLED data direction */
-#define OLED_CS_PORT_DIR     PORTC.PDR.BIT.B6
-#define OLED_DC_PORT_DIR     PORTC.PDR.BIT.B7
-#define OLED_WR_PORT_DIR     PORT5.PDR.BIT.B0
+#define OLED_CS_PORT_DIR     PORT5.PDR.BIT.B5
+#define OLED_DC_PORT_DIR     PORT5.PDR.BIT.B4
+#define OLED_RD_PORT_DIR     PORT5.PDR.BIT.B2
 #define OLED_RESET_PORT_DIR  PORT5.PDR.BIT.B1
+#define OLED_WR_PORT_DIR     PORT5.PDR.BIT.B0
 #define OLED_DATA_PORT_DIR   PORTD.PDR.BYTE
 
 
