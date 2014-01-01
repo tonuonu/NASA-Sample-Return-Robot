@@ -18,30 +18,10 @@
  *  along with this software.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-/*******************************************************************************
-* File Name    : switch.h
-* Version     : 1.00
-* Device     : R5F5630E
-* Tool-Chain   : Renesas RX Toolchain 1.2.0.0
-* H/W Platform  : RSKRX630
-* Description    : Provides declarations of functions defined in switch.c
-*******************************************************************************/
-/*******************************************************************************
-* History     : 23 Jan. 2012  Ver. 1.00 First Release
-*******************************************************************************/
 
-/*******************************************************************************
-* Project Includes
-*******************************************************************************/
-/* Defines standard boolean variable types used in this file */
 #include <stdbool.h>
-/* Defines standard variable types used in this file */
 #include <stdint.h>
 
-/*******************************************************************************
-* Macro Definitions
-*******************************************************************************/
-/* Multiple inclusion prevention macro */
 #ifndef SWITCH_H
 #define SWITCH_H
 
@@ -57,10 +37,15 @@
 #define SWITCHPRESS_3    0x20u
 /* Switch 3 held down flag mask */
 #define SWITCHHOLD_3    0x02u
+/* Switch 4 pressed flag mask */
+#define SWITCHPRESS_4    0x10u
+/* Switch 4 held down flag mask */
+#define SWITCHHOLD_4    0x01u
+
 /* Any switch pressed flag mask */
-#define SWITCHPRESS_ALL    0xE0u
+#define SWITCHPRESS_ALL    0xF0u
 /* Any switch held down flag mask */
-#define SWITCHHOLD_ALL    0x0Eu
+#define SWITCHHOLD_ALL    0x0Fu
 
 /* Defines the CMT compare match value for the short switch debounce */
 #define DEBOUNCE_SHORT    0x0800u
@@ -79,11 +64,11 @@ extern volatile bool gSwitchStandbyReady;
     b7 : Switch 1 press complete flag*
     b6 : Switch 2 press complete flag*
     b5 : Switch 3 press complete flag*
-    b4 : Unused
+    b4 : Switch 4 press complete flag*
     b3 : Switch 1 held-down status flag
     b2 : Switch 2 held-down status flag
     b1 : Switch 3 held-down status flag
-    b0 : Unused  
+    b0 : Switch 4 held-down status flag
      * Switch press complete flags must be cleared manually     */
 extern volatile uint8_t gSwitchFlag;
 
@@ -99,5 +84,4 @@ void SetSwitchPressCallback(void(*callBack)(void));
 /* Switch callback function initialisation function prototype */
 void SetSwitchReleaseCallback(void(*callBack)(void));
 
-/* End of multiple inclusion prevention macro */
 #endif

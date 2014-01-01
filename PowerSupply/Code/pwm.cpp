@@ -65,82 +65,88 @@ volatile bool gClearLCD = false;
 * Argument    : none
 * Return value  : none
 *******************************************************************************/
-void Init_PWM(void)
-{  
-  /* Configure pin 7 of port 1 as an output */
-  PORT1.PDR.BIT.B5 = 1;
-  PORT1.PDR.BIT.B7 = 1;
+void Init_PWM(void) {
+    /* 
+     * RGB LED is connected to P13 (blue), P15 (green) and P17 (red). We use PWM 
+     * to drive them
+     */
+    /* Configure pin 7 of port 1 as an output */
+    PORT1.PDR.BIT.B3 = 1;
+    PORT1.PDR.BIT.B5 = 1;
+    PORT1.PDR.BIT.B7 = 1;
   
-  /* Configure pin 7 of port 1 for peripheral function */
-  PORT1.PMR.BIT.B5 = 1;
-  PORT1.PMR.BIT.B7 = 1;
+    /* Configure pin 7 of port 1 for peripheral function */
+    PORT1.PMR.BIT.B3 = 1;
+    PORT1.PMR.BIT.B5 = 1;
+    PORT1.PMR.BIT.B7 = 1;
   
-  /* Enable write to PFSWE bit */
-  MPC.PWPR.BYTE = 0x00;
+    /* Enable write to PFSWE bit */
+    MPC.PWPR.BYTE = 0x00;
   
-  /* Disable write protection to PFS registers */
-  MPC.PWPR.BYTE = 0x40;
+    /* Disable write protection to PFS registers */
+    MPC.PWPR.BYTE = 0x40;
   
-  /* Configure pin 7 of port 1 for MTIOC3A outputs */
-  MPC.P15PFS.BIT.PSEL = 0x1;
-  MPC.P17PFS.BIT.PSEL = 0x1;
+    /* Configure pin 7 of port 1 for MTIOC3A outputs */
+    MPC.P13PFS.BIT.PSEL = 0x1;
+    MPC.P15PFS.BIT.PSEL = 0x1;
+    MPC.P17PFS.BIT.PSEL = 0x1;
   
-  /* Enable write protection to PFS registers */
-  MPC.PWPR.BYTE = 0x80;
+    /* Enable write protection to PFS registers */
+    MPC.PWPR.BYTE = 0x80;
   
-  /* Protection off */
-  SYSTEM.PRCR.WORD = 0xA503;
+    /* Protection off */
+    SYSTEM.PRCR.WORD = 0xA503;
   
-  /* Cancel the MTU3 module clock stop mode */
-  MSTP_MTU3 = 0x0;
+    /* Cancel the MTU3 module clock stop mode */
+    MSTP_MTU3 = 0x0;
     
-  /* Protection on */
-  SYSTEM.PRCR.WORD = 0xA500;
+    /* Protection on */
+    SYSTEM.PRCR.WORD = 0xA500;
               
-  /* Set MTU3 TGIA3 interrupt priority level to 7 */  
-  IPR(MTU3,TGIA3) = 0x7;
-  /* Enable MTU3 TGIA3 interrupts */
-  IEN(MTU3,TGIA3) = 0x1;
-  /* Clear MTU3 TGIA3 interrupt flag */
-  IR(MTU3,TGIA3) = 0x0;
+    /* Set MTU3 TGIA3 interrupt priority level to 7 */  
+    IPR(MTU3,TGIA3) = 0x7;
+    /* Enable MTU3 TGIA3 interrupts */
+    IEN(MTU3,TGIA3) = 0x1;
+    /* Clear MTU3 TGIA3 interrupt flag */
+    IR(MTU3,TGIA3) = 0x0;
   
-  /* Set MTU3 TGIB3 interrupt priority level to 7 */  
-  IPR(MTU3,TGIB3) = 0x7;
-  /* Enable MTU3 TGIB3 interrupts */
-  IEN(MTU3,TGIB3) = 0x1;
-  /* Clear MTU3 TGIB3 interrupt flag */
-  IR(MTU3,TGIB3) = 0x0;
+    /* Set MTU3 TGIB3 interrupt priority level to 7 */  
+    IPR(MTU3,TGIB3) = 0x7;
+    /* Enable MTU3 TGIB3 interrupts */
+    IEN(MTU3,TGIB3) = 0x1;
+    /* Clear MTU3 TGIB3 interrupt flag */
+    IR(MTU3,TGIB3) = 0x0;
   
-  /* Clock PCLK/1=48MHz, count at falling edge, 
-     TCNT cleared by TGRA compare match */
-  MTU3.TCR.BYTE = 0x28;
+    /* Clock PCLK/1=48MHz, count at falling edge, 
+       TCNT cleared by TGRA compare match */
+    MTU3.TCR.BYTE = 0x28;
+    
+    /* Operate timers in pwm mode */
+    MTU3.TMDR.BYTE = 0x02;
   
-  /* Operate timers in pwm mode */
-  MTU3.TMDR.BYTE = 0x02;
+    /* Initial MTIOC3A output is 1 and toggled at 
+       TGRA compare match. TRGB output is disabled. */
+    MTU3.TIORH.BYTE = 0x37;
+    
+    /* Enable TGIEA interrupts */
+    MTU3.TIER.BYTE = 0x01;
   
-  /* Initial MTIOC3A output is 1 and toggled at 
-     TGRA compare match. TRGB output is disabled. */
-  MTU3.TIORH.BYTE = 0x37;
+    /* Enable access to protected MTU registers */
+    MTU.TRWER.BIT.RWE = 0x1;
   
-  /* Enable TGIEA interrupts */
-  MTU3.TIER.BYTE = 0x01;
+    /* Use TGRA to set the pwm cycle to 1KHz*/
+    MTU3.TGRA = 48000;
   
-  /* Enable access to protected MTU registers */
-  MTU.TRWER.BIT.RWE = 0x1;
+    /* TGRB used to set the pwm duty cycle to 90% */
+    MTU3.TGRB = 4800;
   
-  /* Use TGRA to set the pwm cycle to 1KHz*/
-  MTU3.TGRA = 48000;
-  
-  /* TGRB used to set the pwm duty cycle to 90% */
-  MTU3.TGRB = 4800;
-  
-  /* Set a switch press callback function */
-  SetSwitchReleaseCallback(CB_Switch_Press);
+    /* Set a switch press callback function */
+    SetSwitchReleaseCallback(CB_Switch_Press);
 
-  /* Start the TCNT counter */  
-  MTU.TSTR.BIT.CST3 = 0x1;
+    /* Start the TCNT counter */  
+    MTU.TSTR.BIT.CST3 = 0x1;
 
-/***************/
+  /***************/
   
   /*
    * Battery charger PWMs init
@@ -528,13 +534,17 @@ __interrupt void Excep_MTU3_TGIA3(void)
   case 0:
       LED0 ^=1;
       /* Configure buzzer for peripheral function */
+      PORT1.PMR.BIT.B3 = 1;
+      PORT1.PMR.BIT.B5 = 1;
       PORT1.PMR.BIT.B7 = 1;
 
       counter++;
       break;
   case 2:
       /* Configure buzzer for NOT peripheral function */
-      PORT1.PMR.BIT.B7 = 0;
+     // PORT1.PMR.BIT.B3 = 0;
+     // PORT1.PMR.BIT.B5 = 0;
+     // PORT1.PMR.BIT.B7 = 0;
       counter++;
       break;
   case 999:
