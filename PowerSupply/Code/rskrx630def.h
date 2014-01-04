@@ -32,8 +32,8 @@
 #define  LED6      PORT2.PODR.BIT.B6
 #define  LED7      PORT2.PODR.BIT.B7
 
-#define  LED_BLU      PORT1.PODR.BIT.B3
-#define  LED_GRN      PORT1.PODR.BIT.B5
+#define  LED_GRN      PORT1.PODR.BIT.B3
+#define  LED_BLU      PORT1.PODR.BIT.B5
 #define  LED_RED      PORT1.PODR.BIT.B7
 
 /* LED data direction */
@@ -46,8 +46,8 @@
 #define LED6_PORT_DIR  PORT2.PDR.BIT.B6
 #define LED7_PORT_DIR  PORT2.PDR.BIT.B7
 
-#define LED_BLU_PORT_DIR  PORT1.PDR.BIT.B3
-#define LED_GRN_PORT_DIR  PORT1.PDR.BIT.B5
+#define LED_GRN_PORT_DIR  PORT1.PDR.BIT.B3
+#define LED_BLU_PORT_DIR  PORT1.PDR.BIT.B5
 #define LED_RED_PORT_DIR  PORT1.PDR.BIT.B7
 
 /* Delay units */

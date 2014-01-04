@@ -21,25 +21,18 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include "switch.h"
 
-/* Defines RX630 port registers */
 #include "iorx630.h"
-/* Defines macros relating to the RX630 user LEDs and switches */
 #include "rskrx630def.h"
-/* OLED controlling function prototypes & macro definitions */
 #include "oled.h"
-/* Provides declarations of functions defined in this file */
 #include "rtc.h"
 
 /* Variable used to store the string to be displayed on the OLED */
 uint8_t oled_buffer[9];
-/* Variable used to hold current time */
-uint32_t time_data = 0x0;
-/* Variable used to hold current time */
-uint32_t date_data = 0x0;
 
-/* Integer to string function prototype declaration */
-//static void uint32_ToBCDString(uint8_t *, uint8_t, uint32_t);
+uint32_t time_data = 0x0;/* Variable used to hold current time */
+uint32_t date_data = 0x0;/* Variable used to hold current time */
 
 /*******************************************************************************
 * Outline     : Init_RTC
@@ -48,14 +41,12 @@ uint32_t date_data = 0x0;
 *          an interrupt every second. The alarm is also configured to 
 *          trigger at a specified time.  
 *******************************************************************************/
-void Init_RTC(void)
-{  
+void Init_RTC(void) {
   /* Protection off */
   SYSTEM.PRCR.WORD = 0xA503;    
     
   /* Check if the MCU has come from a cold start (power on reset) */
-  if(0 == SYSTEM.RSTSR1.BIT.CWSF)
-  {  
+  if(0 == SYSTEM.RSTSR1.BIT.CWSF) {  
     /* Set the warm start flag */
     SYSTEM.RSTSR1.BIT.CWSF = 1;
     
@@ -97,9 +88,7 @@ void Init_RTC(void)
       /* Update progress bar string */
       //Display_OLED(OLED_LINE2, progress);
     }
-  }
-  else
-  {
+  } else {
     /* Start sub-clock */
     SYSTEM.SOSCCR.BIT.SOSTP = 0;  
     
@@ -139,22 +128,22 @@ void Init_RTC(void)
   RTC.RCR2.BIT.HR24 = 0x1;
   
   RTC.RADJ.BIT.PMADJ=1; // Addition
-  RTC.RADJ.BIT.ADJ=3; // This is added once per minute to clock. 5...0 bits.
-  RTC.RCR2.BIT.AADJP=1;
-  RTC.RCR2.BIT.AADJE=1;
+  RTC.RADJ.BIT.ADJ=30;  // This is added once per ... to clock. 5...0 bits.
+  RTC.RCR2.BIT.AADJP=1; // every 10 seconds
+  RTC.RCR2.BIT.AADJE=1; // enable this adjustment 
 #if 0
   /* Configure the clock as follows - 
     Initial time - 11:59:30   */
   RTC.RSECCNT.BYTE = 0x00;
-  RTC.RMINCNT.BYTE = 0x31;
-  RTC.RHRCNT.BYTE = 0x18;
+  RTC.RMINCNT.BYTE = 0x41;
+  RTC.RHRCNT.BYTE = 0x22;
   
   /* Configure the date as follows -
     Initial date - 21/11/2011  */
-  RTC.RDAYCNT.BYTE = 0x21;
-  RTC.RMONCNT.BYTE = 0x11;
+  RTC.RDAYCNT.BYTE = 0x02;
+  RTC.RMONCNT.BYTE = 0x01;
   RTC.RYRCNT.WORD = 0x0013;
-  RTC.RWKCNT.BYTE = 0x04; // Thursday
+  RTC.RWKCNT.BYTE = 0x03; // Thursday
 #endif  
   /* Configure the alarm as follows -
     Alarm time - 12:00:00
@@ -220,18 +209,14 @@ void Init_RTC(void)
 *          the alarm registers matches with the current RTC time. 
 *******************************************************************************/
 #pragma vector=VECT_RTC_ALM
-__interrupt void Excep_RTC_ALM(void)
-{
-  /* Turn on LED1 to indicate that the alarm is triggered  */
-  LED1 = LED_ON;
-
+__interrupt void Excep_RTC_ALM(void) {
   /* Clear the interrupt flag */
   ICU.IR[IR_RTC_ALM].BIT.IR = 0;
 }
 extern volatile float adc[8];
 extern volatile float temperature;
 extern volatile float adapter;
-
+extern volatile float test;
 /*******************************************************************************
 * Outline     : CB_1HZ_RTC
 * Description   : RTC periodic interrupt handler generated every 1 sec. It is 
@@ -281,7 +266,7 @@ __interrupt void Excep_RTC_SLEEP(void) {
         dow="Sat";
          break;
     }
-    
+
     snprintf(buf,sizeof(buf),"%3s %2x/%02x/20%02x %2x:%02x:%02x",
                  dow,
                  RTC.RDAYCNT.BYTE,
@@ -291,8 +276,18 @@ __interrupt void Excep_RTC_SLEEP(void) {
                  RTC.RMINCNT.BYTE & 0x7F,
                  RTC.RSECCNT.BYTE & 0x7F
     );
+
     OLED_Show_String(  1,buf, 0, 7*8);
-    snprintf(buf,sizeof(buf),"Temperature: %.1f Adapter: %.1f",temperature,adapter);
+
+//    while(S12AD.ADCSR.BIT.ADST);
+
+ //   snprintf(buf,sizeof(buf),"%04x %x %04x %04x %04x",gSwitchFlag,gSwitchStandbyReady,gSwitchFaultsDetected,S12AD.ADDR0,S12AD.ADDR1,S12AD.ADDR2);
+  //  S12AD.ADCSR.BIT.ADST = 1;
+  //  OLED_Show_String(  1,buf, 0, 0*8);
+
+#if 1
+    snprintf(buf,sizeof(buf),"%f",test);
+//    snprintf(buf,sizeof(buf),"Temperature: %.1f Adapter: %.1f %f",temperature,adapter,test);
     OLED_Show_String(  1,buf, 0, 6*8);
 #define BAT_MISSING_THRESHOLD (2.5f*3.f) 
 #define BAT_CRIT_THRESHOLD (3.3f*3.f) 
@@ -317,68 +312,9 @@ __interrupt void Excep_RTC_SLEEP(void) {
         } else {
             statustext="Normal";
         }
-        snprintf(buf,sizeof(buf),"%d: %4.1fV %6.2fA %11s %3.0f",i,adc[i],adc[i+4],statustext,percent);
+        snprintf(buf,sizeof(buf),"%d: %4.1fV %6.2fA %11s %3.0f",i,adc[i]+1.0,adc[i+4]+2.0,statustext,percent);
         OLED_Show_String(  1, buf, 0, (i+1)*8);
     }
+#endif
 }
 
-/*******************************************************************************
-* Outline      : uint32_ToBCDString
-* Description  : This function converts an 16bit integer into a BCD string,
-*         which is inserted into the character array passed as an 
-*         argument.
-* Argument     : uint8_t * string  - Pointer to array to store BCD string 
-*         uint8_t pos    - Array element to start BCD string from.
-*         uint32_t number  - 32bit integer to convert.
-* Return value : none
-* Note       : No input validation is used, so output data can overflow the
-*         array passed.
-*******************************************************************************/
-#if 0
-static void uint32_ToBCDString(uint8_t * output_string, uint8_t pos, 
-                 uint32_t number)
-{
-  /* Local digit position variable */
-  uint8_t disp_ptr = 0;
-  uint8_t digit = 6u;
-  
-  /* Local string buffer variable */
-  uint8_t buffer_string[6] = {0,0,0,0,0,0};
-  
-  /* Decrement digit each iteration, until digit is zero */
-  while(digit--)
-  {
-    /* Write BCD value to string element */
-    buffer_string[digit] = (uint8_t) (0x30 + (number % 16));
-    
-    /* Move to the next decimal digit */
-    number >>= 4;
-  }
-  
-  /* Set digit position to zero */
-  digit = 0u;
-  
-  /* Loop through each digit, and replace leading zeros with a space
-     character */
-  while(disp_ptr < 6u)
-  {
-    /* Copy digit from buffer string to output string */
-    output_string[digit + pos] = buffer_string[disp_ptr];
-      
-    /* Increment the loop counter */
-    digit++;
-    disp_ptr++;
-    
-    /* Check the digit position. */
-    if((digit == 5)||(digit == 2))
-    {
-      /* Add colon between hours and minutes 
-         and between minutes & seconds. (hh:mm:ss) */
-      output_string[digit + pos] = ':';
-      
-      /* Increment the loop counter */
-      digit++;
-    }
-  }
-}
-#endif

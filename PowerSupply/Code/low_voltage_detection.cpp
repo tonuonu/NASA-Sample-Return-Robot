@@ -74,11 +74,8 @@ void Init_VoltageDetect(void) {
 *				  an NMI). If VCC < VDET, the function sets the voltage detect
 *				  point to above VDET and vice versa. The function also updates
 *				  the gVCCAboveVdet flag.
-* Argument 	 	: none
-* Return value  : none
 *******************************************************************************/
-void NonMaskableInterrupt(void)
-{
+void NonMaskableInterrupt(void) {
 	/* Clear vdet1 passage detection flag */
 	SYSTEM.LVD1SR.BIT.LVD1DET = 0;
 	
@@ -86,74 +83,18 @@ void NonMaskableInterrupt(void)
 	ICU.NMICLR.BIT.LVD1CLR = 1;
 	
 	/* Check if VCC is below trigger voltage */
-	if(SYSTEM.LVD1SR.BIT.LVD1MON == 0)
-	{
+	if(SYSTEM.LVD1SR.BIT.LVD1MON == 0) {
 		/* Set vdet to trigger when VCC > trigger voltage */
 		SYSTEM.LVD1CR1.BYTE = 0x00u;
 		
 		/* Set global vdet status flag */
 		gVCCAboveVdet = false;	
-	}
-	/* VCC is above trigger voltage */
-	else
-	{
+	} else	{	/* VCC is above trigger voltage */
 		/* Set vdet to trigger VCC < trigger voltage */
 		SYSTEM.LVD1CR1.BYTE = 0x02u;	
 		
 		/* Set global vdet status flag */
 		gVCCAboveVdet = true;
 		
-		/* Turn off LED3 */
-		//LED3 = LED_OFF;
 	}	
 }
-/*******************************************************************************
-* End of function NonMaskableInterrupt
-*******************************************************************************/
-#if 0
-/*******************************************************************************
-* Outline 		: LedFlash_VoltageDetect
-* Description 	: This function toggles all the user LEDs if gVCCAboveVdet flag
-*				  is true, or turns LED3 and the other LEDs off if the flag is
-*				  false. The function also waits in a while loop to make the 
-*				  LED toggle a visible flash.
-* Argument 	 	: none
-* Return value  : none
-*******************************************************************************/
-void LedFlash_VoltageDetect(void)
-{
-	/* Check if gVCCAboveVdet is true (VCC above trigger voltage) */
-	if(gVCCAboveVdet)
-	{
-		/* Toggle all user LEDs */
-		LED0 = ~LED0;
-		LED1 = ~LED1;
-		LED2 = ~LED2;
-		LED3 = ~LED3;
-		
-		/* Write VCC status to LCD */
-		Display_LCD(LCD_LINE2, "VCC>VDET");
-	}
-	/* gVCCAboveVdet is false (VCC below trigger voltage) */
-	else
-	{
-		/* Turn off LED0 to LED2 */
-		LED0 = LED_OFF;
-		LED1 = LED_OFF;
-		LED2 = LED_OFF;
-		
-		/* Turn on LED3 */
-		LED3 = LED_ON;
-		
-		/* Write VCC status to LCD */
-		Display_LCD(LCD_LINE2, "VCC<VDET");
-	}
-	
-	/* Define wait count variable */
-	uint32_t wait_count = 0x000FFFFF;
-	
-	/* Decrement the count variable to create delay */
-	while(wait_count--);
-}
-
-#endif

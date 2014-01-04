@@ -19,10 +19,7 @@
  *
  */
 
-/*******************************************************************************
-* File Name    : hwsetup.c
-/* Includes assembley level definitions */
-#include    <machine.h>
+#include <machine.h>
 #include <stdint.h>
 
 #include "iorx630.h"
@@ -31,41 +28,32 @@
 #include "switch.h"
 #include "hwsetup.h"
 
-void HardwareSetup(void)
-{
+void HardwareSetup(void) {
   ConfigureOperatingFrequency();
   ConfigureOutputPorts();
   ConfigureInterrupts();
   EnablePeripheralModules();
 }
 
-/*******************************************************************************
-* Outline     : ConfigureOperatingFrequency
-* Description   : Configures the clock settings for each of the device clocks
-* Argument      : none
-* Return value  : none
-*******************************************************************************/
-void ConfigureOperatingFrequency(void)
-{      
-  /* Declare and initialise a loop count variable */
+void ConfigureOperatingFrequency(void) {      
   uint16_t i = 0;
     
   /* Protection off */
   SYSTEM.PRCR.WORD = 0xA503;      
-  
+
   /* Stop sub-clock */
   SYSTEM.SOSCCR.BYTE = 0x01;      
-                    
+
   /* Specify a wait state greater than 10ms at 12MHz (10.92 msec) */ 
   SYSTEM.MOSCWTCR.BYTE = 0x0D;    
-    
+
   /* 4194304 state (default)*/
   /* wait over 12ms  @PLL=192MHz(12MHz*16) */                
   SYSTEM.PLLWTCR.BYTE = 0x0F;      
-  
+
   /* x16 @PLL */
   SYSTEM.PLLCR.WORD = 0x0F00;  
-  
+
   /* Configure the EXTAL pin */
   PORT3.PMR.BIT.B6 = 0;
   PORT3.PDR.BIT.B6 = 0;
@@ -81,8 +69,7 @@ void ConfigureOperatingFrequency(void)
   SYSTEM.PLLCR2.BYTE = 0x00;  
   
   /* Wait over 12ms */
-  for(i=0; i<2075; i++)
-  {
+  for(i=0; i<2075; i++) {
     nop();
   }
     
@@ -111,19 +98,8 @@ void ConfigureOperatingFrequency(void)
   /* Protection on */
   SYSTEM.PRCR.WORD = 0xA500;    
 }
-/*******************************************************************************
-* End of function ConfigureOperatingFrequency
-*******************************************************************************/
 
-/*******************************************************************************
-* Outline     : ConfigureOutputPorts
-* Description   : Configures the port and pin direction settings, and sets the
-*          pin outputs to a safe level.
-* Argument    : none
-* Return value  : none
-*******************************************************************************/
-void ConfigureOutputPorts(void)
-{  
+void ConfigureOutputPorts(void) {  
 
     /* Configure the LED pins (LED0-LED7) as outputs */
     LED0_PORT_DIR = 0x1;
@@ -135,6 +111,11 @@ void ConfigureOutputPorts(void)
     LED6_PORT_DIR = 0x1;
     LED7_PORT_DIR = 0x1;
 
+    LED_BLU_PORT_DIR = 0x1;
+    LED_GRN_PORT_DIR = 0x1;
+    LED_RED_PORT_DIR = 0x1;
+
+    
     /* Set LED pin outputs as high (all LEDs off) */
     LED0 = LED_OFF;
     LED1 = LED_OFF;
@@ -144,36 +125,16 @@ void ConfigureOutputPorts(void)
     LED5 = LED_OFF;
     LED6 = LED_OFF;
     LED7 = LED_OFF;
+    LED_RED = LED_OFF;
+    LED_GRN = LED_OFF;
+    LED_BLU = LED_OFF;
 }
-/*******************************************************************************
-* End of function ConfigureOutputPorts
-*******************************************************************************/
 
-/*******************************************************************************
-* Outline     : ConfigureInterrupts
-* Description   : Configures the interrupts used
-* Argument    : none
-* Return value  : none
-*******************************************************************************/
-void ConfigureInterrupts(void)
-{
+void ConfigureInterrupts(void) {
   /* Configure switch interrupts */
   InitialiseSwitchInterrupts();
 }
-/*******************************************************************************
-* End of function ConfigureInterrupts
-*******************************************************************************/
 
-/*******************************************************************************
-* Outline     : EnablePeripheralModules
-* Description   : Enables and configures peripheral devices on the MCU
-* Argument    : none
-* Return value  : none
-*******************************************************************************/
-void EnablePeripheralModules(void)
-{
+void EnablePeripheralModules(void) {
   /* Peripherals initialised in specific initialisation functions */
 }
-/*******************************************************************************
-* End of function EnablePeripheralModules
-*******************************************************************************/

@@ -171,8 +171,7 @@ End of function CBDoneWrite
 * Argument    : none
 * Return value  : none
 ***********************************************************************************/
-static void InitialiseData(void)
-{
+static void InitialiseData(void) {
   g_bEcho = false;
   gSwitchFlag = 0;
 }

@@ -48,9 +48,9 @@
 #define SWITCHHOLD_ALL    0x0Fu
 
 /* Defines the CMT compare match value for the short switch debounce */
-#define DEBOUNCE_SHORT    0x0800u
+#define DEBOUNCE_SHORT    0x080u
 /* Defines the CMT compare match value for the long switch debounce */
-#define DEBOUNCE_LONG    0x5000u
+#define DEBOUNCE_LONG    0x500u
 
 /* Define switch interrupt priority level */
 #define SWITCH_IPL      7u
@@ -71,7 +71,7 @@ extern volatile bool gSwitchStandbyReady;
     b0 : Switch 4 held-down status flag
      * Switch press complete flags must be cleared manually     */
 extern volatile uint8_t gSwitchFlag;
-
+extern volatile uint16_t gSwitchFaultsDetected; // REMOVE ME LATER
 /*******************************************************************************
 * Global Function Prototypes
 *******************************************************************************/

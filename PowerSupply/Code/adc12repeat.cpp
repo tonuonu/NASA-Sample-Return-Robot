@@ -59,59 +59,71 @@ void Init_ADC12Repeat(void) {
   Init_Timer();
   
   /* Protection off */
-  SYSTEM.PRCR.WORD = 0xA503;
-  
+  SYSTEM.PRCR.WORD = 0xA503;  
   /* Cancel the S12AD module clock stop mode */
   MSTP_S12AD = 0;
-  
   /* Protection on */
   SYSTEM.PRCR.WORD = 0xA500;
-  
-  /* Use the AN000 (Potentiometer) pin as an I/O for peripheral functions */
-//  PORT4.PMR.BYTE = 0x01;
+
+  /* Enable write to PFSWE bit */
+  MPC.PWPR.BIT.B0WI=0;
+  /* Disable write protection to PFS registers */
+  MPC.PWPR.BIT.PFSWE=1;
+
+  MPC.P40PFS.BIT.ASEL=1;
+  MPC.P41PFS.BIT.ASEL=1;
+  MPC.P42PFS.BIT.ASEL=1;
+  MPC.P43PFS.BIT.ASEL=1;
+  MPC.P44PFS.BIT.ASEL=1;
+  MPC.P45PFS.BIT.ASEL=1;
+  MPC.P46PFS.BIT.ASEL=1;
+  MPC.P47PFS.BIT.ASEL=1;
+
+  MPC.PWPR.BIT.PFSWE=0;
+  MPC.PWPR.BIT.B0WI=1;
   
   /* ADC clock = PCLK/8, continuous scan mode */
-  S12AD.ADCSR.BYTE |= 0x40;
+  // S12AD.ADCSR.BYTE |= 0x40;
+  S12AD.ADCSR.BIT.CKS=0; // PCLK/8
+  S12AD.ADCSR.BIT.ADCS=1; // 0 single scan, 1 continuous
   
   /* Selects AN000..AN007 */
   S12AD.ADANS0.WORD = 0x00FF;
+  S12AD.ADANS0.BIT.ANS0=0x00FF;
 
   /* Set the sampling cycle to 255 states (approximately 5 us) */
-  S12AD.ADSSTR01.WORD = 0x14FF;
+  //S12AD.ADSSTR01.WORD = 0x14FF;
+//  S12AD.ADSSTR01.BIT.SST1=255;
+  S12AD.ADSSTR01.BIT.SST1=25;
+  S12AD.ADSSTR23.BIT.SST2=25;
 
   /* Start ADC */
   S12AD.ADCSR.BIT.ADST = 1;
+  S12AD.ADCER.BIT.ACE = 1;
 
   /* Configure a 10 ms periodic delay used 
      to update the ADC result on to the LCD */
-  Timer_Delay(1, 'm', PERIODIC_MODE);
+  Timer_Delay(100, 'm', PERIODIC_MODE);
 #if 0
   AD.ADCSR.BIT.ADST = 0; // stop conversion
   AD.ADCSR.BIT.CH   = 3; // enable AN3 only
   AD.ADCR.BIT.MODE  = 3; // continuous scanning mode
   AD.ADCR.BIT.CKS   = 0; // clock is PCLK/8
   AD.ADCR.BIT.TRGS  = 0; // software trigger
-  //AD.ADCSR.BIT.ADST = 1; // start conversion
+  AD.ADCSR.BIT.ADST = 1; // start conversion
 #endif
+
+#if 0
   S12AD.ADCER.BIT.ACE=1;
-  S12AD.ADEXICR.BIT.TSS = 1;//?
+  S12AD.ADEXICR.BIT.TSS = 1;// temperature sensor
   S12AD.ADADC.BIT.ADC=0;// how many times to convert
   S12AD.ADSSTR23.BIT.SST2=20;//sampling interval
   TEMPS.TSCR.BIT.TSEN=1;// Start sensor
   TEMPS.TSCR.BIT.TSOE=1;// Enable temperature sensor
+#endif
 }
-/*******************************************************************************
-* End of function Init_ADC12Repeat
-*******************************************************************************/
 
-/*******************************************************************************
-* Outline      : Init_Timer
-* Description  : This function initialises the CMT channel 2.
-* Argument     : none
-* Return value : none
-*******************************************************************************/
-static void Init_Timer(void)
-{
+static void Init_Timer(void) {
   /* Protection off */
   SYSTEM.PRCR.WORD = 0xA503;
   
@@ -129,55 +141,6 @@ static void Init_Timer(void)
   IR(CMT2,CMI2) = 0x0;
   
 }
-/*******************************************************************************
-* End of function Init_Timer
-*******************************************************************************/
-
-/*******************************************************************************
-* Outline      : uint16_ToString
-* Description  : Function converts a 16 bit integer into a character string, 
-*         inserts it into the array via the pointer passed at execution.
-* Argument     : * output_string : Pointer to uint8_t array that will hold 
-*                   character string.
-*               pos : uint8_t number, element number to begin 
-*                   inserting the character string from (offset).
-*          input_number : 16 bit integer to convert into a string.
-* Return value : none
-* Note       : No input validation is used, so output data can overflow the
-*         array passed.
-*******************************************************************************/
-void uint16_ToString(uint8_t *output_string, uint8_t pos, 
-      uint16_t input_number)
-{
-  /* Declare temporary character storage variable, and bit_shift variable */  
-  uint8_t a = 0x00, bit_shift = 12u;
-  
-  /* Declare 16bit mask variable */
-  uint16_t mask = 0xF000;
-  
-  /* Loop through until each hex digit is converted to an ASCII character */
-  while(bit_shift < 30u)
-  {
-    /* Mask and shift the hex digit, and store in temporary variable, a */ 
-    a = (uint8_t)((input_number & mask) >> bit_shift);
-    
-    /* Convert the hex digit into an ASCII character, and store in output
-       string */
-    output_string[pos] = (uint8_t)((a < 0x0A) ? (a + 0x30) : (a + 0x37));
-    
-    /* Shift the bit mask 4 bits to the right, to convert the next digit */
-    mask = (uint16_t) (mask >> 4u);
-    
-    /* Decrement the bit_shift counter by 4 (bits in a each digit) */
-    bit_shift -= 4u;
-    
-    /* Increment the output string location */
-    pos++;
-  }
-}
-/*******************************************************************************
-* End of function uint16_ToString
-*******************************************************************************/
 
 /******************************************************************************
 * Outline    : Timer_Delay
@@ -188,14 +151,12 @@ void uint16_ToString(uint8_t *output_string, uint8_t pos,
 *          uint8   -   Unit  
 * Return value  : none
 ******************************************************************************/
-static void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode)
-{
+static void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode) {
   /* Clear the timer's count */
   gDelay_Counter = 0;
     
   /* Check if microseconds delay is required */
-  if(unit == 'u')
-  {  
+  if(unit == 'u') {
     /* Select the PCLK clock division as PCLK/8 = 6MHz */ 
     CMT2.CMCR.BIT.CKS = 0x0;
     
@@ -207,8 +168,7 @@ static void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode)
   }
   
   /* Check if milliseconds delay is required */
-  if(unit == 'm')
-  {
+  if(unit == 'm') {
     /* Select the PCLK clock division as PCLK/128 = 375KHz */ 
     CMT2.CMCR.BIT.CKS = 0x2;
 
@@ -226,11 +186,9 @@ static void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode)
   CMT.CMSTR1.BIT.STR2 = 1;
 
   /* Skip the following instructions if a periodic timer is required */
-  if((timer_mode != PERIODIC_MODE))
-  {
+  if((timer_mode != PERIODIC_MODE)) {
     /* Wait for the timer to timeout */
-    while((gDelay_Counter != gPeriodic_Delay))
-    {
+    while((gDelay_Counter != gPeriodic_Delay)) {
       /* Wait */
     }  
 
@@ -238,17 +196,16 @@ static void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode)
     CMT.CMSTR1.BIT.STR2 = 0;
   }      
 }
-/******************************************************************************
-* End of function Timer_Delay
-******************************************************************************/
 
+volatile float test=9.0;
+
+#include "assert.h"
 /******************************************************************************
 * Regular ADC interrupt. 
 ******************************************************************************/
-
 #pragma vector=VECT_CMT2_CMI2
 __interrupt void Excep_CMTU1_CMT2(void) {
-    LED1 =1;
+    LED7 =LED_ON;
 
     /* Declare temporary character string */
     // uint8_t lcd_buffer[9] = "=H\'WXYZ\0";
@@ -271,18 +228,22 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     // For every amper change is 4095/3.3*0.185=229.568181818
 #define ICOEFF (4095.0/3.3*   0.185)
 #define IZBASE (   2.5/3.3*4095.0  )
+    //while(S12AD.ADCSR.BIT.ADST);
+LED6=LED_ON;
+    //test =  (float)S12AD.ADDR0*VCOEFF+3.0; // VBAT0_AD 
+    adc[0] =  3.0; // VBAT0_AD 
+    adc[1] =  (float)S12AD.ADDR1*VCOEFF+3.0; // VBAT1_AD
+    adc[2] =  (float)S12AD.ADDR2*VCOEFF+3.0; // VBAT2_AD
+    adc[3] =  (float)S12AD.ADDR3*VCOEFF+3.0; // VBAT3_AD
 
-    adc[0] =  (float)S12AD.ADDR0*VCOEFF; // VBAT0_AD 
-    adc[1] =  (float)S12AD.ADDR1*VCOEFF; // VBAT1_AD
-    adc[2] =  (float)S12AD.ADDR2*VCOEFF; // VBAT2_AD
-    adc[3] =  (float)S12AD.ADDR3*VCOEFF; // VBAT3_AD
+    adc[4] = ((float)S12AD.ADDR4-IZBASE)/ICOEFF+3.0; // IBAT0_AD
+    adc[5] = ((float)S12AD.ADDR5-IZBASE)/ICOEFF+3.0; // IBAT1_AD
+    adc[6] = ((float)S12AD.ADDR6-IZBASE)/ICOEFF+3.0; // IBAT2_AD
+    adc[7] = ((float)S12AD.ADDR7-IZBASE)/ICOEFF+3.0; // IBAT3_AD
+LED6=LED_OFF;
 
-    adc[4] = ((float)S12AD.ADDR4-IZBASE)/ICOEFF; // IBAT0_AD
-    adc[5] = ((float)S12AD.ADDR5-IZBASE)/ICOEFF; // IBAT1_AD
-    adc[6] = ((float)S12AD.ADDR6-IZBASE)/ICOEFF; // IBAT2_AD
-    adc[7] = ((float)S12AD.ADDR7-IZBASE)/ICOEFF; // IBAT3_AD
-
-    S12AD.ADCSR.BIT.ADST =1;
+    S12AD.ADCSR.BIT.ADST = 1;
+#if 0 //////////////////////
     // AN3 is external adapter input
     adapter = (float) AD.ADDRD;
     // T = (Vs – V1)/Slope + T1
@@ -295,10 +256,10 @@ __interrupt void Excep_CMTU1_CMT2(void) {
 #define CURRENT_MAX     1.0
 #define CURRENT_MIN     -1.0
     
-#define BAT0_EN PORTE.PODR.BIT.B0
-#define BAT1_EN PORTE.PODR.BIT.B1
-#define BAT2_EN PORTE.PODR.BIT.B2
-#define BAT3_EN PORTE.PODR.BIT.B3
+#define BAT0_EN PORTA.PODR.BIT.B7
+#define BAT1_EN PORTB.PODR.BIT.B1
+#define BAT2_EN PORTB.PODR.BIT.B2
+#define BAT3_EN PORTB.PODR.BIT.B3
 
     int BAT0_error=0;
     int BAT1_error=0;
@@ -357,11 +318,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
             }
         }
     }
-    
-    /* Voltages are less critical */
-    
-    
-    
-    /* Display the contents of the local string lcd_buffer */
-    LED1 =0;
+#endif //////////////
+    /* Voltages are less critical */        
+    LED7 =LED_OFF;
 }

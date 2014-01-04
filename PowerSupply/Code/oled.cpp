@@ -299,11 +299,12 @@ OLED_Fill_RAM(unsigned char Data) {
     OLED_Set_Row_Address(0x00, 0x7F);
     OLED_CS = 0;
     OLED_Set_Write_RAM();
-    for (i = 0; i < 128; i++)
+    for (i = 0; i < 128; i++) {
 	for (j = 0; j < 120; j++) {
 	    Write_Data(Data);
 	    Write_Data(Data);
 	}
+    }
     OLED_CS = 1;
 }
 
@@ -581,7 +582,7 @@ OLED_Set_Linear_Gray_Scale_Table() {
 
 void
 Init_OLED() {
-  
+/*  
     LED0 = LED_ON;
     LED1 = LED_ON;
     LED2 = LED_ON;
@@ -590,22 +591,22 @@ Init_OLED() {
     LED5 = LED_ON;
     LED6 = LED_ON;
     LED7 = LED_ON;
-
+*/
   
     OLED_DC_PORT_DIR=1;
     OLED_CS_PORT_DIR=1;
     OLED_WR_PORT_DIR=1;
+    OLED_RD_PORT_DIR=1;
     OLED_RESET_PORT_DIR=1;
     PORTD.PDR.BYTE=0xFF;
-//    OLED_RESET=1;
     OLED_CS=1;
     OLED_WR=1;
+    OLED_RD=1;
 
-//    __delay_cycles(96UL*2000UL); // 2000us delay
     OLED_RESET = 0;    
-    __delay_cycles(96UL*2000UL); // 2000us delay - required in datasheet
+    __delay_cycles(100UL*2000UL); // 2000us delay - required in datasheet
     OLED_RESET = 1;
-    __delay_cycles(96UL*2000UL); // 2000us delay    
+    __delay_cycles(100UL*2000UL); // 2000us delay    
 
     OLED_Set_Command_Lock(0x12);			   // Unlock Basic Commands (0x12/0x16)
     OLED_Set_Display_On_Off(0x00);			   // Display Off (0x00/0x01)
@@ -631,7 +632,7 @@ Init_OLED() {
     OLED_Fill_RAM(0x00);
     OLED_Set_Display_On_Off(0x01);			   // Display On (0x00/0x01)
     OLED_Show_Logo();
-    __delay_cycles(96UL*1000UL*1000UL); // 1s delay    
+    __delay_cycles(100UL*1000UL*1000UL); // 1s delay    
 
 }
 
