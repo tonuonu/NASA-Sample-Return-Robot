@@ -197,7 +197,7 @@ static void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode) {
   }      
 }
 
-volatile float test=9.0;
+//volatile float foobar=9.0;
 
 #include "assert.h"
 /******************************************************************************
@@ -230,16 +230,17 @@ __interrupt void Excep_CMTU1_CMT2(void) {
 #define IZBASE (   2.5/3.3*4095.0  )
     //while(S12AD.ADCSR.BIT.ADST);
 LED6=LED_ON;
-    //test =  (float)S12AD.ADDR0*VCOEFF+3.0; // VBAT0_AD 
-    adc[0] =  3.0; // VBAT0_AD 
-    adc[1] =  (float)S12AD.ADDR1*VCOEFF+3.0; // VBAT1_AD
-    adc[2] =  (float)S12AD.ADDR2*VCOEFF+3.0; // VBAT2_AD
-    adc[3] =  (float)S12AD.ADDR3*VCOEFF+3.0; // VBAT3_AD
+    //foobar =  (float)S12AD.ADDR0*VCOEFF; // VBAT0_AD 
+    adc[0] =  (float)S12AD.ADDR0*VCOEFF; // VBAT0_AD 
+//    foobar  +=  VCOEFF; // VBAT0_AD 
+    adc[1] =  (float)S12AD.ADDR1*VCOEFF; // VBAT1_AD
+    adc[2] =  (float)S12AD.ADDR2*VCOEFF; // VBAT2_AD
+    adc[3] =  (float)S12AD.ADDR3*VCOEFF; // VBAT3_AD
 
-    adc[4] = ((float)S12AD.ADDR4-IZBASE)/ICOEFF+3.0; // IBAT0_AD
-    adc[5] = ((float)S12AD.ADDR5-IZBASE)/ICOEFF+3.0; // IBAT1_AD
-    adc[6] = ((float)S12AD.ADDR6-IZBASE)/ICOEFF+3.0; // IBAT2_AD
-    adc[7] = ((float)S12AD.ADDR7-IZBASE)/ICOEFF+3.0; // IBAT3_AD
+    adc[4] = ((float)S12AD.ADDR4-IZBASE)/ICOEFF; // IBAT0_AD
+    adc[5] = ((float)S12AD.ADDR5-IZBASE)/ICOEFF; // IBAT1_AD
+    adc[6] = ((float)S12AD.ADDR6-IZBASE)/ICOEFF; // IBAT2_AD
+    adc[7] = ((float)S12AD.ADDR7-IZBASE)/ICOEFF; // IBAT3_AD
 LED6=LED_OFF;
 
     S12AD.ADCSR.BIT.ADST = 1;

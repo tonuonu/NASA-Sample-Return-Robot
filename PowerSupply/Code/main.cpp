@@ -78,10 +78,20 @@ void _SPI_write(uint8_t reg, uint8_t data) {
 #define MPUREG_USER_CTRL            0x6A
 #define MPUREG_PWR_MGMT_1           0x6B
 
+#define ENABLE_PWR                  PORT1.PODR.BIT.B2
+#define ENABLE_PWR_DIR              PORT1.PDR.BIT.B2
+#include "iorx630.h"
+
 int main() {
     HardwareSetup();
     __enable_interrupt();
     Init_OLED(); // Make sure noone else calls OLED calls in interrupts before init
+    
+    ENABLE_PWR=1; /* Enable TPS51222. 
+                   * Basically 5V is enabled to ACS712 current sensors
+                   */
+    ENABLE_PWR_DIR=1; // Make it output AFTER to avoid power glitch.
+
     Init_PWM();
     // Init_VoltageDetect();
     Init_ADC12Repeat();

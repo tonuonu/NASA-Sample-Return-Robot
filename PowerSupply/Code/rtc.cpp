@@ -216,7 +216,7 @@ __interrupt void Excep_RTC_ALM(void) {
 extern volatile float adc[8];
 extern volatile float temperature;
 extern volatile float adapter;
-extern volatile float test;
+//extern volatile float foobar;
 /*******************************************************************************
 * Outline     : CB_1HZ_RTC
 * Description   : RTC periodic interrupt handler generated every 1 sec. It is 
@@ -286,7 +286,7 @@ __interrupt void Excep_RTC_SLEEP(void) {
   //  OLED_Show_String(  1,buf, 0, 0*8);
 
 #if 1
-    snprintf(buf,sizeof(buf),"%f",test);
+    //snprintf(buf,sizeof(buf),"-->%f<--",foobar);
 //    snprintf(buf,sizeof(buf),"Temperature: %.1f Adapter: %.1f %f",temperature,adapter,test);
     OLED_Show_String(  1,buf, 0, 6*8);
 #define BAT_MISSING_THRESHOLD (2.5f*3.f) 
@@ -312,7 +312,7 @@ __interrupt void Excep_RTC_SLEEP(void) {
         } else {
             statustext="Normal";
         }
-        snprintf(buf,sizeof(buf),"%d: %4.1fV %6.2fA %11s %3.0f",i,adc[i]+1.0,adc[i+4]+2.0,statustext,percent);
+        snprintf(buf,sizeof(buf),"%d: %4.1fV %6.2fA %11s %3.0f",i,adc[i],adc[i+4],statustext,percent);
         OLED_Show_String(  1, buf, 0, (i+1)*8);
     }
 #endif
