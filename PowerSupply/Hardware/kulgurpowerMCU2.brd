@@ -7380,8 +7380,8 @@ design rules under a new name.</description>
 <element name="AN0" library="testpad" package="B1,27" value="TPB1,27" x="55.0467" y="36.9215" smashed="yes" rot="R90">
 <attribute name="TP_SIGNAL_NAME" value="" x="56.9517" y="36.2865" size="1" layer="37" rot="R90"/>
 </element>
-<element name="R18" library="rcl" package="R0603" value="680k" x="53.9152" y="34.4035" smashed="yes" rot="R270"/>
-<element name="R23" library="rcl" package="R0603" value="100k" x="43.8868" y="46.3333" smashed="yes" rot="R180"/>
+<element name="R18" library="rcl" package="R0603" value="100k" x="53.9152" y="34.4035" smashed="yes" rot="R270"/>
+<element name="R23" library="rcl" package="R0603" value="680k" x="43.8868" y="46.3333" smashed="yes" rot="R180"/>
 <element name="R24" library="rcl" package="R0603" value="22r" x="62.3747" y="42.2561" smashed="yes" rot="R90"/>
 <element name="R25" library="rcl" package="R0603" value="22r" x="60.2494" y="42.2491" smashed="yes" rot="R90"/>
 <element name="R26" library="rcl" package="R0603" value="30k" x="71.5" y="46.5" smashed="yes" rot="R90"/>

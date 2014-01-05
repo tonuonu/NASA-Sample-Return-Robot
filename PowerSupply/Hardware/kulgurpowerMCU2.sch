@@ -21477,8 +21477,8 @@ Source: 3M</description>
 <part name="AN0" library="testpad" deviceset="TP" device="B1,27">
 <attribute name="TP_SIGNAL_NAME" value=""/>
 </part>
-<part name="R18" library="rcl" deviceset="R-EU_" device="R0603" value="680k"/>
-<part name="R23" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
+<part name="R18" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
+<part name="R23" library="rcl" deviceset="R-EU_" device="R0603" value="680k"/>
 <part name="R24" library="rcl" deviceset="R-EU_" device="R0603" value="22r"/>
 <part name="R25" library="rcl" deviceset="R-EU_" device="R0603" value="22r"/>
 <part name="R26" library="rcl" deviceset="R-EU_" device="R0603" value="30k"/>

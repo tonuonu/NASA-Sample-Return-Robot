@@ -18275,8 +18275,8 @@ Source: coiltronics_dr_series.pdf</description>
 <part name="X4" library="con-molex" deviceset="22-23-2031" device=""/>
 <part name="X5" library="con-molex" deviceset="22-23-2021" device=""/>
 <part name="GND29" library="supply1" deviceset="GND" device=""/>
-<part name="R10" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
-<part name="R14" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
+<part name="R10" library="rcl" deviceset="R-EU_" device="R0603" value="430k"/>
+<part name="R14" library="rcl" deviceset="R-EU_" device="R0603" value="430k"/>
 <part name="C15" library="rcl" deviceset="CPOL-EU" device="C/6032-28R"/>
 <part name="C30" library="rcl" deviceset="CPOL-EU" device="C/6032-28R"/>
 <part name="19V" library="con-phoenix-508" deviceset="MST2V" device=""/>
