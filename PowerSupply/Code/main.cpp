@@ -104,6 +104,18 @@ int main() {
     BAT2_EN_DIR = 1; 
     BAT3_EN_DIR = 1;
     
+    OUT1_EN = 0; // Configure all power supply main outputs   
+    OUT2_EN = 0; // 0 is enable?
+    OUT3_EN = 0;
+    OUT1_EN_DIR = 1;
+    OUT2_EN_DIR = 1;
+    OUT3_EN_DIR = 1;
+    
+    OUT4_EN = 1; // Configure TPS51222 DC DC outputs
+    OUT5_EN = 1; // 1 is enable, 0 is disable
+    OUT4_EN_DIR = 1; 
+    OUT5_EN_DIR = 1; 
+    
     Init_PWM();
     // Init_VoltageDetect();
     Init_ADC12Repeat();

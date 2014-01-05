@@ -216,7 +216,9 @@ __interrupt void Excep_RTC_ALM(void) {
 extern volatile float adc[8];
 extern volatile float temperature;
 extern volatile float adapter;
-//extern volatile float foobar;
+extern volatile float imon1,imon2;
+
+
 /*******************************************************************************
 * Outline     : CB_1HZ_RTC
 * Description   : RTC periodic interrupt handler generated every 1 sec. It is 
@@ -236,11 +238,6 @@ __interrupt void Excep_RTC_SLEEP(void) {
     /* Read the hours count register */
     time_data |= (RTC.RHRCNT.BYTE  & 0x0000003F) << 16;
   
-    /* Convert the data to string & display on the OLED */
-    // uint32_ToBCDString(oled_buffer, 0, time_data);
-    /* Update time on the debug OLED */
-    // OLED_Show_String(  1, (char*)oled_buffer, 0, 6*8);
-
     char buf[65];
     char *dow;
     switch(RTC.RWKCNT.BYTE & 0x07) {
@@ -279,15 +276,8 @@ __interrupt void Excep_RTC_SLEEP(void) {
 
     OLED_Show_String(  1,buf, 0, 7*8);
 
-//    while(S12AD.ADCSR.BIT.ADST);
-
- //   snprintf(buf,sizeof(buf),"%04x %x %04x %04x %04x",gSwitchFlag,gSwitchStandbyReady,gSwitchFaultsDetected,S12AD.ADDR0,S12AD.ADDR1,S12AD.ADDR2);
-  //  S12AD.ADCSR.BIT.ADST = 1;
-  //  OLED_Show_String(  1,buf, 0, 0*8);
-
 #if 1
-    //snprintf(buf,sizeof(buf),"-->%f<--",foobar);
-//    snprintf(buf,sizeof(buf),"Temperature: %.1f Adapter: %.1f %f",temperature,adapter,test);
+    snprintf(buf,sizeof(buf),"DC in:%4.1fV imon1 %3.1fA imon2 %3.1fA",adapter,imon1,imon2);
     OLED_Show_String(  1,buf, 0, 6*8);
 #define BAT_MISSING_THRESHOLD (2.5f*3.f) 
 #define BAT_CRIT_THRESHOLD (3.3f*3.f) 
@@ -312,7 +302,7 @@ __interrupt void Excep_RTC_SLEEP(void) {
         } else {
             statustext="Normal";
         }
-        snprintf(buf,sizeof(buf),"%d: %4.1fV %5.1fA %11s %3.0f",i,adc[i],adc[i+4],statustext,percent);
+        snprintf(buf,sizeof(buf),"%d: %4.1fV %5.1fA %11s%3.0f%%",i,adc[i],adc[i+4],statustext,percent);
         OLED_Show_String(  1, buf, 0, (i+1)*8);
     }
 #endif

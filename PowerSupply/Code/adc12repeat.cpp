@@ -28,8 +28,9 @@
 #include "adc12repeat.h"
 
 volatile float adc[8] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-volatile float temperature = 1.0;
-volatile float adapter = 1.0;
+volatile float adapter = 0.0;
+volatile float imon1 = 0.0;
+volatile float imon2 = 0.0;
 
 /* The variable gADC_Result is used to contain the value of the 12 bit ADC */
 volatile uint16_t gADC_Result;
@@ -62,6 +63,7 @@ void Init_ADC12Repeat(void) {
   SYSTEM.PRCR.WORD = 0xA503;  
   /* Cancel the S12AD module clock stop mode */
   MSTP_S12AD = 0;
+  MSTP_AD = 0;
   /* Protection on */
   SYSTEM.PRCR.WORD = 0xA500;
 
@@ -77,14 +79,22 @@ void Init_ADC12Repeat(void) {
   MPC.P44PFS.BIT.ASEL=1;
   MPC.P45PFS.BIT.ASEL=1;
   MPC.P46PFS.BIT.ASEL=1;
-  MPC.P47PFS.BIT.ASEL=1;
+  MPC.P47PFS.BIT.ASEL=1; // AN007
 
+  MPC.PE2PFS.BIT.ASEL=1; // AN0
+  MPC.PE3PFS.BIT.ASEL=1; // AN1
+  MPC.PE5PFS.BIT.ASEL=1; // AN3
+  
   MPC.PWPR.BIT.PFSWE=0;
   MPC.PWPR.BIT.B0WI=1;
   
   /* ADC clock = PCLK/8, continuous scan mode */
   // S12AD.ADCSR.BYTE |= 0x40;
-  S12AD.ADCSR.BIT.CKS=0; // PCLK/8
+  S12AD.ADCSR.BIT.CKS=0; /*  0: PCLK/8
+  1: PCLK/4
+  2: PCLK/2
+  3: PCLK
+  */
   S12AD.ADCSR.BIT.ADCS=1; // 0 single scan, 1 continuous
   
   /* Selects AN000..AN007 */
@@ -103,25 +113,18 @@ void Init_ADC12Repeat(void) {
   /* Start ADC */
   S12AD.ADCSR.BIT.ADST = 1;
 
-  /* Configure a 10 ms periodic delay used 
-     to update the ADC result on to the LCD */
-  Timer_Delay(100, 'm', PERIODIC_MODE);
-#if 0
   AD.ADCSR.BIT.ADST = 0; // stop conversion
-  AD.ADCSR.BIT.CH   = 3; // enable AN3 only
-  AD.ADCR.BIT.MODE  = 3; // continuous scanning mode
+  AD.ADCSR.BIT.CH   = 3; // enable AN0..AN3 
+  AD.ADCR.BIT.MODE  = 2; // continuous scan mode
   AD.ADCR.BIT.CKS   = 0; // clock is PCLK/8
-  AD.ADCR.BIT.TRGS  = 0; // software trigger
+  AD.ADCR.BIT.TRGS  = 0; // software trigger  
+  AD.ADCR2.BIT.DPSEL = 0; // Flush-right
   AD.ADCSR.BIT.ADST = 1; // start conversion
-#endif
 
-#if 0
-  S12AD.ADCER.BIT.ACE=1;
-  S12AD.ADEXICR.BIT.TSS = 1;// temperature sensor
-  S12AD.ADSSTR23.BIT.SST2=20;//sampling interval
-  TEMPS.TSCR.BIT.TSEN=1;// Start sensor
-  TEMPS.TSCR.BIT.TSOE=1;// Enable temperature sensor
-#endif
+  /* Configure a 1 ms periodic delay used 
+     to update the ADC result and check for safe numbers */
+  Timer_Delay(1, 'm', PERIODIC_MODE);
+
 }
 
 static void Init_Timer(void) {
@@ -200,6 +203,7 @@ static void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode) {
 #pragma vector=VECT_CMT2_CMI2
 __interrupt void Excep_CMTU1_CMT2(void) {
     LED7 =LED_ON;
+    //AD.ADCSR.BIT.ADST = 1; // start conversion of 10bit ADC, so we do not loose time later
 
     /* Declare temporary character string */
     // uint8_t lcd_buffer[9] = "=H\'WXYZ\0";
@@ -222,27 +226,37 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     // For every amper change is 4095/3.3*0.185=229.568181818
 #define ICOEFF (4095.0/3.3*   0.185)
 #define IZBASE (   2.5/3.3*4095.0  )
-    //while(S12AD.ADCSR.BIT.ADST);
-    adc[0] =  (float)(S12AD.ADDR0>>4)*VCOEFF; // VBAT0_AD 
-    adc[1] =  (float)(S12AD.ADDR1>>4)*VCOEFF; // VBAT1_AD
-    adc[2] =  (float)(S12AD.ADDR2>>4)*VCOEFF; // VBAT2_AD
-    adc[3] =  (float)(S12AD.ADDR3>>4)*VCOEFF; // VBAT3_AD
+    adc[0] = adc[0]*0.9 + 0.1 * (float)(S12AD.ADDR0>>4)*VCOEFF; // VBAT0_AD 
+    adc[1] = adc[1]*0.9 + 0.1 * (float)(S12AD.ADDR1>>4)*VCOEFF; // VBAT1_AD
+    adc[2] = adc[2]*0.9 + 0.1 * (float)(S12AD.ADDR2>>4)*VCOEFF; // VBAT2_AD
+    adc[3] = adc[3]*0.9 + 0.1 * (float)(S12AD.ADDR3>>4)*VCOEFF; // VBAT3_AD
 
-    adc[4] = ((float)(S12AD.ADDR4>>4)-IZBASE)/ICOEFF; // IBAT0_AD
-    adc[5] = ((float)(S12AD.ADDR5>>4)-IZBASE)/ICOEFF; // IBAT1_AD
-    adc[6] = ((float)(S12AD.ADDR6>>4)-IZBASE)/ICOEFF; // IBAT2_AD
-    adc[7] = ((float)(S12AD.ADDR7>>4)-IZBASE)/ICOEFF; // IBAT3_AD
+    adc[4] = adc[4]*0.9 + 0.1 * ((float)(S12AD.ADDR4>>4)-IZBASE)/ICOEFF; // IBAT0_AD
+    adc[5] = adc[5]*0.9 + 0.1 * ((float)(S12AD.ADDR5>>4)-IZBASE)/ICOEFF; // IBAT1_AD
+    adc[6] = adc[6]*0.9 + 0.1 * ((float)(S12AD.ADDR6>>4)-IZBASE)/ICOEFF; // IBAT2_AD
+    adc[7] = adc[7]*0.9 + 0.1 * ((float)(S12AD.ADDR7>>4)-IZBASE)/ICOEFF; // IBAT3_AD
 
-    S12AD.ADCSR.BIT.ADST = 1;
-#if 0 //////////////////////
-    // AN3 is external adapter input
-    adapter = (float) AD.ADDRD;
-    // T = (Vs – V1)/Slope + T1
-    // Slope = 4.1 mV/C
-    // voltage =1.26
+    //S12AD.ADCSR.BIT.ADST = 1;
     
-//#define degrees25C  (16384.0/3.3*1.25)
-//    temperature = (float)(S12AD.ADTSDR/(16384.0/3.3)-degrees25C)/4.1+25.0;
+    //while(AD.ADCSR.BIT.ADST); // Make sure 10bit ADC has finished
+
+#define VCOEFF2 ((680.0/100.0*3.3)/(1023.0))
+    // AN0 is external adapter input
+    adapter = (float) AD.ADDRA*VCOEFF2;
+    
+    /*
+     * IMON1 and IMON2 are current measuring outputs of TPS51222
+     * The measure voltage drop over output inductor and amplyify it by 50.
+     * For Bourns SRP1250-4R7M DCR is 15 milliohm (0.015 ohm) max.
+     * Ohms law states I = U/R.
+     * In our ADC maximum reading of 1023 means 3.3V. 3.3V/50= 0.066V and this  
+     * is maximum drop we can measure on inductor. 
+     *I = 0.066V / 0.015ohm = 4.4A 
+     */
+    imon1 = (float) AD.ADDRC / 1023.0 * 4.4;
+    imon2 = (float) AD.ADDRD / 1023.0 * 4.4;
+    
+#if 0 //////////////////////
 
 #define CURRENT_MAX     1.0
 #define CURRENT_MIN     -1.0
