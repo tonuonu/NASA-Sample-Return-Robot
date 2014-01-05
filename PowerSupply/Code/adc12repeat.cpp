@@ -92,14 +92,16 @@ void Init_ADC12Repeat(void) {
   S12AD.ADANS0.BIT.ANS0=0x00FF;
 
   /* Set the sampling cycle to 255 states (approximately 5 us) */
-  //S12AD.ADSSTR01.WORD = 0x14FF;
-//  S12AD.ADSSTR01.BIT.SST1=255;
-  S12AD.ADSSTR01.BIT.SST1=25;
-  S12AD.ADSSTR23.BIT.SST2=25;
+  S12AD.ADSSTR01.BIT.SST1=255;
+  S12AD.ADSSTR23.BIT.SST2=255;
 
+  S12AD.ADADS0.BIT.ADS0=0x00FF; // AN000...AN007 addition mode on
+  S12AD.ADADS1.BIT.ADS1=0x0000; // AN016... we no not care
+  S12AD.ADADC.BIT.ADC=3;// convert and add 4 times
+  S12AD.ADCER.BIT.ACE = 1; // Clear automatically after data is read
+  
   /* Start ADC */
   S12AD.ADCSR.BIT.ADST = 1;
-  S12AD.ADCER.BIT.ACE = 1;
 
   /* Configure a 10 ms periodic delay used 
      to update the ADC result on to the LCD */
@@ -116,7 +118,6 @@ void Init_ADC12Repeat(void) {
 #if 0
   S12AD.ADCER.BIT.ACE=1;
   S12AD.ADEXICR.BIT.TSS = 1;// temperature sensor
-  S12AD.ADADC.BIT.ADC=0;// how many times to convert
   S12AD.ADSSTR23.BIT.SST2=20;//sampling interval
   TEMPS.TSCR.BIT.TSEN=1;// Start sensor
   TEMPS.TSCR.BIT.TSOE=1;// Enable temperature sensor
@@ -138,8 +139,7 @@ static void Init_Timer(void) {
   /* Enable CMT2 interrupts */
   IEN(CMT2,CMI2) = 0x1;
   /* Clear CMT2 interrupt flag */
-  IR(CMT2,CMI2) = 0x0;
-  
+  IR(CMT2,CMI2) = 0x0;  
 }
 
 /******************************************************************************
@@ -197,12 +197,6 @@ static void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode) {
   }      
 }
 
-//volatile float foobar=9.0;
-
-#include "assert.h"
-/******************************************************************************
-* Regular ADC interrupt. 
-******************************************************************************/
 #pragma vector=VECT_CMT2_CMI2
 __interrupt void Excep_CMTU1_CMT2(void) {
     LED7 =LED_ON;
@@ -229,19 +223,15 @@ __interrupt void Excep_CMTU1_CMT2(void) {
 #define ICOEFF (4095.0/3.3*   0.185)
 #define IZBASE (   2.5/3.3*4095.0  )
     //while(S12AD.ADCSR.BIT.ADST);
-LED6=LED_ON;
-    //foobar =  (float)S12AD.ADDR0*VCOEFF; // VBAT0_AD 
-    adc[0] =  (float)S12AD.ADDR0*VCOEFF; // VBAT0_AD 
-//    foobar  +=  VCOEFF; // VBAT0_AD 
-    adc[1] =  (float)S12AD.ADDR1*VCOEFF; // VBAT1_AD
-    adc[2] =  (float)S12AD.ADDR2*VCOEFF; // VBAT2_AD
-    adc[3] =  (float)S12AD.ADDR3*VCOEFF; // VBAT3_AD
+    adc[0] =  (float)(S12AD.ADDR0>>4)*VCOEFF; // VBAT0_AD 
+    adc[1] =  (float)(S12AD.ADDR1>>4)*VCOEFF; // VBAT1_AD
+    adc[2] =  (float)(S12AD.ADDR2>>4)*VCOEFF; // VBAT2_AD
+    adc[3] =  (float)(S12AD.ADDR3>>4)*VCOEFF; // VBAT3_AD
 
-    adc[4] = ((float)S12AD.ADDR4-IZBASE)/ICOEFF; // IBAT0_AD
-    adc[5] = ((float)S12AD.ADDR5-IZBASE)/ICOEFF; // IBAT1_AD
-    adc[6] = ((float)S12AD.ADDR6-IZBASE)/ICOEFF; // IBAT2_AD
-    adc[7] = ((float)S12AD.ADDR7-IZBASE)/ICOEFF; // IBAT3_AD
-LED6=LED_OFF;
+    adc[4] = ((float)(S12AD.ADDR4>>4)-IZBASE)/ICOEFF; // IBAT0_AD
+    adc[5] = ((float)(S12AD.ADDR5>>4)-IZBASE)/ICOEFF; // IBAT1_AD
+    adc[6] = ((float)(S12AD.ADDR6>>4)-IZBASE)/ICOEFF; // IBAT2_AD
+    adc[7] = ((float)(S12AD.ADDR7>>4)-IZBASE)/ICOEFF; // IBAT3_AD
 
     S12AD.ADCSR.BIT.ADST = 1;
 #if 0 //////////////////////
@@ -251,16 +241,12 @@ LED6=LED_OFF;
     // Slope = 4.1 mV/C
     // voltage =1.26
     
-#define degrees25C  (16384.0/3.3*1.25)
-    temperature = (float)(S12AD.ADTSDR/(16384.0/3.3)-degrees25C)/4.1+25.0;
+//#define degrees25C  (16384.0/3.3*1.25)
+//    temperature = (float)(S12AD.ADTSDR/(16384.0/3.3)-degrees25C)/4.1+25.0;
 
 #define CURRENT_MAX     1.0
 #define CURRENT_MIN     -1.0
     
-#define BAT0_EN PORTA.PODR.BIT.B7
-#define BAT1_EN PORTB.PODR.BIT.B1
-#define BAT2_EN PORTB.PODR.BIT.B2
-#define BAT3_EN PORTB.PODR.BIT.B3
 
     int BAT0_error=0;
     int BAT1_error=0;

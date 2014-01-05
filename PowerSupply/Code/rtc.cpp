@@ -312,7 +312,7 @@ __interrupt void Excep_RTC_SLEEP(void) {
         } else {
             statustext="Normal";
         }
-        snprintf(buf,sizeof(buf),"%d: %4.1fV %6.2fA %11s %3.0f",i,adc[i],adc[i+4],statustext,percent);
+        snprintf(buf,sizeof(buf),"%d: %4.1fV %5.1fA %11s %3.0f",i,adc[i],adc[i+4],statustext,percent);
         OLED_Show_String(  1, buf, 0, (i+1)*8);
     }
 #endif

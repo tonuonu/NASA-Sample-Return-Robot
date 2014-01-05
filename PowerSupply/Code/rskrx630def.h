@@ -50,6 +50,17 @@
 #define LED_BLU_PORT_DIR  PORT1.PDR.BIT.B5
 #define LED_RED_PORT_DIR  PORT1.PDR.BIT.B7
 
+#define BAT0_EN PORTA.PODR.BIT.B7
+#define BAT1_EN PORTB.PODR.BIT.B1
+#define BAT2_EN PORTB.PODR.BIT.B2
+#define BAT3_EN PORTB.PODR.BIT.B3
+
+#define BAT0_EN_DIR PORTA.PDR.BIT.B7
+#define BAT1_EN_DIR PORTB.PDR.BIT.B1
+#define BAT2_EN_DIR PORTB.PDR.BIT.B2
+#define BAT3_EN_DIR PORTB.PDR.BIT.B3
+
+
 /* Delay units */
 #define uS        'u'
 #define mS        'm'

@@ -31,7 +31,9 @@
 #include "usb_cdc_app.h"
 #include "adc12repeat.h"
 #include "low_voltage_detection.h"
+#include "rskrx630def.h"
 
+   
 void _SPI_write(uint8_t reg, uint8_t data) {
     /* Write to data register */
     RSPI0.SPDR.LONG = (uint32_t) 0x00000000 | (reg << 24) | (data << 16);   
@@ -92,6 +94,16 @@ int main() {
                    */
     ENABLE_PWR_DIR=1; // Make it output AFTER to avoid power glitch.
 
+    BAT0_EN = 0; // Make sure battery inputs are NOT enabled here.
+    BAT1_EN = 0; // They may have problems, they later get checked and  
+    BAT2_EN = 0; // enabled if possible
+    BAT3_EN = 0;
+
+    BAT0_EN_DIR = 1; // Make output
+    BAT1_EN_DIR = 1;
+    BAT2_EN_DIR = 1; 
+    BAT3_EN_DIR = 1;
+    
     Init_PWM();
     // Init_VoltageDetect();
     Init_ADC12Repeat();
