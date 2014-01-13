@@ -84,7 +84,19 @@ void _SPI_write(uint8_t reg, uint8_t data) {
 #define ENABLE_PWR_DIR              PORT1.PDR.BIT.B2
 #include "iorx630.h"
 
+
+    
 int main() {
+    BAT0_EN = MAX1614_OFF; // Make sure battery inputs are NOT enabled here.
+    BAT1_EN = MAX1614_OFF; // They may have problems like low voltage, high voltage etc.,  
+    BAT2_EN = MAX1614_OFF; // they later get checked and enabled if possible
+    BAT3_EN = MAX1614_OFF; 
+
+    BAT0_EN_DIR = 1; // Make output
+    BAT1_EN_DIR = 1;
+    BAT2_EN_DIR = 1; 
+    BAT3_EN_DIR = 1;
+
     HardwareSetup();
     __enable_interrupt();
     Init_OLED(); // Make sure noone else calls OLED calls in interrupts before init
@@ -94,19 +106,10 @@ int main() {
                    */
     ENABLE_PWR_DIR=1; // Make it output AFTER to avoid power glitch.
 
-    BAT0_EN = 0; // Make sure battery inputs are NOT enabled here.
-    BAT1_EN = 0; // They may have problems, they later get checked and  
-    BAT2_EN = 0; // enabled if possible
-    BAT3_EN = 0;
-
-    BAT0_EN_DIR = 1; // Make output
-    BAT1_EN_DIR = 1;
-    BAT2_EN_DIR = 1; 
-    BAT3_EN_DIR = 1;
     
-    OUT1_EN = 0; // Configure all power supply main outputs   
-    OUT2_EN = 0; // 0 is enable?
-    OUT3_EN = 0;
+    OUT1_EN = MAX1614_OFF; // Configure all power supply main outputs   
+    OUT2_EN = MAX1614_OFF; 
+    OUT3_EN = MAX1614_OFF;
     OUT1_EN_DIR = 1;
     OUT2_EN_DIR = 1;
     OUT3_EN_DIR = 1;
@@ -118,8 +121,8 @@ int main() {
     
     Init_PWM();
     // Init_VoltageDetect();
-    Init_ADC12Repeat();
     Init_RTC();
+    Init_ADC12Repeat();
     // Init_SPI();
     // Init_UART();  
     // USBCDC_Init();  

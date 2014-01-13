@@ -172,7 +172,8 @@ void Init_RTC(void) {
   ICU.IR[IR_RTC_ALM].BIT.IR = 0;
     
   /* Enable RTC Periodic interrupts */  
-  ICU.IPR[IPR_RTC_PRD].BYTE =  0x08 + 0x02  ; // 16 times in second
+//  ICU.IPR[IPR_RTC_PRD].BYTE =  0x08 + 0x02  ; // 16 times in second
+  ICU.IPR[IPR_RTC_PRD].BYTE =  0x04 + 0x02 + 0x01  ; // 128 times in second
   /*
     b7 to b4 PES[3:0] Periodic Interrupt
     0 1 1 0: A periodic interrupt is generated every 1/256 second.
@@ -210,26 +211,90 @@ void Init_RTC(void) {
 *******************************************************************************/
 #pragma vector=VECT_RTC_ALM
 __interrupt void Excep_RTC_ALM(void) {
-  /* Clear the interrupt flag */
-  ICU.IR[IR_RTC_ALM].BIT.IR = 0;
+    /* Clear the interrupt flag */
+    ICU.IR[IR_RTC_ALM].BIT.IR = 0;
 }
+
 extern volatile float adc[8];
 extern volatile float temperature;
 extern volatile float adapter;
 extern volatile float imon1,imon2;
 
+volatile char mode=E_BAT;
+volatile char mode_just_changed=1;
 
-/*******************************************************************************
-* Outline     : CB_1HZ_RTC
-* Description   : RTC periodic interrupt handler generated every 1 sec. It is 
-*          used to update the time on the debug OLED. It read the RTC 
-*          register values and converts them into a string before 
-*          displaying on the OLED.
-* Argument    : none
-* Return value  : none
-*******************************************************************************/
-#pragma vector=VECT_RTC_PRD
-__interrupt void Excep_RTC_SLEEP(void) {
+static void 
+mode_e_err(void) {
+    char buf[SCREENWIDTH+1];
+    snprintf(buf,sizeof(buf),"Errorlog");
+    OLED_Show_String(  1,buf, 0, 0*8);
+    for(int i=0;i<MAXERRORS;i++) {
+        OLED_Show_String( 1,errlog[i], 0, (i+1)*8);
+    }
+}
+
+static void 
+mode_e_bat(void) {
+    char buf[SCREENWIDTH+1]; 
+    snprintf(buf,sizeof(buf),"DC in:%4.1fV imon1 %3.1fA imon2 %3.1fA",adapter,imon1,imon2);
+    OLED_Show_String(  1,buf, 0, 6*8);
+#define BAT_MISSING_THRESHOLD (2.5f*3.f) 
+#define BAT_CRIT_THRESHOLD (3.3f*3.f) 
+#define BAT_LOW_THRESHOLD  (3.5f*3.f)
+#define BAT_FULL_THRESHOLD (4.2f*3.f)
+    
+    for(int i=0;i<4;i++) {
+        char *statustext;
+        float percent;
+        percent=(adc[i]-BAT_CRIT_THRESHOLD)/(BAT_FULL_THRESHOLD-BAT_CRIT_THRESHOLD)*100.0f;
+        if(adc[i]<=BAT_MISSING_THRESHOLD) {
+            statustext="Missing";
+            percent=0.0f;
+        } else if(adc[i]<=BAT_CRIT_THRESHOLD) {
+            statustext="Criticl";
+            percent=0.0f;
+        } else if(adc[i]<=BAT_LOW_THRESHOLD) {
+            statustext="Low";
+        } else if(adc[i]>BAT_FULL_THRESHOLD) {
+            statustext="Overvlt";
+            percent=0.0f;
+        } else {
+            statustext="Normal";
+        }
+        char *status2;
+        switch(i) {
+        case 0:
+            if(BAT0_EN==MAX1614_ON)
+                status2="EN ";
+            else
+                status2="DIS";
+            break;
+        case 1:
+            if(BAT1_EN==MAX1614_ON)
+                status2="EN ";
+            else
+                status2="DIS";
+            break;
+        case 2:
+            if(BAT2_EN==MAX1614_ON)
+                status2="EN ";
+            else
+                status2="DIS";
+            break;
+        case 3:
+            if(BAT3_EN==MAX1614_ON)
+                status2="EN ";
+            else
+                status2="DIS";
+            break;
+        }
+        snprintf(buf,sizeof(buf),"%d: %4.1fV %5.1fA %7s%3.0f%% %3s",i,adc[i],adc[i+4],statustext,percent,status2);
+        OLED_Show_String(  1, buf, 0, (i+1)*8);
+    }  
+}
+
+void readtime(char *buf) {
+  
     /* Read the time and status flags */
     /* Read the seconds count register */
     time_data  = (uint32_t)(RTC.RSECCNT.BYTE & 0x0000007F);
@@ -238,7 +303,6 @@ __interrupt void Excep_RTC_SLEEP(void) {
     /* Read the hours count register */
     time_data |= (RTC.RHRCNT.BYTE  & 0x0000003F) << 16;
   
-    char buf[65];
     char *dow;
     switch(RTC.RWKCNT.BYTE & 0x07) {
     case 0:
@@ -264,7 +328,7 @@ __interrupt void Excep_RTC_SLEEP(void) {
          break;
     }
 
-    snprintf(buf,sizeof(buf),"%3s %2x/%02x/20%02x %2x:%02x:%02x",
+    snprintf(buf,SCREENWIDTH+1,"%3s %2x/%02x/20%02x %2x:%02x:%02x",
                  dow,
                  RTC.RDAYCNT.BYTE,
                  RTC.RMONCNT.BYTE,
@@ -273,38 +337,55 @@ __interrupt void Excep_RTC_SLEEP(void) {
                  RTC.RMINCNT.BYTE & 0x7F,
                  RTC.RSECCNT.BYTE & 0x7F
     );
+}
 
+void readstime(char *buf) {
+  
+    /* Read the time and status flags */
+    /* Read the seconds count register */
+    time_data  = (uint32_t)(RTC.RSECCNT.BYTE & 0x0000007F);
+    /* Read the minutes count register */
+    time_data |= (RTC.RMINCNT.BYTE & 0x0000007F) << 8;
+    /* Read the hours count register */
+    time_data |= (RTC.RHRCNT.BYTE  & 0x0000003F) << 16;
+  
+
+    snprintf(buf,SCREENWIDTH+1,"%2x/%02x %2x:%02x:%02x",
+                 RTC.RDAYCNT.BYTE,
+                 RTC.RMONCNT.BYTE,
+                 RTC.RHRCNT.BYTE & 0x3F ,
+                 RTC.RMINCNT.BYTE & 0x7F,
+                 RTC.RSECCNT.BYTE & 0x7F
+    );
+}
+
+/*******************************************************************************
+* Outline     : CB_1HZ_RTC
+* Description   : RTC periodic interrupt handler generated every 1 sec. It is 
+*          used to update the time on the debug OLED. It read the RTC 
+*          register values and converts them into a string before 
+*          displaying on the OLED.
+* Argument    : none
+* Return value  : none
+*******************************************************************************/
+#pragma vector=VECT_RTC_PRD
+__interrupt void Excep_RTC_SLEEP(void) {
+
+    if(mode_just_changed) {
+        OLED_Fill_RAM(0x00); // clear screen
+        mode_just_changed=0;
+    }    
+
+    switch(mode) {
+    case E_BAT:
+        mode_e_bat();
+        break;
+    case E_ERR:
+        mode_e_err();
+        break;
+    }      
+    char buf[SCREENWIDTH+1];
+    readtime(buf);
     OLED_Show_String(  1,buf, 0, 7*8);
-
-#if 1
-    snprintf(buf,sizeof(buf),"DC in:%4.1fV imon1 %3.1fA imon2 %3.1fA",adapter,imon1,imon2);
-    OLED_Show_String(  1,buf, 0, 6*8);
-#define BAT_MISSING_THRESHOLD (2.5f*3.f) 
-#define BAT_CRIT_THRESHOLD (3.3f*3.f) 
-#define BAT_LOW_THRESHOLD  (3.5f*3.f)
-#define BAT_FULL_THRESHOLD (4.2f*3.f)
-    
-    for(int i=0;i<4;i++) {
-        char *statustext;
-        float percent;
-        percent=(adc[i]-BAT_CRIT_THRESHOLD)/(BAT_FULL_THRESHOLD-BAT_CRIT_THRESHOLD)*100.0f;
-        if(adc[i]<=BAT_MISSING_THRESHOLD) {
-            statustext="Missing";
-            percent=0.0f;
-        } else if(adc[i]<=BAT_CRIT_THRESHOLD) {
-            statustext="Critical";
-            percent=0.0f;
-        } else if(adc[i]<=BAT_LOW_THRESHOLD) {
-            statustext="Low";
-        } else if(adc[i]>BAT_FULL_THRESHOLD) {
-            statustext="Overvoltage";
-            percent=0.0f;
-        } else {
-            statustext="Normal";
-        }
-        snprintf(buf,sizeof(buf),"%d: %4.1fV %5.1fA %11s%3.0f%%",i,adc[i],adc[i+4],statustext,percent);
-        OLED_Show_String(  1, buf, 0, (i+1)*8);
-    }
-#endif
 }
 

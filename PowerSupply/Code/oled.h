@@ -36,14 +36,33 @@
 #define OLED_RESET_PORT_DIR  PORT5.PDR.BIT.B1
 #define OLED_WR_PORT_DIR     PORT5.PDR.BIT.B0
 #define OLED_DATA_PORT_DIR   PORTD.PDR.BYTE
-
+ 
 
 void Init_OLED(void);
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 void OLED_Show_String(unsigned char a,  char *Data_Pointer, unsigned char b, unsigned char c);
 void OLED_Fill_RAM(unsigned char Data);
+
+
+/* modes */
+#define E_MAINMENU (0)
+#define E_BAT      (1)
+#define E_ERR      (2)
+
+#define MAX_MODE   (2)
+
+extern volatile char mode;
+extern volatile char mode_just_changed;
+void readtime(char *buf);
+void readstime(char *buf);
+#define MAXERRORS 6
+#define SCREENWIDTH    42
+extern char errlog[MAXERRORS][SCREENWIDTH+1];
+
+
 #ifdef __cplusplus
 }
 #endif

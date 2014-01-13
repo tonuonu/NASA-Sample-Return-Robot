@@ -26,6 +26,8 @@
 #include "switch.h"
 #include "oled.h"
 #include "adc12repeat.h"
+#include "stdio.h"
+#include "string.h"
 
 volatile float adc[8] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
 volatile float adapter = 0.0;
@@ -72,7 +74,7 @@ void Init_ADC12Repeat(void) {
   /* Disable write protection to PFS registers */
   MPC.PWPR.BIT.PFSWE=1;
 
-  MPC.P40PFS.BIT.ASEL=1;
+  MPC.P40PFS.BIT.ASEL=1; // AN000
   MPC.P41PFS.BIT.ASEL=1;
   MPC.P42PFS.BIT.ASEL=1;
   MPC.P43PFS.BIT.ASEL=1;
@@ -123,7 +125,7 @@ void Init_ADC12Repeat(void) {
 
   /* Configure a 1 ms periodic delay used 
      to update the ADC result and check for safe numbers */
-  Timer_Delay(1, 'm', PERIODIC_MODE);
+  Timer_Delay(10, 'm', PERIODIC_MODE);
 
 }
 
@@ -200,6 +202,20 @@ static void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode) {
   }      
 }
 
+
+char errlog[MAXERRORS][SCREENWIDTH+1]={"","","","","",""};
+volatile char errptr=0;
+
+void logerror(char *buf) {
+    readstime(errlog[errptr]);
+    errlog[errptr][14]=' ';
+    strcpy(errlog[errptr]+15,buf);
+    errptr++;
+    if(errptr==MAXERRORS){
+        errptr=0;
+    }
+}
+
 #pragma vector=VECT_CMT2_CMI2
 __interrupt void Excep_CMTU1_CMT2(void) {
     LED7 =LED_ON;
@@ -214,7 +230,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     // So when reference is 3.3V, maximum ADC reading is 133k/33k*3.3V=13.3V
     // Because we have 12bit ADC, formula for voltage is 13.3/(2^12-1)*reading
     // 13.3/(2^12)*4095=13.3V etc
-#define VCOEFF ((133.0/33.0*3.3)/(4095.0))
+#define VCOEFF (((100.0+33.0)/33.0*3.3)/(4095.0))
   
     // ACS712 5A version outputs 185mV for each A
     // Center is at VCC/2, so 2.5V
@@ -226,21 +242,16 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     // For every amper change is 4095/3.3*0.185=229.568181818
 #define ICOEFF (4095.0/3.3*   0.185)
 #define IZBASE (   2.5/3.3*4095.0  )
-    adc[0] = adc[0]*0.9 + 0.1 * (float)(S12AD.ADDR0>>4)*VCOEFF; // VBAT0_AD 
-    adc[1] = adc[1]*0.9 + 0.1 * (float)(S12AD.ADDR1>>4)*VCOEFF; // VBAT1_AD
-    adc[2] = adc[2]*0.9 + 0.1 * (float)(S12AD.ADDR2>>4)*VCOEFF; // VBAT2_AD
-    adc[3] = adc[3]*0.9 + 0.1 * (float)(S12AD.ADDR3>>4)*VCOEFF; // VBAT3_AD
+    adc[0] =  (float)(S12AD.ADDR0>>4)*VCOEFF; // VBAT0_AD 
+    adc[1] =  (float)(S12AD.ADDR1>>4)*VCOEFF; // VBAT1_AD
+    adc[2] =  (float)(S12AD.ADDR2>>4)*VCOEFF; // VBAT2_AD
+    adc[3] =  (float)(S12AD.ADDR3>>4)*VCOEFF; // VBAT3_AD
 
-    adc[4] = adc[4]*0.9 + 0.1 * ((float)(S12AD.ADDR4>>4)-IZBASE)/ICOEFF; // IBAT0_AD
-    adc[5] = adc[5]*0.9 + 0.1 * ((float)(S12AD.ADDR5>>4)-IZBASE)/ICOEFF; // IBAT1_AD
-    adc[6] = adc[6]*0.9 + 0.1 * ((float)(S12AD.ADDR6>>4)-IZBASE)/ICOEFF; // IBAT2_AD
-    adc[7] = adc[7]*0.9 + 0.1 * ((float)(S12AD.ADDR7>>4)-IZBASE)/ICOEFF; // IBAT3_AD
-
-    //S12AD.ADCSR.BIT.ADST = 1;
-    
-    //while(AD.ADCSR.BIT.ADST); // Make sure 10bit ADC has finished
-
-#define VCOEFF2 ((680.0/100.0*3.3)/(1023.0))
+    adc[4] =  ((float)(S12AD.ADDR4>>4)-IZBASE)/ICOEFF; // IBAT0_AD
+    adc[5] =  ((float)(S12AD.ADDR5>>4)-IZBASE)/ICOEFF; // IBAT1_AD
+    adc[6] =  ((float)(S12AD.ADDR6>>4)-IZBASE)/ICOEFF; // IBAT2_AD
+    adc[7] =  ((float)(S12AD.ADDR7>>4)-IZBASE)/ICOEFF; // IBAT3_AD
+#define VCOEFF2 (((680.0+100.0)/100.0*3.3)/(1023.0))
     // AN0 is external adapter input
     adapter = (float) AD.ADDRA*VCOEFF2;
     
@@ -256,36 +267,72 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     imon1 = (float) AD.ADDRC / 1023.0 * 4.4;
     imon2 = (float) AD.ADDRD / 1023.0 * 4.4;
     
-#if 0 //////////////////////
 
-#define CURRENT_MAX     1.0
-#define CURRENT_MIN     -1.0
-    
+#define CURRENT_MAX     3.0
+#define CURRENT_MIN     -3.0
+#define VOLTAGE_MAX     12.6
+#define VOLTAGE_MIN     9.5    
 
     int BAT0_error=0;
     int BAT1_error=0;
     int BAT2_error=0;
     int BAT3_error=0;
-    
-    /* First check for battery currents */
-    
-    if(adc[4] > CURRENT_MAX || adc[4] < CURRENT_MIN) { // BAT0
-        BAT0_EN=0; // Turn off MOSFET
+
+    char buf[65];
+
+    /* check for voltages */   
+    if(BAT0_EN==MAX1614_ON && (adc[0] > VOLTAGE_MAX || adc[0] < VOLTAGE_MIN)) { // BAT0
+        BAT0_EN=MAX1614_OFF; // Turn off MOSFET
         BAT0_error=1;
+        snprintf(buf,sizeof(buf),"E:BAT0:%.2fV",adc[0]);
+        logerror(buf);
     }
-    if(adc[5] > CURRENT_MAX || adc[5] < CURRENT_MIN) { // BAT0
-        BAT1_EN=0; // Turn off MOSFET
+    if(BAT1_EN==MAX1614_ON && (adc[1] > VOLTAGE_MAX || adc[1] < VOLTAGE_MIN)) { // BAT1
+        BAT1_EN=MAX1614_OFF; // Turn off MOSFET
         BAT1_error=1;
+        snprintf(buf,sizeof(buf),"E:BAT1:%.2fV",adc[1]);
+        logerror(buf);
     }
-    if(adc[6] > CURRENT_MAX || adc[6] < CURRENT_MIN) { // BAT0
-        BAT2_EN=0; // Turn off MOSFET
+    if(BAT2_EN==MAX1614_ON && (adc[2] > VOLTAGE_MAX || adc[2] < VOLTAGE_MIN)) { // BAT2
+        BAT2_EN=MAX1614_OFF; // Turn off MOSFET
         BAT2_error=1;
+        snprintf(buf,sizeof(buf),"E:BAT2:%.2fV",adc[2]);
+        logerror(buf);
     }
-    if(adc[7] > CURRENT_MAX || adc[7] < CURRENT_MIN) { // BAT0
-        BAT3_EN=0; // Turn off MOSFET
+    if(BAT3_EN==MAX1614_ON && (adc[3] > VOLTAGE_MAX || adc[3] < VOLTAGE_MIN)) { // BAT3
+        BAT3_EN=MAX1614_OFF; // Turn off MOSFET
         BAT3_error=1;
+        snprintf(buf,sizeof(buf),"E:BAT3:%.2fV",adc[3]);
+        logerror(buf);
     }
 
+    /* check for battery currents */   
+    if(BAT0_EN==MAX1614_ON && (adc[4] > CURRENT_MAX || adc[4] < CURRENT_MIN)) { // BAT0
+        BAT0_EN=MAX1614_OFF; // Turn off MOSFET
+        BAT0_error=1;
+        snprintf(buf,sizeof(buf),"E:BAT0:%.2fA",adc[4]);
+        logerror(buf);
+    }
+    if(BAT1_EN==MAX1614_ON && (adc[5] > CURRENT_MAX || adc[5] < CURRENT_MIN)) { // BAT1
+        BAT1_EN=MAX1614_OFF; // Turn off MOSFET
+        BAT1_error=1;
+        snprintf(buf,sizeof(buf),"E:BAT1:%.2fA",adc[5]);
+        logerror(buf);
+    }
+    if(BAT2_EN==MAX1614_ON && (adc[6] > CURRENT_MAX || adc[6] < CURRENT_MIN)) { // BAT2
+        BAT2_EN=MAX1614_OFF; // Turn off MOSFET
+        BAT2_error=1;
+        snprintf(buf,sizeof(buf),"E:BAT2:%.2fA",adc[6]);
+        logerror(buf);
+    }
+    if(BAT3_EN==MAX1614_ON && (adc[7] > CURRENT_MAX || adc[7] < CURRENT_MIN)) { // BAT3
+        BAT3_EN=MAX1614_OFF; // Turn off MOSFET
+        BAT3_error=1;
+        snprintf(buf,sizeof(buf),"E:BAT3:%.2fA",adc[7]);
+        logerror(buf);
+    }    
+
+    
     int PWM0,PWM1,PWM2,PWM3;
     /* Check if adapter voltage exceeds any battery voltage. 
        If yes, we can charge! */
@@ -319,7 +366,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
             }
         }
     }
-#endif //////////////
+
     /* Voltages are less critical */        
     LED7 =LED_OFF;
 }

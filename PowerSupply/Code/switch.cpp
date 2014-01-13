@@ -24,6 +24,7 @@
 #include "rskrx630def.h"
 #include "iorx630.h"
 #include "switch.h"
+#include "oled.h"
 
 /* Switch flag global variable */
 volatile uint8_t gSwitchFlag = 0x00;
@@ -321,6 +322,7 @@ void StartDebounceTimer(uint16_t compare_match) {
     CMT.CMSTR0.BIT.STR0 = 1; /* Start timer */
 }
 
+
 #pragma vector=VECT_CMT0_CMI0
 __interrupt void Excep_CMTU0_CMT0(void) {
     /* Stop the CMT0 timer running */
@@ -376,6 +378,10 @@ LED3=LED_ON;
             gSwitchFaultsDetected++;
         } else { /* Switch 3 pin level is low (valid switch press) */
 LED2=LED_ON;
+            if(mode != MAX_MODE) {
+                mode++;
+                mode_just_changed=1;
+            }       
             /* Check if switch press callback function is not NULL */
             if(gSwitchPressCallbackFunc) {
                 /* Execute user callback function */
@@ -399,6 +405,10 @@ LED2=LED_ON;
             gSwitchFaultsDetected++;
         } else { /* Switch 2 pin level is low (valid switch press) */
 LED1=LED_ON;
+            if(mode!=1) {
+                mode--; 
+                mode_just_changed=1;
+            }
             /* Check if switch press callback function is not NULL */
             if(gSwitchPressCallbackFunc) {
                 /* Execute user callback function */
