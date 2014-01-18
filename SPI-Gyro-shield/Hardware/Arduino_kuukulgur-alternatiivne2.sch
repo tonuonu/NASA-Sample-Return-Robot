@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -29383,8 +29383,8 @@ SMD chip inductor</description>
 <part name="JP11" library="SparkFun" deviceset="M02" device="LOCK"/>
 <part name="JP12" library="SparkFun" deviceset="M02" device="LOCK"/>
 <part name="S1" library="SparkFun" deviceset="TAC_SWITCH" device="PTH"/>
-<part name="LED1" library="led" deviceset="LED" device="CHIP-LED0603" value="Red"/>
-<part name="LED2" library="led" deviceset="LED" device="CHIP-LED0603" value="Green"/>
+<part name="LED1" library="led" deviceset="LED" device="CHIP-LED0603" value="Blue"/>
+<part name="LED2" library="led" deviceset="LED" device="CHIP-LED0603" value="Blue"/>
 <part name="GND15" library="SparkFun" deviceset="GND" device=""/>
 <part name="GND16" library="SparkFun" deviceset="GND" device=""/>
 <part name="MOTOR0" library="con-lstb" deviceset="MA05-2" device=""/>
@@ -29446,7 +29446,7 @@ SMD chip inductor</description>
 <part name="GND23" library="supply1" deviceset="GND" device=""/>
 <part name="C1" library="SmartPrj" deviceset="C-EU" device="0603-RND" value="100n"/>
 <part name="GND24" library="supply1" deviceset="GND" device=""/>
-<part name="C5" library="SmartPrj" deviceset="C-EU" device="0603-RND" value="100n"/>
+<part name="C5" library="SmartPrj" deviceset="C-EU" device="0603-RND" value="220n"/>
 <part name="C4" library="SmartPrj" deviceset="C-EU" device="0603-RND" value="100n"/>
 <part name="GND25" library="supply1" deviceset="GND" device=""/>
 <part name="GND26" library="supply1" deviceset="GND" device=""/>
@@ -29484,14 +29484,14 @@ SMD chip inductor</description>
 <part name="GND17" library="supply1" deviceset="GND" device=""/>
 <part name="JMP1" library="jump-0r-smd" deviceset="0R-JUMP" device="B"/>
 <part name="GND22" library="SparkFun" deviceset="GND" device=""/>
-<part name="R27" library="SmartPrj" deviceset="R-EU_" device="R0603" value="330r"/>
-<part name="R28" library="SmartPrj" deviceset="R-EU_" device="R0603" value="330r"/>
+<part name="R27" library="SmartPrj" deviceset="R-EU_" device="R0603" value="1k"/>
+<part name="R28" library="SmartPrj" deviceset="R-EU_" device="R0603" value="1k"/>
 <part name="U$3" library="tonu" deviceset="TPS54332" device="" value="TPS54332"/>
 <part name="C15" library="SparkFun" deviceset="CAP" device="0603-CAP" value="0.1"/>
 <part name="C11" library="SparkFun" deviceset="CAP" device="0603-CAP" value="12pF"/>
 <part name="C9" library="SparkFun" deviceset="CAP" device="0603-CAP" value="180pF"/>
 <part name="C27" library="SparkFun" deviceset="CAP" device="0603-CAP" value="15nF"/>
-<part name="R35" library="SparkFun" deviceset="RESISTOR" device="0603-RES"/>
+<part name="R35" library="SparkFun" deviceset="RESISTOR" device="0603-RES" value="100k"/>
 <part name="R29" library="SparkFun" deviceset="RESISTOR" device="0603-RES" value="63k4"/>
 <part name="R36" library="SparkFun" deviceset="RESISTOR" device="0603-RES" value="1k87"/>
 <part name="R37" library="SparkFun" deviceset="RESISTOR" device="0603-RES" value="10k"/>
@@ -29500,17 +29500,17 @@ SMD chip inductor</description>
 <part name="GND59" library="SparkFun" deviceset="GND" device=""/>
 <part name="D100" library="diode" deviceset="BAT54" device=""/>
 <part name="GND60" library="SparkFun" deviceset="GND" device=""/>
-<part name="C100" library="rcl" deviceset="CPOL-EU" device="C/6032-28R" value="47uF/10V"/>
+<part name="C100" library="rcl" deviceset="CPOL-EU" device="C/6032-28R" value="100uF/10V"/>
 <part name="GND44" library="SparkFun" deviceset="GND" device=""/>
 <part name="L1" library="SparkFun" deviceset="INDUCTOR" device="SRU1038"/>
-<part name="LED3" library="led" deviceset="LED" device="CHIP-LED0603" value="Green"/>
-<part name="R38" library="SmartPrj" deviceset="R-EU_" device="R0603" value="330r"/>
-<part name="R39" library="SmartPrj" deviceset="R-EU_" device="R0603" value="330r"/>
-<part name="R40" library="SmartPrj" deviceset="R-EU_" device="R0603" value="330r"/>
-<part name="R41" library="SmartPrj" deviceset="R-EU_" device="R0603" value="330r"/>
-<part name="LED4" library="led" deviceset="LED" device="CHIP-LED0603" value="Green"/>
-<part name="LED5" library="led" deviceset="LED" device="CHIP-LED0603" value="Green"/>
-<part name="LED6" library="led" deviceset="LED" device="CHIP-LED0603" value="Green"/>
+<part name="LED3" library="led" deviceset="LED" device="CHIP-LED0603" value="Blue"/>
+<part name="R38" library="SmartPrj" deviceset="R-EU_" device="R0603" value="1k"/>
+<part name="R39" library="SmartPrj" deviceset="R-EU_" device="R0603" value="1k"/>
+<part name="R40" library="SmartPrj" deviceset="R-EU_" device="R0603" value="1k"/>
+<part name="R41" library="SmartPrj" deviceset="R-EU_" device="R0603" value="1k"/>
+<part name="LED4" library="led" deviceset="LED" device="CHIP-LED0603" value="Blue"/>
+<part name="LED5" library="led" deviceset="LED" device="CHIP-LED0603" value="Blue"/>
+<part name="LED6" library="led" deviceset="LED" device="CHIP-LED0603" value="Blue"/>
 <part name="GND35" library="supply1" deviceset="GND" device=""/>
 <part name="GND36" library="supply1" deviceset="GND" device=""/>
 <part name="GND37" library="supply1" deviceset="GND" device=""/>
@@ -29593,8 +29593,8 @@ SMD chip inductor</description>
 <attribute name="TP_SIGNAL_NAME" value=""/>
 </part>
 <part name="LED7" library="led" deviceset="LED" device="CHIP-LED0603" value="Yellow"/>
-<part name="R42" library="SmartPrj" deviceset="R-EU_" device="R0603" value="1k"/>
-<part name="C7" library="rcl" deviceset="C-EU" device="C0805" value="47uF/16V"/>
+<part name="R42" library="SmartPrj" deviceset="R-EU_" device="R0603" value="3k3"/>
+<part name="C7" library="rcl" deviceset="C-EU" device="C0805" value="1uF/16V"/>
 <part name="TP33" library="testpad" deviceset="TP" device="B1,27"/>
 <part name="TP34" library="testpad" deviceset="TP" device="B1,27"/>
 <part name="TP35" library="testpad" deviceset="TP" device="B1,27"/>
@@ -29622,8 +29622,8 @@ SMD chip inductor</description>
 <part name="GND43" library="supply1" deviceset="GND" device=""/>
 <part name="GND45" library="supply1" deviceset="GND" device=""/>
 <part name="GND46" library="supply1" deviceset="GND" device=""/>
-<part name="R43" library="SmartPrj" deviceset="R-EU_" device="R0603" value="330r"/>
-<part name="LED8" library="led" deviceset="LED" device="CHIP-LED0603" value="Green"/>
+<part name="R43" library="SmartPrj" deviceset="R-EU_" device="R0603" value="1k"/>
+<part name="LED8" library="led" deviceset="LED" device="CHIP-LED0603" value="Red"/>
 <part name="GND47" library="supply1" deviceset="GND" device=""/>
 <part name="IC2" library="samuel" deviceset="TPS773*" device="" value="TPS77301DGK"/>
 <part name="SUPPLY8" library="supply1" deviceset="GND" device=""/>
@@ -29633,16 +29633,16 @@ SMD chip inductor</description>
 <part name="GND49" library="supply1" deviceset="GND" device=""/>
 <part name="+3V15" library="supply1" deviceset="+3V3" device="" value="+3V3"/>
 <part name="+3V16" library="supply1" deviceset="+3V3" device="" value="+3V3"/>
-<part name="C29" library="rcl" deviceset="CPOL-EU" device="C/6032-28R" value="47uF/16V"/>
+<part name="C29" library="rcl" deviceset="CPOL-EU" device="C/6032-28R" value="100uF/16V"/>
 <part name="+3V17" library="supply1" deviceset="+3V3" device="" value="+3V3"/>
 <part name="GND50" library="supply1" deviceset="GND" device=""/>
-<part name="C30" library="rcl" deviceset="CPOL-EU" device="C/6032-28R" value="47uF/16V"/>
+<part name="C30" library="rcl" deviceset="CPOL-EU" device="C/6032-28R" value="100uF/16V"/>
 <part name="GND51" library="SparkFun" deviceset="GND" device=""/>
-<part name="C31" library="rcl" deviceset="CPOL-EU" device="C/6032-28R" value="47uF/10V"/>
+<part name="C31" library="rcl" deviceset="CPOL-EU" device="C/6032-28R" value="100uF/10V"/>
 <part name="GND52" library="SparkFun" deviceset="GND" device=""/>
 <part name="R44" library="SmartPrj" deviceset="R-EU_" device="R0603" value="47k"/>
 <part name="GND53" library="supply1" deviceset="GND" device=""/>
-<part name="R45" library="SparkFun" deviceset="RESISTOR" device="0603-RES"/>
+<part name="R45" library="SparkFun" deviceset="RESISTOR" device="0603-RES" value="21k5"/>
 <part name="GND54" library="SparkFun" deviceset="GND" device=""/>
 <part name="L4" library="inductor-neosid" deviceset="SM-1206" device="" value="LB3218T220K"/>
 <part name="C32" library="rcl" deviceset="C-EU" device="C1210" value="GRM32ER71E226KE15L"/>
@@ -29656,8 +29656,8 @@ SMD chip inductor</description>
 <part name="C33" library="SmartPrj" deviceset="C-EU" device="0603-RND" value="100n"/>
 <part name="GND61" library="SparkFun" deviceset="GND" device=""/>
 <part name="GND62" library="SparkFun" deviceset="GND" device=""/>
-<part name="R48" library="rcl" deviceset="R-EU_" device="R0603"/>
-<part name="R49" library="rcl" deviceset="R-EU_" device="R0603"/>
+<part name="R48" library="rcl" deviceset="R-EU_" device="R0603" value="118k"/>
+<part name="R49" library="rcl" deviceset="R-EU_" device="R0603" value="42.2k"/>
 <part name="GND63" library="supply1" deviceset="GND" device=""/>
 </parts>
 <sheets>
@@ -32803,6 +32803,7 @@ SMD chip inductor</description>
 <plain>
 <text x="50.8" y="17.78" size="1.778" layer="91">Farnell 1710821</text>
 <text x="50.8" y="15.24" size="1.778" layer="91">Digikey 296-23902-1-ND</text>
+<text x="0" y="20.32" size="1.778" layer="91">Enable at about 7V</text>
 </plain>
 <instances>
 <instance part="U$3" gate="G$1" x="63.5" y="33.02"/>
