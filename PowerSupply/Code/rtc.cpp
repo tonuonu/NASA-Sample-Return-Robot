@@ -220,7 +220,7 @@ extern volatile float temperature;
 extern volatile float adapter;
 extern volatile float imon1,imon2;
 
-volatile char mode=E_BAT;
+volatile char mode=E_GYRO;
 volatile char mode_just_changed=1;
 
 static void 
@@ -232,6 +232,37 @@ mode_e_err(void) {
         OLED_Show_String( 1,errlog[i], 0, (i+1)*8);
     }
 }
+
+extern volatile uint32_t hello0;
+extern volatile uint32_t hello1;
+
+static void 
+mode_e_gyro(void) {
+    char buf[SCREENWIDTH+1];
+    snprintf(buf,sizeof(buf),"Gyros");
+    OLED_Show_String(  1,buf, 0, 0*8);
+
+    snprintf(buf,sizeof(buf),"recv0:%x",RSPI0.SPDR.WORD.H);
+    OLED_Show_String(  1,buf, 0, 1*8);
+
+    snprintf(buf,sizeof(buf),"recv0:%x",RSPI0.SPDR.LONG);
+    OLED_Show_String(  1,buf, 0, 2*8);
+
+    snprintf(buf,sizeof(buf),"recv0:%x",hello0);
+    OLED_Show_String(  1,buf, 0, 3*8);
+
+    
+    snprintf(buf,sizeof(buf),"recv1:%x",RSPI1.SPDR.WORD.H);
+    OLED_Show_String(  1,buf, 0, 4*8);
+
+    snprintf(buf,sizeof(buf),"recv1:%x",RSPI1.SPDR.LONG);
+    OLED_Show_String(  1,buf, 0, 5*8);
+
+    snprintf(buf,sizeof(buf),"recv1:%x",hello1);
+    OLED_Show_String(  1,buf, 0, 6*8);
+
+}
+
 
 static void 
 mode_e_bat(void) {
@@ -382,6 +413,9 @@ __interrupt void Excep_RTC_SLEEP(void) {
         break;
     case E_ERR:
         mode_e_err();
+        break;
+    case E_GYRO:
+        mode_e_gyro();
         break;
     }      
     char buf[SCREENWIDTH+1];

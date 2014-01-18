@@ -37,7 +37,7 @@
 void _SPI_write(uint8_t reg, uint8_t data) {
     /* Write to data register */
     RSPI0.SPDR.LONG = (uint32_t) 0x00000000 | (reg << 24) | (data << 16);   
-    RSPI1.SPDR.LONG = (uint32_t) 0x00000000 | (reg << 24) | (data << 16);   
+    RSPI1.SPDR.LONG = (uint32_t) 0x00000000 | (reg << 24) | (data << 16);
     /* Wait until transmission is complete */
     while(RSPI0.SPSR.BIT.IDLNF);
     while(RSPI1.SPSR.BIT.IDLNF);
@@ -79,12 +79,15 @@ void _SPI_write(uint8_t reg, uint8_t data) {
 #define MPUREG_INT_ENABLE           0x38
 #define MPUREG_USER_CTRL            0x6A
 #define MPUREG_PWR_MGMT_1           0x6B
+#define MPUREG_WHOAMI               0x75
 
 #define ENABLE_PWR                  PORT1.PODR.BIT.B2
 #define ENABLE_PWR_DIR              PORT1.PDR.BIT.B2
 #include "iorx630.h"
 
 
+volatile uint32_t hello0 = 0xAAAAAAAA;
+volatile uint32_t hello1 = 0xAAAAAAAA;
     
 int main() {
     BAT0_EN = MAX1614_OFF; // Make sure battery inputs are NOT enabled here.
@@ -133,7 +136,7 @@ int main() {
   
     __delay_cycles(96UL*2000UL); // 2000us delay    
     OLED_Fill_RAM(0x00);				   // Clear Screen
-    OLED_Show_String(  1, "Battery statuses", 0, 0*8);
+//    OLED_Show_String(  1, "Battery statuses", 0, 0*8);
 
 
 #if 0
@@ -143,7 +146,6 @@ int main() {
   
   __delay_cycles(100UL*100000UL); // 100ms delay    
 
-  
 
   // Wake up device and select GyroZ clock (better performance)
   _SPI_write(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
@@ -162,24 +164,22 @@ int main() {
     
     while(1) {
         __wait_for_interrupt();
-#if 0
+LED6=LED_ON;
         /* Load message byte into transmit container variable */
-        uint8_t tx_byte = 0x55;
-    
+        uint8_t tx_byte = MPUREG_WHOAMI;
         /* Write to data register */
-        RSPI1.SPDR.LONG = (uint32_t) 0xA5000000 | (tx_byte << 16);
+        RSPI0.SPDR.LONG = (uint32_t) 0x00000000 | (tx_byte << 24);
+        RSPI1.SPDR.LONG = (uint32_t) 0x00000000 | (tx_byte << 24);
+        while(RSPI0.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
+        while(RSPI1.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
+        RSPI0.SPDCR.BIT.SPRDTD=0; // SPDR is given from receive buffer
+        RSPI1.SPDCR.BIT.SPRDTD=0; // SPDR is given from receive buffer
+        hello0=RSPI0.SPDR.LONG ; 
+        hello1=RSPI1.SPDR.LONG ; 
+LED6=LED_OFF;
+        
     
-        /* Wait until transmission is complete */
-        while(RSPI1.SPSR.BIT.IDLNF);
-    
-        /* Increment loop counter */
-  
-        /* Send a dummy transmission to receive the final byte from the slave */
-        RSPI1.SPDR.LONG = 0xA3000000;
-  
-        /* Wait until transmission is complete */
-        while(RSPI1.SPSR.BIT.IDLNF);
-#endif
+
     }
 
 }
