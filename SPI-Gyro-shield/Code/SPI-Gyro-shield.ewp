@@ -1637,9 +1637,6 @@
     <name>$PROJ_DIR$\SPI0.c</name>
   </file>
   <file>
-    <name>$PROJ_DIR$\SPI2.c</name>
-  </file>
-  <file>
     <name>$PROJ_DIR$\SPI3.c</name>
   </file>
   <file>
@@ -1647,6 +1644,9 @@
   </file>
   <file>
     <name>$PROJ_DIR$\SPI5.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\SPI6.c</name>
   </file>
 </project>
 

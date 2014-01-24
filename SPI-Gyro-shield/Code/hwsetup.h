@@ -70,19 +70,19 @@ void HardwareSetup(void);
 #define TX0s         p6_3s
 #define TX0d         pd6_3
 
-// SPI2, motor 1
-#define TX2          p7_0
-#define RX2          p7_1
-#define TX2s         p7_0s
-#define RX2s         p7_1s
-#define TX2d         pd7_0
-#define RX2d         pd7_1
-#define CLOCK2       p7_2
-#define CLOCK2d      pd7_2
-#define CLOCK2s      p7_2s
-#define CS2d         pd7_3
-#define CS2          p7_3
-#define CS2s         p7_3s
+// SPI6, motor 1
+#define TX6          p4_7
+#define RX6          p4_6
+#define TX6s         p4_7s
+#define RX6s         p4_6s
+#define TX6d         pd4_7
+#define RX6d         pd4_6
+#define CLOCK6       p4_5
+#define CLOCK6d      pd4_5
+#define CLOCK6s      p4_5s
+#define CS6d         pd7_3
+#define CS6          p7_3
+#define CS6s         p7_3s
 
 // SPI3, motor 2
 #define CLOCK3       p4_1

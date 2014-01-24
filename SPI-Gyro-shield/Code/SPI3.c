@@ -46,7 +46,7 @@ SPI3_Init(void) {
     stps_u3mr  = 0;                                        // 0=1 stop bit, 0 required
     pry_u3mr   = 0;                                        // Parity, 0=odd, 0 required 
     prye_u3mr  = 0;                                        // Parity Enable? 0=disable, 0 required 
-    iopol_u3mr = myIOPOL;                                        // IO Polarity, 0=not inverted, 0 required
+    iopol_u3mr = myIOPOL;                                  // IO Polarity, 0=not inverted, 0 required
 
     clk0_u3c0 = 0;                                         // Clock source f1 for u3brg
     clk1_u3c0 = 0;                                         // 
@@ -68,7 +68,7 @@ SPI3_Init(void) {
     u3smr2 = 0x00;
 
     sse_u3smr3 = 0;                                        // SS is disabled when 0
-    ckph_u3smr3 = myCKPH;                                       // Non clock delayed 
+    ckph_u3smr3 = myCKPH;                                  // Non clock delayed 
     dinc_u3smr3 = 0;                                       // Master mode when 0
     nodc_u3smr3 = 0;                                       // Select a clock output  mode "push-pull" when 0 
     err_u3smr3 = 0;                                        // Error flag, no error when 0 

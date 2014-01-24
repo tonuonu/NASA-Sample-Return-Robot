@@ -51,7 +51,7 @@ __interrupt void _uart5_receive(void) {
 LED4=1;
         /* bypass byte transparently */
         u0tb=
-        u2tb=
+        u6tb=
         u3tb=
         u4tb=recv_buf;
 LED4=0;
@@ -170,13 +170,13 @@ __interrupt void _int2(void) {
      * register (transmission completed)
      */
     while(txept_u0c0 == 0);
-    while(txept_u2c0 == 0);
+    while(txept_u6c0 == 0);
     while(txept_u3c0 == 0);
     while(txept_u4c0 == 0);
 
     if(fpga_in != FPGA_LOADED) {
         // Copy CS5 pin to all four motor outputs
-        CS0=CS2=CS3=CS4 = CS5;
+        CS0=CS6=CS3=CS4 = CS5;
     }
  
     

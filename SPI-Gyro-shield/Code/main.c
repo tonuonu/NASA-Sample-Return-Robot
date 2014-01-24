@@ -39,7 +39,7 @@ complete_tx(void) {
      * register (transmission completed)
      */
     while((txept_u0c0 == 0) ||
-          (txept_u2c0 == 0) ||
+          (txept_u6c0 == 0) ||
           (txept_u3c0 == 0) ||
           (txept_u4c0 == 0));
 }
@@ -47,26 +47,27 @@ complete_tx(void) {
 void 
 set_steady_speed(unsigned char motor_idx) {
     complete_tx();
-    CS0=CS2=CS3=CS4 = 0;
+    CS0=CS6=CS3=CS4 = 0;
 
-    u0tb=u2tb=u3tb=u4tb=CMD_STEADY_SPEED | motor_idx;
+    u0tb=u6tb=u3tb=u4tb=CMD_STEADY_SPEED | motor_idx;
     complete_tx();
 
-    u0tb=u2tb=u3tb=u4tb=steady_speed[0];
+    u0tb=u6tb=u3tb=u4tb=steady_speed[0];
     complete_tx();
     
-    //    u0tb=u2tb=u3tb=u4tb=100;
-    u0tb=u2tb=u3tb=u4tb=steady_speed[1];
+    //    u0tb=u6tb=u3tb=u4tb=100;
+    u0tb=u6tb=u3tb=u4tb=steady_speed[1];
     complete_tx();
 
-    u0tb=u2tb=u3tb=u4tb=0;
+    u0tb=u6tb=u3tb=u4tb=0;
     complete_tx();
 
-    u0tb=u2tb=u3tb=u4tb=0;
+    u0tb=u6tb=u3tb=u4tb=0;
     complete_tx();
 
-    CS0=CS2=CS3=CS4 = 1;
+    CS0=CS6=CS3=CS4 = 1;
 }
+
 
 int
 main(void) {
@@ -79,10 +80,10 @@ main(void) {
  //       __wait_for_interrupt();
 #if 1        
         if(fpga_in==FPGA_LOADED) {
-//            set_steady_speed(0);
+            set_steady_speed(0);
             set_steady_speed(1);
-//            set_steady_speed(2);
-//            set_steady_speed(3);
+            set_steady_speed(2);
+            set_steady_speed(3);
         }
 #endif
     }
