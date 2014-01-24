@@ -30501,8 +30501,8 @@ SMD chip inductor</description>
 <attribute name="NAME" x="64.6684" y="163.83" size="1.778" layer="95" rot="R90"/>
 <attribute name="VALUE" x="64.77" y="169.291" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="+3V11" gate="G$1" x="66.04" y="177.8"/>
-<instance part="+3V13" gate="G$1" x="73.66" y="177.8"/>
+<instance part="+3V11" gate="G$1" x="66.04" y="182.88"/>
+<instance part="+3V13" gate="G$1" x="73.66" y="182.88"/>
 <instance part="R34" gate="G$1" x="-12.7" y="60.96" smashed="yes" rot="R180">
 <attribute name="NAME" x="-16.51" y="62.3316" size="1.778" layer="95"/>
 <attribute name="VALUE" x="-11.049" y="62.23" size="1.778" layer="96"/>
@@ -30787,6 +30787,7 @@ SMD chip inductor</description>
 <wire x1="101.6" y1="53.34" x2="96.52" y2="53.34" width="0.1524" layer="91"/>
 <wire x1="96.52" y1="53.34" x2="96.52" y2="55.88" width="0.1524" layer="91"/>
 <junction x="96.52" y="55.88"/>
+<label x="88.9" y="55.88" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="MCU" gate="G$1" pin="AVCC"/>
@@ -30821,12 +30822,14 @@ SMD chip inductor</description>
 <segment>
 <pinref part="R33" gate="G$1" pin="1"/>
 <pinref part="+3V11" gate="G$1" pin="+3V3"/>
-<wire x1="66.04" y1="175.26" x2="66.04" y2="172.72" width="0.1524" layer="91"/>
+<wire x1="66.04" y1="180.34" x2="66.04" y2="172.72" width="0.1524" layer="91"/>
+<label x="63.5" y="175.26" size="1.778" layer="95" rot="R180"/>
 </segment>
 <segment>
 <pinref part="R32" gate="G$1" pin="1"/>
 <pinref part="+3V13" gate="G$1" pin="+3V3"/>
-<wire x1="73.66" y1="175.26" x2="73.66" y2="172.72" width="0.1524" layer="91"/>
+<wire x1="73.66" y1="180.34" x2="73.66" y2="172.72" width="0.1524" layer="91"/>
+<label x="71.12" y="175.26" size="1.778" layer="95" rot="R180"/>
 </segment>
 </net>
 <net name="MISO_5V_D50" class="0">
@@ -31559,6 +31562,7 @@ SMD chip inductor</description>
 <pinref part="U1" gate="G$1" pin="VDD"/>
 <pinref part="+3V5" gate="G$1" pin="+3V3"/>
 <wire x1="-20.32" y1="71.12" x2="3.81" y2="71.12" width="0.1524" layer="91"/>
+<label x="-12.7" y="71.12" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="C12" gate="G$1" pin="1"/>
@@ -33022,6 +33026,7 @@ SMD chip inductor</description>
 </sheet>
 <sheet>
 <plain>
+<text x="-7.62" y="83.82" size="1.778" layer="91">http://www.wolframalpha.com/input/?i=%284.5V%2F1.1834V-1%29*42.2kohm</text>
 </plain>
 <instances>
 <instance part="IC2" gate="G$1" x="41.91" y="54.61"/>
