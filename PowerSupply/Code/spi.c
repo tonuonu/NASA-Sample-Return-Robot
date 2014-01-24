@@ -34,67 +34,150 @@ void MasterRxInterrupt_SPI(void);
 
 void Init_SPI(void) { 
 
+  SYSTEM.PRCR.WORD = 0xA502;
+  /* Enable RSPI0 and 1 peripherals */
+  MSTP_RSPI0 = 0;
+  MSTP_RSPI1 = 0;
+  
+  SYSTEM.PRCR.WORD = 0xA500;
+
+  RSPI0.SSLP.BIT.SSL0P=0; // SSL0 is active low
+  RSPI1.SSLP.BIT.SSL0P=0; // SSL0 is active low
+
+  /* Set number of transmit frames to 1 for both channels */
+  RSPI0.SPDCR.BIT.SPFC = 0;
+  RSPI1.SPDCR.BIT.SPFC = 0;
+  
+  RSPI0.SPDCR.BIT.SPRDTD = 0; // 
+  RSPI1.SPDCR.BIT.SPRDTD = 0; // 
+  
+  RSPI0.SPDCR.BIT.SPLW = 1;
+  RSPI1.SPDCR.BIT.SPLW = 1;
+  
+  RSPI0.SPCR2.BIT.SPPE=0;
+  RSPI1.SPCR2.BIT.SPPE=0;
+  
+  RSPI0.SPCR2.BIT.SPIIE=0;
+  RSPI1.SPCR2.BIT.SPIIE=0;
+  
+  RSPI0.SPCR2.BIT.PTE=0;
+  RSPI1.SPCR2.BIT.PTE=0;
+      
+  RSPI0.SPCMD0.BIT.CPHA=0;
+  RSPI1.SPCMD0.BIT.CPHA=0;
+
+  RSPI0.SPCMD0.BIT.CPOL=0;
+  RSPI1.SPCMD0.BIT.CPOL=0;
+
+  RSPI0.SPCMD0.BIT.BRDV=3;
+  RSPI1.SPCMD0.BIT.BRDV=3;
+
+  RSPI0.SPCMD0.BIT.SSLA=0;
+  RSPI1.SPCMD0.BIT.SSLA=0;
+  
+  RSPI0.SPCMD0.BIT.SSLKP=0;
+  RSPI1.SPCMD0.BIT.SSLKP=0;
+  
+  RSPI0.SPCMD0.BIT.SPB=0xF; // 16 bits data length
+  RSPI1.SPCMD0.BIT.SPB=0xF;
+  
+  RSPI0.SPCMD0.BIT.LSBF=0;
+  RSPI1.SPCMD0.BIT.LSBF=0;
+
+  RSPI0.SPCMD0.BIT.SPNDEN=0;
+  RSPI1.SPCMD0.BIT.SPNDEN=0;
+  
+  RSPI0.SPCMD0.BIT.SLNDEN=0;
+  RSPI1.SPCMD0.BIT.SLNDEN=0;
+  
+  RSPI0.SPCMD0.BIT.SCKDEN=0;
+  RSPI1.SPCMD0.BIT.SCKDEN=0;
+   
+  /* Set pins from general IO to SPI */
+  /* RSPI A */
+  PORTC.PMR.BIT.B4=0; // CS
+  PORTC.PMR.BIT.B5=0; // CLK
+  PORTC.PMR.BIT.B6=0; // MOSI
+  PORTC.PMR.BIT.B7=0; // MISO
+  
+#if 0
+  /* enable pullups */
+  PORTC.PCR.BIT.B4=1; // CS
+  PORTC.PCR.BIT.B5=1; // CLK
+  PORTC.PCR.BIT.B6=1; // MOSI
+  PORTC.PCR.BIT.B7=1; // MISO
+#endif
+  
+  /* RSPI B */
+  PORTE.PMR.BIT.B1=0; // CLK
+  PORTE.PMR.BIT.B4=0; // CS
+  PORTE.PMR.BIT.B6=0; // MOSI
+  PORTE.PMR.BIT.B7=0; // MISO
+
+#if 0
+  /* enable pullups */
+  PORTE.PCR.BIT.B1=1; // CLK
+  PORTE.PCR.BIT.B4=1; // CS
+  PORTE.PCR.BIT.B6=1; // MOSI
+  PORTE.PCR.BIT.B7=1; // MISO
+#endif
+  
+  /* Disable MPC register protection */
+  MPC.PWPR.BIT.B0WI = 0; // Enable writing to PFSWE bit
+  MPC.PWPR.BIT.PFSWE = 1; // Enable writing to PFS register
+    
+  /* Configure channel A SPI pins */
+  MPC.PC4PFS.BIT.PSEL=0xD; // 01101b is RSPI mode
+  MPC.PC5PFS.BIT.PSEL=0xD;
+  MPC.PC6PFS.BIT.PSEL=0xD;
+  MPC.PC7PFS.BIT.PSEL=0xD;
+  
+  /* Configure channel B SPI pins */
+  MPC.PE1PFS.BYTE = 0x0E; // 01110b for this pineonly
+  MPC.PE4PFS.BYTE = 0x0D; // 01101b again
+  MPC.PE6PFS.BYTE = 0x0D;
+  MPC.PE7PFS.BYTE = 0x0D;  
+
+  MPC.PWPR.BIT.PFSWE = 0; // Disable writing to PFS register
+  MPC.PWPR.BIT.B0WI = 1; // Disable writing to PFSWE bit
+
   /* Set pins from general IO to SPI */
   /* RSPI A */
   PORTC.PMR.BIT.B4=1; // CS
   PORTC.PMR.BIT.B5=1; // CLK
   PORTC.PMR.BIT.B6=1; // MOSI
   PORTC.PMR.BIT.B7=1; // MISO
-  
-  /* enable pullups */
-  PORTC.PCR.BIT.B4=1; // CS
-  PORTC.PCR.BIT.B5=1; // CLK
-  PORTC.PCR.BIT.B6=1; // MOSI
-  PORTC.PCR.BIT.B7=1; // MISO
-  
   /* RSPI B */
   PORTE.PMR.BIT.B1=1; // CLK
   PORTE.PMR.BIT.B4=1; // CS
   PORTE.PMR.BIT.B6=1; // MOSI
   PORTE.PMR.BIT.B7=1; // MISO
-
-  /* enable pullups */
-  PORTE.PCR.BIT.B1=1; // CLK
-  PORTE.PCR.BIT.B4=1; // CS
-  PORTE.PCR.BIT.B6=1; // MOSI
-  PORTE.PCR.BIT.B7=1; // MISO
-    
-  /* Disable MPC register protection */
-  MPC.PWPR.BIT.B0WI = 0;
-  MPC.PWPR.BIT.PFSWE = 1;
   
-  /* Disable PFS register protection */
-  SYSTEM.PRCR.WORD = 0xA50B;  
-  
-  /* Configure channel A SPI pins */
-  MPC.PC4PFS.BYTE = 0x0D; // 01101b is RSPI mode
-  MPC.PC5PFS.BYTE = 0x0D;
-  MPC.PC6PFS.BYTE = 0x0D;
-  MPC.PC7PFS.BYTE = 0x0D;
-  
-  /* Configure channel B SPI pins */
-  MPC.PE1PFS.BYTE = 0x0E; // 01110b for this one only
-  MPC.PE4PFS.BYTE = 0x0D; // 01101b again
-  MPC.PE6PFS.BYTE = 0x0D;
-  MPC.PE7PFS.BYTE = 0x0D;  
-
-  /* Enable RSPI0 and 1 peripherals */
-  MSTP_RSPI0 = 0;
-  MSTP_RSPI1 = 0;
-
-  /* Re-enable PFS register protection */
-  SYSTEM.PRCR.WORD = 0xA500u;
-  
-  /* Configure SPI to operate in 3-wire mode. CONFUSING! This is not MOSI-MISO on same wire!  */
-  RSPI0.SPCR.BIT.SPMS = 1;
-  RSPI1.SPCR.BIT.SPMS = 1;
+  /* Configure SPI to operate in 4-wire mode. CONFUSING! This is not MOSI-MISO on same wire!  */
+  RSPI0.SPCR.BIT.SPMS = 0;
+  RSPI1.SPCR.BIT.SPMS = 0;
   /* Full duplex mode */
   RSPI0.SPCR.BIT.TXMD = 0;
   RSPI1.SPCR.BIT.TXMD = 0;
-  
+
+  RSPI0.SPCR.BIT.MODFEN = 0; // Must be 0 for Single-Master Mode
+  RSPI1.SPCR.BIT.MODFEN = 0; // Must be 0 for Single-Master Mode
+
   /* Set SPI master */
   RSPI0.SPCR.BIT.MSTR = 1;
   RSPI1.SPCR.BIT.MSTR = 1;
+
+  RSPI0.SPCR.BIT.SPEIE = 0;
+  RSPI1.SPCR.BIT.SPEIE = 0;
+
+  RSPI0.SPCR.BIT.SPTIE = 0;
+  RSPI1.SPCR.BIT.SPTIE = 0;
+
+  RSPI0.SPCR.BIT.SPE = 0;
+  RSPI1.SPCR.BIT.SPE = 0;
+
+  RSPI0.SPCR.BIT.SPRIE = 0;
+  RSPI1.SPCR.BIT.SPRIE = 0;
   
   /* Enable receive interrupt for both channels */
 //  ICU.IER[4].BIT.IEN7 = 1;
@@ -105,30 +188,14 @@ void Init_SPI(void) {
   /* Set receive interrupt priority for both channels */
 //  ICU.IPR[39].BYTE = 5u;
 //  ICU.IPR[42].BYTE = 6u;
-      
-  /* Set bit rate */
-  RSPI0.SPBR = 255u;
-  RSPI1.SPBR = 255u;
-  
-  /* Set number of transmit frames to 1 for both channels */
-  RSPI1.SPDCR.BIT.SPFC = 0;
-  RSPI0.SPDCR.BIT.SPFC = 0;
-      
-  /* Set command register 0 data length to 16bits */
-  RSPI1.SPCMD0.BIT.SPB = 0xF;
-  RSPI0.SPCMD0.BIT.SPB = 0xF;
-  
-  /* Set command register 0 bit rate divisor to 0 */
-  RSPI1.SPCMD0.BIT.BRDV = 0;
-  RSPI0.SPCMD0.BIT.BRDV = 0;
 
   /* Empty the transmit buffer for both channels */
-  RSPI1.SPDR.LONG = 0x00000000;
   RSPI0.SPDR.LONG = 0x00000000;
+  RSPI1.SPDR.LONG = 0x00000000;
     
   /* Enable both SPI channels */
-  RSPI1.SPCR.BIT.SPE = 1;
   RSPI0.SPCR.BIT.SPE = 1;
+  RSPI1.SPCR.BIT.SPE = 1;
 }
 
 #if 0

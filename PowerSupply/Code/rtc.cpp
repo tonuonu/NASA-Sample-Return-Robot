@@ -242,21 +242,9 @@ mode_e_gyro(void) {
     snprintf(buf,sizeof(buf),"Gyros");
     OLED_Show_String(  1,buf, 0, 0*8);
 
-    snprintf(buf,sizeof(buf),"recv0:%x",RSPI0.SPDR.WORD.H);
-    OLED_Show_String(  1,buf, 0, 1*8);
-
-    snprintf(buf,sizeof(buf),"recv0:%x",RSPI0.SPDR.LONG);
-    OLED_Show_String(  1,buf, 0, 2*8);
-
     snprintf(buf,sizeof(buf),"recv0:%x",hello0);
     OLED_Show_String(  1,buf, 0, 3*8);
 
-    
-    snprintf(buf,sizeof(buf),"recv1:%x",RSPI1.SPDR.WORD.H);
-    OLED_Show_String(  1,buf, 0, 4*8);
-
-    snprintf(buf,sizeof(buf),"recv1:%x",RSPI1.SPDR.LONG);
-    OLED_Show_String(  1,buf, 0, 5*8);
 
     snprintf(buf,sizeof(buf),"recv1:%x",hello1);
     OLED_Show_String(  1,buf, 0, 6*8);

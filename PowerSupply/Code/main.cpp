@@ -80,7 +80,9 @@ void _SPI_write(uint8_t reg, uint8_t data) {
 #define MPUREG_USER_CTRL            0x6A
 #define MPUREG_PWR_MGMT_1           0x6B
 #define MPUREG_WHOAMI               0x75
-
+#define MPUREG_ACCEL_XOUT           0x3b
+#define MPUREG_TEMP_OUT             0x41
+#define MPUREG_GYRO_XOUT            0x43
 #define ENABLE_PWR                  PORT1.PODR.BIT.B2
 #define ENABLE_PWR_DIR              PORT1.PDR.BIT.B2
 #include "iorx630.h"
@@ -88,7 +90,37 @@ void _SPI_write(uint8_t reg, uint8_t data) {
 
 volatile uint32_t hello0 = 0xAAAAAAAA;
 volatile uint32_t hello1 = 0xAAAAAAAA;
-    
+
+
+void
+sendspi16(uint8_t cmd,uint8_t data) {
+
+        RSPI0.SPCMD0.BIT.SPB=0xF; // 16 bits data length
+        RSPI1.SPCMD0.BIT.SPB=0xF;
+
+        /* Write to data register */
+        RSPI0.SPDR.LONG = (uint32_t) 0x00000000 | (cmd << 8) | data;
+        RSPI1.SPDR.LONG = (uint32_t) 0x00000000 | (cmd << 8) | data;
+        while(RSPI0.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
+        while(RSPI1.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
+
+}
+
+void
+sendspi32(uint8_t cmd) {
+
+        RSPI0.SPCMD0.BIT.SPB=0x3; // 32 bits data length
+        RSPI1.SPCMD0.BIT.SPB=0x3;
+
+        /* Write to data register */
+        RSPI0.SPDR.LONG = (uint32_t) 0x00000000 | (cmd << 24);
+        RSPI1.SPDR.LONG = (uint32_t) 0x00000000 | (cmd << 24);
+        while(RSPI0.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
+        while(RSPI1.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
+
+}
+
+
 int main() {
     BAT0_EN = MAX1614_OFF; // Make sure battery inputs are NOT enabled here.
     BAT1_EN = MAX1614_OFF; // They may have problems like low voltage, high voltage etc.,  
@@ -126,11 +158,12 @@ int main() {
     // Init_VoltageDetect();
     Init_RTC();
     Init_ADC12Repeat();
-    // Init_SPI();
+    Init_SPI();
     // Init_UART();  
     // USBCDC_Init();  
     /* Initialise the SPI unit */
   
+//sendspi16(MPUREG_PWR_MGMT_1,0x80); // reset
   
     //MasterSend_SPI(sizeof(gTransmitMessage), gTransmitMessage);
   
@@ -139,47 +172,41 @@ int main() {
 //    OLED_Show_String(  1, "Battery statuses", 0, 0*8);
 
 
-#if 0
-      // Chip reset
-  _SPI_write(MPUREG_PWR_MGMT_1, BIT_H_RESET);
-  
-  
-  __delay_cycles(100UL*100000UL); // 100ms delay    
 
-
-  // Wake up device and select GyroZ clock (better performance)
-  _SPI_write(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
-  // Disable I2C bus (recommended on datasheet)
-  _SPI_write(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
-  // SAMPLE RATE
-  _SPI_write(MPUREG_SMPLRT_DIV,0x04);     // Sample rate = 200Hz    Fsample= 1Khz/(4+1) = 200Hz     
-  // FS & DLPF   FS=2000?/s, DLPF = 42Hz (low pass filter)
-  _SPI_write(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);  // BITS_DLPF_CFG_20HZ BITS_DLPF_CFG_42HZ BITS_DLPF_CFG_98HZ
-  _SPI_write(MPUREG_GYRO_CONFIG,BITS_FS_2000DPS);  // Gyro scale 2000?/s
-  _SPI_write(MPUREG_ACCEL_CONFIG,BITS_FS_2G);           // Accel scele 2g (g=8192)  
-  // INT CFG => Interrupt on Data Ready
-  _SPI_write(MPUREG_INT_ENABLE,BIT_RAW_RDY_EN);         // INT: Raw data ready
-  _SPI_write(MPUREG_INT_PIN_CFG,BIT_INT_ANYRD_2CLEAR);  // INT: Clear on any read
-#endif
-    
-    while(1) {
-        __wait_for_interrupt();
-LED6=LED_ON;
-        /* Load message byte into transmit container variable */
-        uint8_t tx_byte = MPUREG_WHOAMI;
-        /* Write to data register */
-        RSPI0.SPDR.LONG = (uint32_t) 0x00000000 | (tx_byte << 24);
-        RSPI1.SPDR.LONG = (uint32_t) 0x00000000 | (tx_byte << 24);
-        while(RSPI0.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
-        while(RSPI1.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
-        RSPI0.SPDCR.BIT.SPRDTD=0; // SPDR is given from receive buffer
-        RSPI1.SPDCR.BIT.SPRDTD=0; // SPDR is given from receive buffer
+    __delay_cycles(100UL*100000UL); // 100ms delay from GYRO reset is mandatory to wait
+    sendspi16(MPUREG_PWR_MGMT_1,0x03); // wake up
         hello0=RSPI0.SPDR.LONG ; 
         hello1=RSPI1.SPDR.LONG ; 
-LED6=LED_OFF;
-        
-    
-
+  
+  
+    sendspi16(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
+        hello0=RSPI0.SPDR.LONG ; 
+        hello1=RSPI1.SPDR.LONG ; 
+#if 1
+    // SAMPLE RATE
+    sendspi16(MPUREG_SMPLRT_DIV,0x04);     // Sample rate = 200Hz    Fsample= 1Khz/(4+1) = 200Hz     
+        hello0=RSPI0.SPDR.LONG ; 
+        hello1=RSPI1.SPDR.LONG ; 
+    // FS & DLPF   FS=2000?/s, DLPF = 42Hz (low pass filter)
+    sendspi16(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);  // BITS_DLPF_CFG_20HZ BITS_DLPF_CFG_42HZ BITS_DLPF_CFG_98HZ
+        hello0=RSPI0.SPDR.LONG ; 
+        hello1=RSPI1.SPDR.LONG ; 
+    sendspi16(MPUREG_GYRO_CONFIG,BITS_FS_2000DPS);  // Gyro scale 2000?/s
+        hello0=RSPI0.SPDR.LONG ; 
+        hello1=RSPI1.SPDR.LONG ; 
+    sendspi16(MPUREG_ACCEL_CONFIG,BITS_FS_2G);           // Accel scele 2g (g=8192)  
+        hello0=RSPI0.SPDR.LONG ; 
+        hello1=RSPI1.SPDR.LONG ; 
+#endif
+    while(1) {
+        // __wait_for_interrupt();
+        LED6=LED_ON;
+        sendspi16(MPUREG_GYRO_XOUT | 0x80 /* read bit*/, 0x00);
+//        sendspi16(MPUREG_WHOAMI | 0x80 /* read bit*/, 0x00);
+        // sendspi32(MPUREG_TEMP_OUT | 0x80 /* read bit*/);
+        hello0=RSPI0.SPDR.LONG ; 
+        hello1=RSPI1.SPDR.LONG ; 
+        LED6=LED_OFF;
     }
 
 }
