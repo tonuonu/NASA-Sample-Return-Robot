@@ -233,8 +233,10 @@ mode_e_err(void) {
     }
 }
 
-extern volatile uint32_t hello0;
-extern volatile uint32_t hello1;
+extern volatile int16_t gyro0[3];
+extern volatile int16_t gyro1[3];
+extern volatile int16_t accel0[3];
+extern volatile int16_t accel1[3];
 
 static void 
 mode_e_gyro(void) {
@@ -242,13 +244,21 @@ mode_e_gyro(void) {
     snprintf(buf,sizeof(buf),"Gyros");
     OLED_Show_String(  1,buf, 0, 0*8);
 
-    snprintf(buf,sizeof(buf),"recv0:%x",hello0);
+    snprintf(buf,sizeof(buf),"g0: %6d %6d %6d",gyro0[0],gyro0[1],gyro0[2]);
+    OLED_Show_String(  1,buf, 0, 1*8);
+    snprintf(buf,sizeof(buf),"g1: %6d %6d %6d",gyro1[0],gyro1[1],gyro1[2]);
+    OLED_Show_String(  1,buf, 0, 2*8);
+    snprintf(buf,sizeof(buf),"gs: %6d %6d %6d",(gyro0[0]+gyro1[0])/2,(gyro0[1]+gyro1[1])/2,(gyro0[2]+gyro1[2])/2);
     OLED_Show_String(  1,buf, 0, 3*8);
 
-
-    snprintf(buf,sizeof(buf),"recv1:%x",hello1);
+    snprintf(buf,sizeof(buf),"a0: %6d %6d %6d",accel0[0],accel0[1],accel0[2]);
+    OLED_Show_String(  1,buf, 0, 4*8);
+    snprintf(buf,sizeof(buf),"a1: %6d %6d %6d",accel1[0],accel1[1],accel1[2]);
+    OLED_Show_String(  1,buf, 0, 5*8);
+    snprintf(buf,sizeof(buf),"as: %6d %6d %6d",(accel0[0]+accel1[0])/2,(accel0[1]+accel1[1])/2,(accel0[2]+accel1[2])/2);
     OLED_Show_String(  1,buf, 0, 6*8);
 
+    
 }
 
 

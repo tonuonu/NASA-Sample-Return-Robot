@@ -80,16 +80,26 @@ void _SPI_write(uint8_t reg, uint8_t data) {
 #define MPUREG_USER_CTRL            0x6A
 #define MPUREG_PWR_MGMT_1           0x6B
 #define MPUREG_WHOAMI               0x75
-#define MPUREG_ACCEL_XOUT           0x3b
+
 #define MPUREG_TEMP_OUT             0x41
+
 #define MPUREG_GYRO_XOUT            0x43
+#define MPUREG_GYRO_YOUT            0x45
+#define MPUREG_GYRO_ZOUT            0x47
+
+#define MPUREG_ACCEL_XOUT            0x3B
+#define MPUREG_ACCEL_YOUT            0x3D
+#define MPUREG_ACCEL_ZOUT            0x3F
+
 #define ENABLE_PWR                  PORT1.PODR.BIT.B2
 #define ENABLE_PWR_DIR              PORT1.PDR.BIT.B2
 #include "iorx630.h"
 
 
-volatile uint32_t hello0 = 0xAAAAAAAA;
-volatile uint32_t hello1 = 0xAAAAAAAA;
+volatile int16_t gyro0[3] = {0x0,0x0,0x0};
+volatile int16_t gyro1[3] = {0x0,0x0,0x0};
+volatile int16_t accel0[3] = {0x0,0x0,0x0};
+volatile int16_t accel1[3] = {0x0,0x0,0x0};
 
 
 void
@@ -105,6 +115,21 @@ sendspi16(uint8_t cmd,uint8_t data) {
         while(RSPI1.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
 
 }
+
+void
+sendspi24(uint8_t cmd) {
+
+        RSPI0.SPCMD0.BIT.SPB=0x1; // 24 bits data length
+        RSPI1.SPCMD0.BIT.SPB=0x1;
+
+        /* Write to data register */
+        RSPI0.SPDR.LONG = (uint32_t) 0x00000000 | (cmd << 16);
+        RSPI1.SPDR.LONG = (uint32_t) 0x00000000 | (cmd << 16);
+        while(RSPI0.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
+        while(RSPI1.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
+
+}
+
 
 void
 sendspi32(uint8_t cmd) {
@@ -171,41 +196,69 @@ int main() {
     OLED_Fill_RAM(0x00);				   // Clear Screen
 //    OLED_Show_String(  1, "Battery statuses", 0, 0*8);
 
-
+uint32_t dummy;
 
     __delay_cycles(100UL*100000UL); // 100ms delay from GYRO reset is mandatory to wait
     sendspi16(MPUREG_PWR_MGMT_1,0x03); // wake up
-        hello0=RSPI0.SPDR.LONG ; 
-        hello1=RSPI1.SPDR.LONG ; 
+        dummy=RSPI0.SPDR.LONG ; 
+        dummy=RSPI1.SPDR.LONG ; 
   
   
     sendspi16(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
-        hello0=RSPI0.SPDR.LONG ; 
-        hello1=RSPI1.SPDR.LONG ; 
+        dummy=RSPI0.SPDR.LONG ; 
+        dummy=RSPI1.SPDR.LONG ; 
 #if 1
     // SAMPLE RATE
     sendspi16(MPUREG_SMPLRT_DIV,0x04);     // Sample rate = 200Hz    Fsample= 1Khz/(4+1) = 200Hz     
-        hello0=RSPI0.SPDR.LONG ; 
-        hello1=RSPI1.SPDR.LONG ; 
+        dummy=RSPI0.SPDR.LONG ; 
+        dummy=RSPI1.SPDR.LONG ; 
     // FS & DLPF   FS=2000?/s, DLPF = 42Hz (low pass filter)
     sendspi16(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);  // BITS_DLPF_CFG_20HZ BITS_DLPF_CFG_42HZ BITS_DLPF_CFG_98HZ
-        hello0=RSPI0.SPDR.LONG ; 
-        hello1=RSPI1.SPDR.LONG ; 
+        dummy=RSPI0.SPDR.LONG ; 
+        dummy=RSPI1.SPDR.LONG ; 
     sendspi16(MPUREG_GYRO_CONFIG,BITS_FS_2000DPS);  // Gyro scale 2000?/s
-        hello0=RSPI0.SPDR.LONG ; 
-        hello1=RSPI1.SPDR.LONG ; 
+        dummy=RSPI0.SPDR.LONG ; 
+        dummy=RSPI1.SPDR.LONG ; 
     sendspi16(MPUREG_ACCEL_CONFIG,BITS_FS_2G);           // Accel scele 2g (g=8192)  
-        hello0=RSPI0.SPDR.LONG ; 
-        hello1=RSPI1.SPDR.LONG ; 
+        dummy=RSPI0.SPDR.LONG ; 
+        dummy=RSPI1.SPDR.LONG ; 
 #endif
     while(1) {
         // __wait_for_interrupt();
         LED6=LED_ON;
-        sendspi16(MPUREG_GYRO_XOUT | 0x80 /* read bit*/, 0x00);
-//        sendspi16(MPUREG_WHOAMI | 0x80 /* read bit*/, 0x00);
-        // sendspi32(MPUREG_TEMP_OUT | 0x80 /* read bit*/);
-        hello0=RSPI0.SPDR.LONG ; 
-        hello1=RSPI1.SPDR.LONG ; 
+        
+
+        
+        sendspi24(MPUREG_GYRO_XOUT | 0x80 /* read bit*/);
+        gyro0[0]=(int16_t)RSPI0.SPDR.LONG ; 
+        gyro1[0]=(int16_t)RSPI1.SPDR.LONG ; 
+
+
+        sendspi24(MPUREG_GYRO_YOUT | 0x80 /* read bit*/);
+        gyro0[1]=(int16_t)RSPI0.SPDR.LONG ; 
+        gyro1[1]=(int16_t)RSPI1.SPDR.LONG ; 
+
+        sendspi24(MPUREG_GYRO_ZOUT | 0x80 /* read bit*/);
+        gyro0[2]=(int16_t)RSPI0.SPDR.LONG ; 
+        gyro1[2]=(int16_t)RSPI1.SPDR.LONG ; 
+
+
+
+        
+        sendspi24(MPUREG_ACCEL_XOUT | 0x80 /* read bit*/);
+        accel0[0]=(int16_t)RSPI0.SPDR.LONG ; 
+        accel1[0]=(int16_t)RSPI1.SPDR.LONG ; 
+
+
+        sendspi24(MPUREG_ACCEL_YOUT | 0x80 /* read bit*/);
+        accel0[1]=(int16_t)RSPI0.SPDR.LONG ; 
+        accel1[1]=(int16_t)RSPI1.SPDR.LONG ; 
+
+        sendspi24(MPUREG_ACCEL_ZOUT | 0x80 /* read bit*/);
+        accel0[2]=(int16_t)RSPI0.SPDR.LONG ; 
+        accel1[2]=(int16_t)RSPI1.SPDR.LONG ; 
+        
+        
         LED6=LED_OFF;
     }
 
