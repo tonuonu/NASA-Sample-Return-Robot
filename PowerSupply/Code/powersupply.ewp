@@ -1838,6 +1838,9 @@
     <name>$PROJ_DIR$\hwsetup.cpp</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\log.c</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\low_voltage_detection.cpp</name>
   </file>
   <file>

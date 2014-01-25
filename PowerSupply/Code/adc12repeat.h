@@ -1,16 +1,6 @@
-/* Copyright (C) 2012 Renesas Electronics Corporation. All rights reserved.   */
-/*******************************************************************************
-* File Name    : adc12repeat.h
-* Version     : 1.00
-* Device     : R5F5630E
-* Tool Chain   : IAR Embedded Workbench
-* H/W Platform  : RSKRX630
-* Description   : Contains prototypes for the ADC controlling functions 
-*******************************************************************************/
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /* Multiple inclusion prevention macro */
 #ifndef ADC12_REPEAT_H
@@ -24,7 +14,7 @@ extern "C" {
 *******************************************************************************/
 /* ADC initialisation function prototype declaration */
 void Init_ADC12Repeat(void);
-void uint16_ToString(uint8_t *output_string, uint8_t pos, uint16_t input_number);
+//void uint16_ToString(uint8_t *output_string, uint8_t pos, uint16_t input_number);
 
 /* End of multiple inclusion prevention macro */
 #endif

@@ -27,6 +27,7 @@
 #include "rskrx630def.h"
 #include "oled.h"
 #include "rtc.h"
+#include "spi.h"
 
 /* Variable used to store the string to be displayed on the OLED */
 uint8_t oled_buffer[9];
@@ -135,15 +136,15 @@ void Init_RTC(void) {
   /* Configure the clock as follows - 
     Initial time - 11:59:30   */
   RTC.RSECCNT.BYTE = 0x00;
-  RTC.RMINCNT.BYTE = 0x41;
-  RTC.RHRCNT.BYTE = 0x22;
+  RTC.RMINCNT.BYTE = 0x59;
+  RTC.RHRCNT.BYTE = 0x14;
   
   /* Configure the date as follows -
-    Initial date - 21/11/2011  */
-  RTC.RDAYCNT.BYTE = 0x02;
+    Initial date - 25/01/2013  */
+  RTC.RDAYCNT.BYTE = 0x25;
   RTC.RMONCNT.BYTE = 0x01;
-  RTC.RYRCNT.WORD = 0x0013;
-  RTC.RWKCNT.BYTE = 0x03; // Thursday
+  RTC.RYRCNT.WORD = 0x0014;
+  RTC.RWKCNT.BYTE = 0x06; // Saturday
 #endif  
   /* Configure the alarm as follows -
     Alarm time - 12:00:00
@@ -233,10 +234,6 @@ mode_e_err(void) {
     }
 }
 
-extern volatile int16_t gyro0[3];
-extern volatile int16_t gyro1[3];
-extern volatile int16_t accel0[3];
-extern volatile int16_t accel1[3];
 
 static void 
 mode_e_gyro(void) {

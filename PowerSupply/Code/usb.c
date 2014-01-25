@@ -40,45 +40,25 @@ This allows enumeration to complete before we try and communicate.*/
 /*Delay between repeating initial message*/
 #define DELAY_VALUE 0x00500000UL
 
-/*Size of buffer - Lets use the packet size*/
-#define BUFFER_SIZE BULK_OUT_PACKET_SIZE 
 
-/***********************************************************************************
-Variables
-***********************************************************************************/
-/*Main menu text*/
-static const char* const szWelcomeMsg1 = "\r\nRenesas USB CDC Sample\r\n";
-static const char* const szWelcomeMsg2 = "Press:-\r\n";
-static const char* const szWelcomeMsg3 = "Switch1 - Show instructions(these).\r\n";
-static const char* const szWelcomeMsg4 = "Switch2 - Start Echo of everthing typed.\r\n";
-static const char* const szWelcomeMsg5 = "Switch3 = Stop Echo.\r\n";
 
 /*Flags*/
 static volatile bool g_bEcho = false;
 
 /*Data Buffers*/
-static uint8_t g_Buffer1[BUFFER_SIZE];
-static uint8_t g_Buffer2[BUFFER_SIZE];
-static uint8_t* g_pBuffEmpty = g_Buffer1;
-static uint8_t* g_pBuffFull = g_Buffer2;
+uint8_t g_Buffer1[BUFFER_SIZE];
+uint8_t g_Buffer2[BUFFER_SIZE];
+uint8_t* g_pBuffEmpty = g_Buffer1;
+uint8_t* g_pBuffFull = g_Buffer2;
 
-/***********************************************************************************
-Private Function Prototypes
-***********************************************************************************/
 /* Initialises this modules data. */
-static void InitialiseData(void);
+//static void InitialiseData(void);
 /* Callback called when we have read some data. */
-static void CBDoneRead(USB_ERR _err, uint32_t _NumBytes);
+void CBDoneRead(USB_ERR _err, uint32_t _NumBytes);
 /* Callback called when we have written some data. */
-static void CBDoneWrite(USB_ERR _err);
+//static void CBDoneWrite(USB_ERR _err);
 
-/**********************************************************************************
-* Outline     : USB_CDC_APP_Main
-* Description   : Start the CDC USB sample application.
-*                 This function does not return.
-* Argument    : none
-* Return value  : none
-**********************************************************************************/
+#if 0
 void USB_CDC_APP_Main(void)
 {  
   /* LCD */
@@ -197,10 +177,8 @@ void USB_CDC_APP_Main(void)
     }
   }
 }
-/***********************************************************************************
-End of function USB_CDC_APP_Main
-***********************************************************************************/
 
+#endif
 /***********************************************************************************
 * Outline     : CBDoneRead 
 * Description   : Callback called when a USBCDC_Read_Async request
@@ -210,9 +188,8 @@ End of function USB_CDC_APP_Main
 *          _NumBytes : Number of bytes read.
 * Return value  : none
 ***********************************************************************************/
-
-static void CBDoneRead(USB_ERR _err, uint32_t _NumBytes)
-{    
+void 
+CBDoneRead(USB_ERR _err, uint32_t _NumBytes) {  
   /*Toggle buffers - as now the empty buffer has been filled
   by this read completing*/
   if(g_pBuffEmpty == g_Buffer2)
@@ -225,8 +202,8 @@ static void CBDoneRead(USB_ERR _err, uint32_t _NumBytes)
     g_pBuffEmpty = g_Buffer2;
     g_pBuffFull = g_Buffer1;
   }
-  
-  if(true == g_bEcho)
+  logerror((char *) g_pBuffFull);
+  //if(true == g_bEcho)
   {
     /*Setup another read*/
     USBCDC_Read_Async(BUFFER_SIZE, g_pBuffEmpty, CBDoneRead);
@@ -234,13 +211,11 @@ static void CBDoneRead(USB_ERR _err, uint32_t _NumBytes)
     /*Echo what was read back*/
     if(USB_ERR_OK == _err)
     {
-      USBCDC_Write_Async(_NumBytes, g_pBuffFull, CBDoneWrite);
+   //   USBCDC_Write_Async(_NumBytes, g_pBuffFull, CBDoneWrite);
     }
   }
 }
-/***********************************************************************************
-End of function CBDoneRead
-***********************************************************************************/
+
 
 /***********************************************************************************
 * Outline     : CBDoneWrite 
@@ -249,30 +224,23 @@ End of function CBDoneRead
 * Argument    : none
 * Return value  : none
 ***********************************************************************************/
-
+#if 0
 static void CBDoneWrite(USB_ERR _err)
 {
   assert(USB_ERR_OK == _err);
   /*Write has completed*/
   /*Nothing to do*/
 }
-/***********************************************************************************
-End of function CBDoneWrite
-***********************************************************************************/
+#endif
 
-/***********************************************************************************
-* Outline     : InitialiseData
-* Description   : Initialise this modules data.
-*          Put into a function so it can be called each
-*          time a USB cable is connected.
-* Argument    : none
-* Return value  : none
-***********************************************************************************/
+
+#if 0
 static void InitialiseData(void)
 {
   g_bEcho = false;
   gSwitchFlag = 0;
 }
+#endif
 /***********************************************************************************
 End of function InitialiseData
 ***********************************************************************************/

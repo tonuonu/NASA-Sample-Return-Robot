@@ -19,8 +19,6 @@
  *
  */
 
-#include "iorx630.h"
-
 /* OLED ouptut pin settings */
 #define  OLED_CS      PORT5.PODR.BIT.B5
 #define  OLED_DC      PORT5.PODR.BIT.B4
@@ -39,10 +37,11 @@
  
 
 void Init_OLED(void);
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+ 
 void OLED_Show_String(unsigned char a,  char *Data_Pointer, unsigned char b, unsigned char c);
 void OLED_Fill_RAM(unsigned char Data);
 
@@ -58,11 +57,11 @@ void OLED_Fill_RAM(unsigned char Data);
 extern volatile char mode;
 extern volatile char mode_just_changed;
 void readtime(char *buf);
-void readstime(char *buf);
+
 #define MAXERRORS 6
 #define SCREENWIDTH    42
 extern char errlog[MAXERRORS][SCREENWIDTH+1];
-
+  
 
 #ifdef __cplusplus
 }

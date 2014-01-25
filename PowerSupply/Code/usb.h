@@ -34,11 +34,22 @@ User Includes
 ********************************************************************************/
 
 #include "usb_common.h"
+/*Size of buffer - Lets use the packet size*/
+#define BUFFER_SIZE BULK_OUT_PACKET_SIZE 
+
+/*Data Buffers*/
+extern uint8_t g_Buffer1[BUFFER_SIZE];
+extern uint8_t g_Buffer2[BUFFER_SIZE];
+extern uint8_t* g_pBuffEmpty ;
+extern uint8_t* g_pBuffFull ;
+
+
 
 /********************************************************************************
 Function Prototypes
 ********************************************************************************/
-void USB_CDC_APP_Main(void);
+//void USB_CDC_APP_Main(void);
+void CBDoneRead(USB_ERR _err, uint32_t _NumBytes);
 
 /* End of multiple inclusion prevention macro */
 #endif

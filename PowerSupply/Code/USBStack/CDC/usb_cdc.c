@@ -22,6 +22,7 @@ User Includes
 #include "usb_core.h"
 #include "usbdescriptors.h"
 #include "usb_cdc.h"
+#include "../log.h"
 
 /***********************************************************************************
 Defines
@@ -449,7 +450,7 @@ USB_ERR USBCDC_Cancel(void)
 /**********************************************************************************
 End of function USBCDC_Cancel
 ***********************************************************************************/   
-extern void logerror(char *buf);
+
 /**********************************************************************
 * Outline     : CBCable 
 * Description   : Callback when the USB cable is connected or disconnected.

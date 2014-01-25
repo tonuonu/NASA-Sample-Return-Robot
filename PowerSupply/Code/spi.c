@@ -22,6 +22,103 @@
 #include "spi.h"
 #include "iorx630.h"
 
+
+volatile int16_t  gyro0[3] = {0,0,0};
+volatile int16_t  gyro1[3] = {0,0,0};
+volatile int16_t accel0[3] = {0,0,0};
+volatile int16_t accel1[3] = {0,0,0};
+
+void
+sendspi16cmd(uint8_t cmd,uint8_t data) {
+    RSPI0.SPCMD0.BIT.SPB=0xF; // 16 bits data length (8 register no + 8 data)
+    RSPI1.SPCMD0.BIT.SPB=0xF;
+
+    /* Turn full duplex mode off when we do not care about
+     * returned data. This avoids dummy read like this:
+     *  dummy=RSPI0.SPDR.LONG; 
+     *  dummy=RSPI1.SPDR.LONG;     
+     */
+    RSPI0.SPCR.BIT.TXMD = 1; // duplex mode off
+    RSPI1.SPCR.BIT.TXMD = 1;
+
+    /* Write to data register */
+    RSPI0.SPDR.LONG = (uint32_t) 0x00000000 | (cmd << 8) | data;
+    RSPI1.SPDR.LONG = (uint32_t) 0x00000000 | (cmd << 8) | data;
+    while(RSPI0.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
+    while(RSPI1.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
+}
+
+void
+sendspi24(uint8_t cmd) {
+    RSPI0.SPCMD0.BIT.SPB=0x1; // 24 bits data length
+    RSPI1.SPCMD0.BIT.SPB=0x1;
+    RSPI0.SPCR.BIT.TXMD = 0; // duplex mode on
+    RSPI1.SPCR.BIT.TXMD = 0;
+
+    /* Write to data register */
+    RSPI0.SPDR.LONG = (uint32_t) 0x00000000 | (cmd << 16);
+    RSPI1.SPDR.LONG = (uint32_t) 0x00000000 | (cmd << 16);
+    while(RSPI0.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
+    while(RSPI1.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
+}
+
+void
+sendspi32(uint8_t cmd) {
+    RSPI0.SPCMD0.BIT.SPB=0x3; // 32 bits data length
+    RSPI1.SPCMD0.BIT.SPB=0x3;
+
+    /* Write to data register */
+    RSPI0.SPDR.LONG = (uint32_t) 0x00000000 | (cmd << 24);
+    RSPI1.SPDR.LONG = (uint32_t) 0x00000000 | (cmd << 24);
+    while(RSPI0.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
+    while(RSPI1.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
+}
+
+void read_gyro(void) {
+        sendspi24(MPUREG_GYRO_XOUT | 0x80 /* read bit*/);
+        gyro0[0]=(int16_t)RSPI0.SPDR.LONG ; 
+        gyro1[0]=(int16_t)RSPI1.SPDR.LONG ; 
+
+        sendspi24(MPUREG_GYRO_YOUT | 0x80 /* read bit*/);
+        gyro0[1]=(int16_t)RSPI0.SPDR.LONG ; 
+        gyro1[1]=(int16_t)RSPI1.SPDR.LONG ; 
+
+        sendspi24(MPUREG_GYRO_ZOUT | 0x80 /* read bit*/);
+        gyro0[2]=(int16_t)RSPI0.SPDR.LONG ; 
+        gyro1[2]=(int16_t)RSPI1.SPDR.LONG ; 
+
+        sendspi24(MPUREG_ACCEL_XOUT | 0x80 /* read bit*/);
+        accel0[0]=(int16_t)RSPI0.SPDR.LONG ; 
+        accel1[0]=(int16_t)RSPI1.SPDR.LONG ; 
+
+        sendspi24(MPUREG_ACCEL_YOUT | 0x80 /* read bit*/);
+        accel0[1]=(int16_t)RSPI0.SPDR.LONG ; 
+        accel1[1]=(int16_t)RSPI1.SPDR.LONG ; 
+
+        sendspi24(MPUREG_ACCEL_ZOUT | 0x80 /* read bit*/);
+        accel0[2]=(int16_t)RSPI0.SPDR.LONG ; 
+        accel1[2]=(int16_t)RSPI1.SPDR.LONG ; 
+}
+
+void
+Init_Gyros(void) {
+
+    // sendspi16cmd(MPUREG_PWR_MGMT_1,0x80); // reset
+    // __delay_cycles(100UL*100000UL); // 100ms delay from GYRO reset is mandatory to wait
+    sendspi16cmd(MPUREG_PWR_MGMT_1,0x03); // wake up
+    sendspi16cmd(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
+    // SAMPLE RATE
+    sendspi16cmd(MPUREG_SMPLRT_DIV,0x04);     // Sample rate = 200Hz    Fsample= 1Khz/(4+1) = 200Hz     
+    // DLPF = 42Hz (low pass filter)
+    sendspi16cmd(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);  // BITS_DLPF_CFG_20HZ BITS_DLPF_CFG_42HZ BITS_DLPF_CFG_98HZ
+    sendspi16cmd(MPUREG_GYRO_CONFIG,BITS_FS_250DPS); 
+    sendspi16cmd(MPUREG_ACCEL_CONFIG,BITS_FS_2G);
+  
+}
+
+
+
+
 /* SPI Master receive buffer */
 volatile uint8_t gMasterRxBuffer[32];
 /* Transmit message buffer variable (imported) */

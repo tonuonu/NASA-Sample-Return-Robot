@@ -24,7 +24,7 @@
 #include "rskrx630def.h"
 #include "oled.h"
 #include "switch.h"
-#include "oled.h"
+#include "log.h"
 #include "adc12repeat.h"
 #include "stdio.h"
 #include "string.h"
@@ -202,19 +202,6 @@ static void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode) {
   }      
 }
 
-
-char errlog[MAXERRORS][SCREENWIDTH+1]={"","","","","",""};
-volatile char errptr=0;
-extern "C"
-void logerror(char *buf) {
-    readstime(errlog[errptr]);
-    errlog[errptr][14]=' ';
-    strcpy(errlog[errptr]+15,buf);
-    errptr++;
-    if(errptr==MAXERRORS){
-        errptr=0;
-    }
-}
 
 #pragma vector=VECT_CMT2_CMI2
 __interrupt void Excep_CMTU1_CMT2(void) {

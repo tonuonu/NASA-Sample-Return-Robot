@@ -40,11 +40,16 @@
 #ifndef RTC_H
 #define RTC_H
 
-/*******************************************************************************
-* Global Function Prototypes
-*******************************************************************************/
-/* RTC initialisation function prototype */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void Init_RTC(void);
- 
+void readstime(char *buf);
+
+#ifdef __cplusplus
+}
+#endif
+
 /* End of multiple inclusion prevention macro */
 #endif
