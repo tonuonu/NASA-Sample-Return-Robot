@@ -26,6 +26,7 @@
 #include "intrinsics.h"
 
 #include "switch.h"
+#include "shell.h"
 #include "usb_hal.h"
 #include "usb_cdc.h"
 #include "usb.h"
@@ -209,8 +210,8 @@ CBDoneRead(USB_ERR _err, uint32_t _NumBytes) {
     USBCDC_Read_Async(BUFFER_SIZE, g_pBuffEmpty, CBDoneRead);
       
     /*Echo what was read back*/
-    if(USB_ERR_OK == _err)
-    {
+    if(USB_ERR_OK == _err) {
+         shell(_NumBytes, g_pBuffFull);
    //   USBCDC_Write_Async(_NumBytes, g_pBuffFull, CBDoneWrite);
     }
   }

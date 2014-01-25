@@ -19,17 +19,17 @@
  *
  */
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+void
+shell(uint32_t _NumBytes, const uint8_t* _Buffer);
 
 
 /* Multiple inclusion prevention macro */
-#ifndef LOG_H
-#define LOG_H
+#ifndef SHELL_H
+#define SHELL_H
 
-void logerror(char *buf);
   
 /* End of multiple inclusion prevention macro */
 #endif

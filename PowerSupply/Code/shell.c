@@ -20,20 +20,19 @@
  */
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "iorx630.h"
+#include "rskrx630def.h"
+#include "oled.h"
+#include "switch.h"
+#include "shell.h"
+#include "log.h"
+#include "rtc.h"
+#include "stdio.h"
+#include "string.h"
 
-
-/* Multiple inclusion prevention macro */
-#ifndef LOG_H
-#define LOG_H
-
-void logerror(char *buf);
+void
+shell(uint32_t _NumBytes, const uint8_t* _Buffer) {
   
-/* End of multiple inclusion prevention macro */
-#endif
-
-#ifdef __cplusplus
+  
+  
 }
-#endif

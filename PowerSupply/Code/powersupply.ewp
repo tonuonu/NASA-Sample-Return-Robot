@@ -1859,6 +1859,9 @@
     <name>$PROJ_DIR$\rtc.cpp</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\shell.c</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\spi.c</name>
   </file>
   <file>
