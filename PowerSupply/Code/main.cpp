@@ -28,7 +28,7 @@
 //#include "async.h"
 #include "usb_hal.h"
 #include "usb_cdc.h"
-#include "usb_cdc_app.h"
+#include "usb.h"
 #include "adc12repeat.h"
 #include "low_voltage_detection.h"
 #include "rskrx630def.h"
