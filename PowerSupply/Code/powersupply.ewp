@@ -1859,7 +1859,7 @@
     <name>$PROJ_DIR$\switch.cpp</name>
   </file>
   <file>
-    <name>$PROJ_DIR$\usb_cdc_app.c</name>
+    <name>$PROJ_DIR$\usb.c</name>
   </file>
 </project>
 

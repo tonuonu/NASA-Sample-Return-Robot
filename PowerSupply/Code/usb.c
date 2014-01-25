@@ -18,51 +18,17 @@
  *  along with this software.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-/*******************************************************************************
-* File Name : usb_cdc_app.c
-* Version : 1.00
-* Device     : R5F5630EDDFP
-* Tool Chain : RX Family C Compiler
-* H/W Platform   : RSKRX630
-* Description : Application that uses the USB CDC class.
-       
-        This means the device will appear as a virtual COM port to the host.
-        When the host connects to this virtual COM port using a terminal
-        program such as MS HyperTerminal instructions will appear.
-        A menu is provided that can be controlled by pressing the RSK switches.
-    
-        Demonstrates CDC usage by providing an echo test mode,
-        where any characters read will be echoed back.
-    
-        For more details see 'USB Sample Code User's Manual'.
-    
-        See file async.c for baud rate for serial debug output.
-***********************************************************************************/
-/***********************************************************************************
-* History     : 23.01.2012 Ver. 1.00 First Release
-***********************************************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-/***********************************************************************************
-System Includes
-***********************************************************************************/
 #include <stdint.h>
 #include <stdbool.h>
 #include <assert.h>
 
 #include "intrinsics.h"
 
-/***********************************************************************************
-User Includes
-***********************************************************************************/
-#include "oled.h"
 #include "switch.h"
 #include "usb_hal.h"
 #include "usb_cdc.h"
-#include "usb_cdc_app.h"
-#include "adc12repeat.h"
+#include "usb.h"
 
 /***********************************************************************************
 Defines
@@ -80,6 +46,12 @@ This allows enumeration to complete before we try and communicate.*/
 /***********************************************************************************
 Variables
 ***********************************************************************************/
+/*Main menu text*/
+static const char* const szWelcomeMsg1 = "\r\nRenesas USB CDC Sample\r\n";
+static const char* const szWelcomeMsg2 = "Press:-\r\n";
+static const char* const szWelcomeMsg3 = "Switch1 - Show instructions(these).\r\n";
+static const char* const szWelcomeMsg4 = "Switch2 - Start Echo of everthing typed.\r\n";
+static const char* const szWelcomeMsg5 = "Switch3 = Stop Echo.\r\n";
 
 /*Flags*/
 static volatile bool g_bEcho = false;
@@ -100,6 +72,131 @@ static void CBDoneRead(USB_ERR _err, uint32_t _NumBytes);
 /* Callback called when we have written some data. */
 static void CBDoneWrite(USB_ERR _err);
 
+/**********************************************************************************
+* Outline     : USB_CDC_APP_Main
+* Description   : Start the CDC USB sample application.
+*                 This function does not return.
+* Argument    : none
+* Return value  : none
+**********************************************************************************/
+void USB_CDC_APP_Main(void)
+{  
+  /* LCD */
+//  Init_LCD();
+  
+  /* Display splash screen on the debug LCD */
+//  Display_LCD(LCD_LINE1,"Renesas ");
+//  Display_LCD(LCD_LINE2,"USB CDC ");
+    
+  DEBUG_MSG_LOW( ("\r\n*** CDC App Starting ***\r\n"));
+  
+  /*Initialise the USB CDC Class*/
+  USBCDC_Init();
+  
+  __enable_interrupt();
+  
+  while(1)
+  {
+    volatile uint32_t DelayPreWrite = DELAY_VALUE_INITIAL;
+    
+    /*Wait for USB cable to be connected */
+    while(false == USBCDC_IsConnected());
+    
+    /*Reset the application data for a new connection */
+    InitialiseData();
+    
+    /*Not necessary but to avoid confusion when reading the log -
+    Wait for enmeration to happen before starting to send data*/
+    while(0 != DelayPreWrite){DelayPreWrite--;}
+  
+    /*Keep putting out a message that will be seen when a terminal connects
+    to the virtual com port this has just produced.
+    The message says press SW1 - so continue until SW1 is pressed.*/
+    while(0 == (SWITCHPRESS_1 & gSwitchFlag))
+    {
+      volatile uint32_t Delay;
+      USBCDC_WriteString("\r\nRenesas USB CDC Sample, Press Switch SW1.\r\n");
+      Delay = DELAY_VALUE;
+      while(0 != Delay--)
+      {
+        if(SWITCHPRESS_1 == gSwitchFlag)
+        {
+          Delay = 0;
+        }
+        
+        /*If a user presses another switch (not SW1) at this time, then
+        immediatly repeat the instruction to press SW1*/
+        if(SWITCHPRESS_2 & gSwitchFlag)
+        {
+          Delay = 0;
+          gSwitchFlag = 0;
+        }
+        if(SWITCHPRESS_3 & gSwitchFlag)
+        {
+          Delay = 0;
+          gSwitchFlag = 0;
+        }
+      }
+    }
+  
+    /*Wait for switch interrupts to set flags.*/
+    while(true == USBCDC_IsConnected())
+    {
+      /*Has SW1 been pressed*/
+      if(SWITCHPRESS_1 & gSwitchFlag)
+      {
+        /*Write main instrutions out*/
+        USBCDC_WriteString(szWelcomeMsg1);
+        USBCDC_WriteString(szWelcomeMsg2);
+        USBCDC_WriteString(szWelcomeMsg3);
+        USBCDC_WriteString(szWelcomeMsg4);
+        USBCDC_WriteString(szWelcomeMsg5);
+      
+        /*Reset the switch pressed flag*/
+        gSwitchFlag = 0;
+      }
+    
+      /*Has SW2 been pressed*/
+      if(SWITCHPRESS_2 & gSwitchFlag)
+      {
+        /*Reset the switch pressed flag*/
+        gSwitchFlag = 0;
+      
+        /*Make sure we are not already in echo mode*/
+        if(false == g_bEcho)
+        {
+          /*Start Echo mode*/
+          g_bEcho = true;
+      
+          USBCDC_WriteString("\r\nStarting Echo:-\r\n");
+      
+          /*Start a Read*/
+          USBCDC_Read_Async(BUFFER_SIZE, g_pBuffEmpty, CBDoneRead);
+      
+          /*This continues in the CBDoneRead function...*/
+        }
+      }
+  
+      /*Has SW3 been pressed*/
+      if(SWITCHPRESS_3 & gSwitchFlag)
+      {
+        /*Reset the switch pressed flag*/
+        gSwitchFlag = 0;
+      
+        /*Make sure we are in echo mode*/
+        if(true == g_bEcho)
+        {
+          /*Stop echo mode*/
+          g_bEcho = false;
+        
+          /*Stop the CDC layer waiting for a read*/
+          USBCDC_Cancel();
+          USBCDC_WriteString("\r\nFinished Echo.\r\n");
+        }
+      }  
+    }
+  }
+}
 /***********************************************************************************
 End of function USB_CDC_APP_Main
 ***********************************************************************************/
@@ -171,13 +268,11 @@ End of function CBDoneWrite
 * Argument    : none
 * Return value  : none
 ***********************************************************************************/
-static void InitialiseData(void) {
+static void InitialiseData(void)
+{
   g_bEcho = false;
   gSwitchFlag = 0;
 }
 /***********************************************************************************
 End of function InitialiseData
 ***********************************************************************************/
-#ifdef __cplusplus
-}
-#endif
