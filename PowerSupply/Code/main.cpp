@@ -31,6 +31,7 @@
 #include "log.h"
 #include "adc12repeat.h"
 #include "low_voltage_detection.h"
+#include "interrupt-main.h"
 #include "rskrx630def.h"
 #include "iorx630.h"
 
@@ -75,9 +76,15 @@ int main() {
     Init_ADC12Repeat();
     Init_SPI();
     Init_Gyros();
-
-    // Init_UART();  
     USBCDC_Init();  
+    /* 
+     * Configure a 10 ms periodic delay used 
+     * to update the ADC and Gyro results and check for safety
+     * This is sort of high priority "main loop" for us.
+     * Low priority things can go into usual main loop.
+     */
+    Timer_Delay(10, 'm', PERIODIC_MODE);
+      
     __enable_interrupt();  
     __delay_cycles(96UL*2000UL); // 2000us delay    
     OLED_Fill_RAM(0x00);				   // Clear Screen

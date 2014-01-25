@@ -30,9 +30,72 @@
 #include "usb.h"
 #include "log.h"
 #include "adc12repeat.h"
+#include "interrupt-main.h"
 #include "low_voltage_detection.h"
 #include "rskrx630def.h"
 #include "iorx630.h"
+
+
+/* Dclare a variable to hold the periodic delay specified */
+volatile uint32_t gPeriodic_Delay;
+/* Declare a variable to store the global delay count value */
+volatile uint32_t gDelay_Counter = 0;
+
+/******************************************************************************
+* Outline    : Timer_Delay
+* Description  : Function used to create delays in milliseconds or 
+*          microseconds depending on the user selection for controlling 
+*          the debug LCD function's calls. 
+* Argument      : uint32_t   -   _Delay_Period
+*          uint8   -   Unit  
+* Return value  : none
+******************************************************************************/
+void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode) {
+  /* Clear the timer's count */
+  gDelay_Counter = 0;
+    
+  /* Check if microseconds delay is required */
+  if(unit == 'u') {
+    /* Select the PCLK clock division as PCLK/8 = 6MHz */ 
+    CMT2.CMCR.BIT.CKS = 0x0;
+    
+    /* Store a copy of the user delay value to gPeriodic_Delay */
+    gPeriodic_Delay = user_delay * 6;
+  
+    /* Specify the timer period */
+    CMT2.CMCOR = gPeriodic_Delay;
+  }
+  
+  /* Check if milliseconds delay is required */
+  if(unit == 'm') {
+    /* Select the PCLK clock division as PCLK/128 = 375KHz */ 
+    CMT2.CMCR.BIT.CKS = 0x2;
+
+    /* Stor a copy of the user delay value to gPeriodic_Delay */
+    gPeriodic_Delay = user_delay * 375;
+
+    /* Specify the timer period */
+    CMT2.CMCOR = gPeriodic_Delay;
+  }
+  
+  /* Enable the compare match interrupt */
+  CMT2.CMCR.BIT.CMIE = 1;
+
+  /* Start CMT2 count */
+  CMT.CMSTR1.BIT.STR2 = 1;
+
+  /* Skip the following instructions if a periodic timer is required */
+  if((timer_mode != PERIODIC_MODE)) {
+    /* Wait for the timer to timeout */
+    while((gDelay_Counter != gPeriodic_Delay)) {
+      /* Wait */
+    }  
+
+    /* Stop CMT2 count */
+    CMT.CMSTR1.BIT.STR2 = 0;
+  }      
+}
+
 
 
 #pragma vector=VECT_CMT2_CMI2

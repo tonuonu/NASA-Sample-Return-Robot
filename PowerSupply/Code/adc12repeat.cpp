@@ -40,16 +40,12 @@ volatile uint16_t gADC_Result;
 /* Declare a variable used to specify if the delay 
 function should only generate the specific delay or not */
 uint8_t gTimer_Mode_Flag = 0;
-/* Dclare a variable to hold the periodic delay specified */
-volatile uint32_t gPeriodic_Delay;
-/* Declare a variable to store the global delay count value */
-volatile uint32_t gDelay_Counter = 0;
 /* Init_Timer function prototype */
 static void Init_Timer(void);
 /* 16 bit integer to character string function prototype declaration */
 //static void uint16_ToString(uint8_t *, uint8_t, uint16_t);
 /* Timer_Delay function prototype */
-static void Timer_Delay(uint32_t, uint8_t, uint8_t);
+//static void Timer_Delay(uint32_t, uint8_t, uint8_t);
 
 /*******************************************************************************
 * Outline     : Init_ADC12Repeat
@@ -123,9 +119,6 @@ void Init_ADC12Repeat(void) {
   AD.ADCR2.BIT.DPSEL = 0; // Flush-right
   AD.ADCSR.BIT.ADST = 1; // start conversion
 
-  /* Configure a 10 ms periodic delay used 
-     to update the ADC and Gyro results and check for safe numbers */
-  Timer_Delay(10, 'm', PERIODIC_MODE);
 
 }
 
@@ -145,60 +138,5 @@ static void Init_Timer(void) {
   IEN(CMT2,CMI2) = 0x1;
   /* Clear CMT2 interrupt flag */
   IR(CMT2,CMI2) = 0x0;  
-}
-
-/******************************************************************************
-* Outline    : Timer_Delay
-* Description  : Function used to create delays in milliseconds or 
-*          microseconds depending on the user selection for controlling 
-*          the debug LCD function's calls. 
-* Argument      : uint32_t   -   _Delay_Period
-*          uint8   -   Unit  
-* Return value  : none
-******************************************************************************/
-static void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode) {
-  /* Clear the timer's count */
-  gDelay_Counter = 0;
-    
-  /* Check if microseconds delay is required */
-  if(unit == 'u') {
-    /* Select the PCLK clock division as PCLK/8 = 6MHz */ 
-    CMT2.CMCR.BIT.CKS = 0x0;
-    
-    /* Store a copy of the user delay value to gPeriodic_Delay */
-    gPeriodic_Delay = user_delay * 6;
-  
-    /* Specify the timer period */
-    CMT2.CMCOR = gPeriodic_Delay;
-  }
-  
-  /* Check if milliseconds delay is required */
-  if(unit == 'm') {
-    /* Select the PCLK clock division as PCLK/128 = 375KHz */ 
-    CMT2.CMCR.BIT.CKS = 0x2;
-
-    /* Stor a copy of the user delay value to gPeriodic_Delay */
-    gPeriodic_Delay = user_delay * 375;
-
-    /* Specify the timer period */
-    CMT2.CMCOR = gPeriodic_Delay;
-  }
-  
-  /* Enable the compare match interrupt */
-  CMT2.CMCR.BIT.CMIE = 1;
-
-  /* Start CMT2 count */
-  CMT.CMSTR1.BIT.STR2 = 1;
-
-  /* Skip the following instructions if a periodic timer is required */
-  if((timer_mode != PERIODIC_MODE)) {
-    /* Wait for the timer to timeout */
-    while((gDelay_Counter != gPeriodic_Delay)) {
-      /* Wait */
-    }  
-
-    /* Stop CMT2 count */
-    CMT.CMSTR1.BIT.STR2 = 0;
-  }      
 }
 
