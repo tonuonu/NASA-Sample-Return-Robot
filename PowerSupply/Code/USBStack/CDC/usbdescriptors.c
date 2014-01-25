@@ -233,7 +233,7 @@ const DESCRIPTOR gConfigurationDescriptor =
   /*Note Language ID is in USB Core */
 
 /*Manufacturer string*/
-#define STRING_MANUFACTURER_SIZE 16
+#define STRING_MANUFACTURER_SIZE 30
 /* "Renesas" */
 static const uint8_t gStringDescriptorManufacturerData[STRING_MANUFACTURER_SIZE] = 
 {
@@ -242,8 +242,9 @@ static const uint8_t gStringDescriptorManufacturerData[STRING_MANUFACTURER_SIZE]
   /* Descriptor Type = STRING */
   0x03,
   /* Descriptor Text (unicode) */
-  'R', 0x00, 'E', 0x00, 'N', 0x00, 'E', 0x00,
-  'S', 0x00, 'A', 0x00, 'S', 0x00
+  'T', 0x00, 'e', 0x00, 'a', 0x00, 'm', 0x00,  ' ', 0x00,  
+  'K', 0x00, 'u', 0x00, 'u', 0x00, 
+  'k', 0x00, 'u', 0x00, 'l', 0x00, 'g', 0x00, 'u', 0x00, 'r', 0x00
 };
 
 const DESCRIPTOR  gStringDescriptorManufacturer = 
@@ -253,8 +254,8 @@ const DESCRIPTOR  gStringDescriptorManufacturer =
 };
 
 /*Product string*/
-#define STRING_PRODUCT_SIZE 44
-/* "CDC USB Demonstration" */
+#define STRING_PRODUCT_SIZE 66
+
 static const uint8_t gStringDescriptorProductData[STRING_PRODUCT_SIZE] = 
 {
   /* Length of this descriptor*/
@@ -262,12 +263,12 @@ static const uint8_t gStringDescriptorProductData[STRING_PRODUCT_SIZE] =
   /* Descriptor Type = STRING */
   0x03,
   /* Descriptor Text (unicode) */
-  'C', 0x00, 'D', 0x00, 'C', 0x00, ' ', 0x00,
-  'U', 0x00, 'S', 0x00, 'B', 0x00, ' ', 0x00,
-  'D', 0x00, 'e', 0x00, 'm', 0x00, 'o', 0x00,
-  'n', 0x00, 's', 0x00, 't', 0x00, 'r', 0x00,
-  'a', 0x00, 't', 0x00, 'i', 0x00, 'o', 0x00,
-  'n', 0x00
+  'N', 0x00, 'A', 0x00, 'S', 0x00, 'A', 0x00, ' ', 0x00,
+  'C', 0x00, 'e', 0x00, 'n', 0x00, 't', 0x00, 'e', 0x00, 'n', 0x00,
+  'n', 0x00, 'n', 0x00, 'i', 0x00, 'a', 0x00, 'l', 0x00, ' ', 0x00,
+  'C', 0x00, 'h', 0x00, 'a', 0x00, 'l', 0x00, 'l', 0x00, 'e', 0x00, 
+  'n', 0x00, 'g', 0x00, 'e', 0x00, ' ', 0x00, 
+  'r', 0x00, 'o', 0x00, 'b', 0x00, 'o', 0x00, 't', 0x00
 };
 
 const DESCRIPTOR gStringDescriptorProduct =
@@ -276,7 +277,7 @@ const DESCRIPTOR gStringDescriptorProduct =
   gStringDescriptorProductData  
 };
 
-/*Serial number string "1.1"*/
+/*Serial number string "0.1"*/
 #define STRING_SERIAL_NUM_SIZE 8
 static const uint8_t gStringDescriptorSerialNumData[STRING_SERIAL_NUM_SIZE] =
 {
@@ -285,7 +286,7 @@ static const uint8_t gStringDescriptorSerialNumData[STRING_SERIAL_NUM_SIZE] =
   /* Descriptor Type = STRING */
   0x03,
   /* Descriptor Text (unicode) */
-  '1', 0x00, '.', 0x00, '1', 0x00
+  '0', 0x00, '.', 0x00, '1', 0x00
 };
 
 const DESCRIPTOR gStringDescriptorSerialNum = 

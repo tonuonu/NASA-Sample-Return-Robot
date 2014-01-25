@@ -449,7 +449,7 @@ USB_ERR USBCDC_Cancel(void)
 /**********************************************************************************
 End of function USBCDC_Cancel
 ***********************************************************************************/   
-
+extern void logerror(char *buf);
 /**********************************************************************
 * Outline     : CBCable 
 * Description   : Callback when the USB cable is connected or disconnected.
@@ -464,12 +464,13 @@ static void CBCable(bool _bConnected)
     
     /* Initialise data - as this is like re-starting */
     InitialiseData();
-    
+    logerror("USB connected");
     g_bConnected = true;
   }
   else
   {
     DEBUG_MSG_LOW( ("USBCDC: Cable Disconnected\r\n"));
+    logerror("USB disconnected");
     g_bConnected = false;
     
     /*In case we are waiting on any flags set them here*/

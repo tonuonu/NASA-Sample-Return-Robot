@@ -205,7 +205,7 @@ static void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode) {
 
 char errlog[MAXERRORS][SCREENWIDTH+1]={"","","","","",""};
 volatile char errptr=0;
-
+extern "C"
 void logerror(char *buf) {
     readstime(errlog[errptr]);
     errlog[errptr][14]=' ';

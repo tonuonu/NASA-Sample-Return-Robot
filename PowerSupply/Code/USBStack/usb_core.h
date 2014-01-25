@@ -58,7 +58,7 @@ Defines
 #define CLEAR_FEATURE    0x01
 #define SET_FEATURE      0x03
 #define SET_ADDRESS      0x05  
-#define  GET_DESCRIPTOR     0x06
+#define GET_DESCRIPTOR     0x06
 #define SET_DESCRIPTOR    0x07
 #define GET_CONFIGURATION  0x08
 #define SET_CONFIGURATION  0x09
