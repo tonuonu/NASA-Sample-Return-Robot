@@ -97,7 +97,7 @@ int main() {
             LED6=LED_OFF;
             done=false;
         }
-        read_gyro();        
+        
     }
 }
 

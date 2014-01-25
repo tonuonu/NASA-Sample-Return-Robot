@@ -8,6 +8,10 @@ extern "C" {
 
 /* Define a macro to indicate selection of a periodic timer mode */
 #define PERIODIC_MODE 0x1
+volatile extern float adc[8] ;
+volatile extern float adapter;
+volatile extern float imon1 ;
+volatile extern float imon2 ;
 
 /*******************************************************************************
 * Global Function Prototypes
