@@ -330,13 +330,10 @@ void Init_PWM(void) {
      * http://en.wikipedia.org/wiki/Servo_control 
      * recommends using 20ms (50Hz) cycle.
      * 48Mhz/64/15000 == 50Hz
-     * Same page says 1.5ms high pulse keeps servo at middle
+     * Same page says 1.5ms high pulse keeps servo at middle 
      * 15000/20*1.5=1125
+     * Side limits are 1 and 2ms (750 and 1500).
      */
-
-    // 48Mhz/64/15000 == 50Hz
-    /* Set a period */
-  
     TPU4.TGRA = 15000-1125;
     TPU4.TGRB = 15000;
 
