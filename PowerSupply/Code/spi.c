@@ -137,7 +137,7 @@ Init_Gyros(void) {
 
     sendspi16cmd(MPUREG_PWR_MGMT_1,0x00); // wake up    
     sendspi16cmd(MPUREG_USER_CTRL, BIT_I2C_IF_DIS); // Disable I2C. 
-    sendspi16cmd(MPUREG_PWR_MGMT_1,0x03); // wake up and Z axis is reference.
+    sendspi16cmd(MPUREG_PWR_MGMT_1,0x03); // Z axis is reference.
     sendspi16cmd(MPUREG_PWR_MGMT_2,0x00); // ?
     sendspi16cmd(MPUREG_GYRO_CONFIG,BITS_FS_500DPS); 
     sendspi16cmd(MPUREG_ACCEL_CONFIG,BITS_FS_4G);
@@ -305,6 +305,7 @@ void Init_SPI(void) {
   RSPI1.SPCR.BIT.SPE = 1;
 }
 
+#if 0
 /*******************************************************************************
 * Outline     : Excep_RSPI0_SPRI0
 * Description   : Slave receive interrupt handler. Function is triggered when
@@ -397,3 +398,4 @@ void MasterRxInterrupt_SPI(void) {
     /* Do nothing */
   }
 }
+#endif
