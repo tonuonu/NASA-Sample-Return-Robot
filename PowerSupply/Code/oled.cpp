@@ -22,6 +22,9 @@
 #include "delay.h"
 #include "hwsetup.h"
 #include "oled.h"
+#include "spi.h"
+#include "adc12repeat.h"
+#include "stdio.h"
 #include "tnroman.h"
 #include "iorx630.h"
 #include "rskrx630def.h"
@@ -579,6 +582,126 @@ void
 OLED_Set_Linear_Gray_Scale_Table() {
     Write_Instruction(0xB9);				   // Set Default Linear Gray Scale Table
 }
+volatile char mode=E_GYRO;
+volatile char mode_just_changed=1;
+
+static void 
+mode_e_err(void) {
+    char buf[SCREENWIDTH+1];
+    snprintf(buf,sizeof(buf),"Errorlog");
+    OLED_Show_String(  1,buf, 0, 0*8);
+    for(int i=0;i<MAXERRORS;i++) {
+        OLED_Show_String( 1,errlog[i], 0, (i+1)*8);
+    }
+}
+
+
+static void 
+mode_e_gyro(void) {
+    char buf[SCREENWIDTH+1];
+    snprintf(buf,sizeof(buf),"Gyros");
+    OLED_Show_String(  1,buf, 0, 0*8);
+
+    snprintf(buf,sizeof(buf),"g0: %6d %6d %6d",gyro0[0],gyro0[1],gyro0[2]);
+    OLED_Show_String(  1,buf, 0, 1*8);
+    snprintf(buf,sizeof(buf),"g1: %6d %6d %6d",gyro1[0],gyro1[1],gyro1[2]);
+    OLED_Show_String(  1,buf, 0, 2*8);
+    snprintf(buf,sizeof(buf),"gs: %6d %6d %6d",(gyro0[0]+gyro1[0])/2,(gyro0[1]+gyro1[1])/2,(gyro0[2]+gyro1[2])/2);
+    OLED_Show_String(  1,buf, 0, 3*8);
+
+    snprintf(buf,sizeof(buf),"a0: %6d %6d %6d",accel0[0],accel0[1],accel0[2]);
+    OLED_Show_String(  1,buf, 0, 4*8);
+    snprintf(buf,sizeof(buf),"a1: %6d %6d %6d",accel1[0],accel1[1],accel1[2]);
+    OLED_Show_String(  1,buf, 0, 5*8);
+    snprintf(buf,sizeof(buf),"as: %6d %6d %6d",(accel0[0]+accel1[0])/2,(accel0[1]+accel1[1])/2,(accel0[2]+accel1[2])/2);
+    OLED_Show_String(  1,buf, 0, 6*8);
+
+    
+}
+
+
+static void 
+mode_e_bat(void) {
+    char buf[SCREENWIDTH+1]; 
+    snprintf(buf,sizeof(buf),"DC in:%4.1fV imon1 %3.1fA imon2 %3.1fA",adapter,imon1,imon2);
+    OLED_Show_String(  1,buf, 0, 6*8);
+#define BAT_MISSING_THRESHOLD (2.5f*3.f) 
+#define BAT_CRIT_THRESHOLD (3.3f*3.f) 
+#define BAT_LOW_THRESHOLD  (3.5f*3.f)
+#define BAT_FULL_THRESHOLD (4.2f*3.f)
+    
+    for(int i=0;i<4;i++) {
+        char *statustext;
+        float percent;
+        percent=(adc[i]-BAT_CRIT_THRESHOLD)/(BAT_FULL_THRESHOLD-BAT_CRIT_THRESHOLD)*100.0f;
+        if(adc[i]<=BAT_MISSING_THRESHOLD) {
+            statustext="Missing";
+            percent=0.0f;
+        } else if(adc[i]<=BAT_CRIT_THRESHOLD) {
+            statustext="Criticl";
+            percent=0.0f;
+        } else if(adc[i]<=BAT_LOW_THRESHOLD) {
+            statustext="Low";
+        } else if(adc[i]>BAT_FULL_THRESHOLD) {
+            statustext="Overvlt";
+            percent=0.0f;
+        } else {
+            statustext="Normal";
+        }
+        char *status2;
+        switch(i) {
+        case 0:
+            if(BAT0_EN==MAX1614_ON)
+                status2="EN ";
+            else
+                status2="DIS";
+            break;
+        case 1:
+            if(BAT1_EN==MAX1614_ON)
+                status2="EN ";
+            else
+                status2="DIS";
+            break;
+        case 2:
+            if(BAT2_EN==MAX1614_ON)
+                status2="EN ";
+            else
+                status2="DIS";
+            break;
+        case 3:
+            if(BAT3_EN==MAX1614_ON)
+                status2="EN ";
+            else
+                status2="DIS";
+            break;
+        }
+        snprintf(buf,sizeof(buf),"%d: %4.1fV %5.1fA %7s%3.0f%% %3s",i,adc[i],adc[i+4],statustext,percent,status2);
+        OLED_Show_String(  1, buf, 0, (i+1)*8);
+    }  
+}
+
+void
+refresh(void) {
+
+    if(mode_just_changed) {
+        OLED_Fill_RAM(0x00); // clear screen
+        mode_just_changed=0;
+    }    
+
+    switch(mode) {
+    case E_BAT:
+        mode_e_bat();
+        break;
+    case E_ERR:
+        mode_e_err();
+        break;
+    case E_GYRO:
+        mode_e_gyro();
+        break;
+    }      
+  
+}
+
 
 void
 Init_OLED() {

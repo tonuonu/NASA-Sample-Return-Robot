@@ -62,6 +62,7 @@ void readtime(char *buf);
 #define SCREENWIDTH    42
 extern char errlog[MAXERRORS][SCREENWIDTH+1];
   
+void refresh(void);
 
 #ifdef __cplusplus
 }

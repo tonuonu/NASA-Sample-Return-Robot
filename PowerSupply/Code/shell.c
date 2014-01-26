@@ -46,18 +46,23 @@ shell(uint32_t _NumBytes, const uint8_t* _Buffer) {
     strncat((char *)shellbuf,(char *)_Buffer,_NumBytes);
     char * enter=strchr((char *)shellbuf,13); // search for "Enter"
     char * ctrlc=strchr((char *)shellbuf,3); // search for "Ctrl-C"
+    char * bs=strchr((char *)shellbuf,3); // search for "backspace"
     char * error="";
     if(ctrlc) {
-      mems_realtime=false;
-      *ctrlc=0;
-      shellbuf[0]=0;
+        mems_realtime=false;
+        *ctrlc=0;
+        shellbuf[0]=0;
+    } else if(bs) {
+        *bs=0x7f;
+        //shellbuf[0]=0;
     } else if(enter) {
         char pnferr[80];
         *enter=0;
         logerror((char *)shellbuf);
         if(strcmp((char *)shellbuf,"")==0) {
-            /* just emty enter */
-            //USBCDC_Write_Async(strlen((char *)path),path , CBDoneWrite);
+            /* just empty enter 
+             * Avoid syntax error with this empty check.
+             */
         } else if(strncmp((char *)shellbuf,"cd ",3)==0) {
             if(strcmp((char *)shellbuf+3,"/mems")==0) {
                 path="/mems";

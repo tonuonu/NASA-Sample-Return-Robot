@@ -24,6 +24,7 @@
 #include "stdio.h"
 #include "stdbool.h"
 #include "string.h"
+#include "oled.h"
 #include "usb_hal.h"
 #include "usb.h"
 #include "usb_cdc.h"
@@ -107,7 +108,7 @@ void read_gyro(void) {
         accel1[2]=(int16_t)RSPI1.SPDR.LONG ; 
 
 
-if(mems_realtime==true) {
+        if(mems_realtime==true) {
                 char buf[128];
                 snprintf(buf,sizeof(buf),"g:" 
                           "%x %x %x "
@@ -119,7 +120,8 @@ if(mems_realtime==true) {
                           accel0[0],accel0[1],accel0[2],
                           accel1[0],accel1[1],accel1[2]);
                 USBCDC_Write_Async(strlen((char*)buf), (uint8_t*)buf, CBDoneWrite);
-            }        
+         }
+        
 }
 
 void
