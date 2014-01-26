@@ -69,6 +69,7 @@ sendspi24(uint8_t cmd) {
     while(RSPI1.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
 }
 
+#if 0
 void
 sendspi32(uint8_t cmd) {
     RSPI0.SPCMD0.BIT.SPB=0x3; // 32 bits data length
@@ -80,9 +81,12 @@ sendspi32(uint8_t cmd) {
     while(RSPI0.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
     while(RSPI1.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
 }
-extern volatile bool mems_realtime;
+#endif
 
-void read_gyro(void) {
+//extern volatile bool mems_realtime;
+
+void 
+read_gyro(void) {
         sendspi24(MPUREG_GYRO_XOUT | 0x80 /* read bit*/);
         gyro0[0]=(int16_t)RSPI0.SPDR.LONG ; 
         gyro1[0]=(int16_t)RSPI1.SPDR.LONG ; 
@@ -105,38 +109,28 @@ void read_gyro(void) {
 
         sendspi24(MPUREG_ACCEL_ZOUT | 0x80 /* read bit*/);
         accel0[2]=(int16_t)RSPI0.SPDR.LONG ; 
-        accel1[2]=(int16_t)RSPI1.SPDR.LONG ; 
-
-
-        if(mems_realtime==true) {
-                char buf[128];
-                snprintf(buf,sizeof(buf),"g:" 
-                          "%x %x %x "
-                          "%x %x %x "
-                          "%x %x %x "
-                          "%x %x %x \r\n",
-                          gyro0[0],gyro0[1],gyro0[2],
-                          gyro1[0],gyro1[1],gyro1[2],
-                          accel0[0],accel0[1],accel0[2],
-                          accel1[0],accel1[1],accel1[2]);
-                USBCDC_Write_Async(strlen((char*)buf), (uint8_t*)buf, CBDoneWrite);
-         }
-        
+        accel1[2]=(int16_t)RSPI1.SPDR.LONG ;
 }
 
 void
 Init_Gyros(void) {
-
+    /* 
+     * In some weird reason this reset breaks everything 
+     * Fix if you can.
+     */ 
     // sendspi16cmd(MPUREG_PWR_MGMT_1,0x80); // reset
     // __delay_cycles(100UL*100000UL); // 100ms delay from GYRO reset is mandatory to wait
-    sendspi16cmd(MPUREG_PWR_MGMT_1,0x03); // wake up
-    sendspi16cmd(MPUREG_USER_CTRL, BIT_I2C_IF_DIS);
-    // SAMPLE RATE
-    sendspi16cmd(MPUREG_SMPLRT_DIV,0x04);     // Sample rate = 200Hz    Fsample= 1Khz/(4+1) = 200Hz     
+
+    sendspi16cmd(MPUREG_PWR_MGMT_1,0x00); // wake up    
+    sendspi16cmd(MPUREG_USER_CTRL, BIT_I2C_IF_DIS); // Disable I2C. 
+    sendspi16cmd(MPUREG_PWR_MGMT_1,0x03); // wake up and Z axis is reference.
+    sendspi16cmd(MPUREG_PWR_MGMT_2,0x00); // ?
+    sendspi16cmd(MPUREG_GYRO_CONFIG,BITS_FS_500DPS); 
+    sendspi16cmd(MPUREG_ACCEL_CONFIG,BITS_FS_4G);
+    sendspi16cmd(MPUREG_SMPLRT_DIV,0); // maximum sample rate. Why not :)
+                                       // Fsample= 1khz/(0+1) = 1kHz     
     // DLPF = 42Hz (low pass filter)
-    sendspi16cmd(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);  // BITS_DLPF_CFG_20HZ BITS_DLPF_CFG_42HZ BITS_DLPF_CFG_98HZ
-    sendspi16cmd(MPUREG_GYRO_CONFIG,BITS_FS_250DPS); 
-    sendspi16cmd(MPUREG_ACCEL_CONFIG,BITS_FS_2G);
+    // sendspi16cmd(MPUREG_CONFIG, BITS_DLPF_CFG_42HZ);  // BITS_DLPF_CFG_20HZ BITS_DLPF_CFG_42HZ BITS_DLPF_CFG_98HZ
   
 }
 
@@ -190,11 +184,11 @@ void Init_SPI(void) {
   RSPI0.SPCMD0.BIT.CPOL=0;
   RSPI1.SPCMD0.BIT.CPOL=0;
 
-// SPBR ?
+  RSPI0.SPBR=0;
+  RSPI1.SPBR=0;
+
   RSPI0.SPCMD0.BIT.BRDV=0;
   RSPI1.SPCMD0.BIT.BRDV=0;
-
-  
   
   RSPI0.SPCMD0.BIT.SSLA=0;
   RSPI1.SPCMD0.BIT.SSLA=0;
@@ -223,28 +217,12 @@ void Init_SPI(void) {
   PORTC.PMR.BIT.B5=0; // CLK
   PORTC.PMR.BIT.B6=0; // MOSI
   PORTC.PMR.BIT.B7=0; // MISO
-  
-#if 0
-  /* enable pullups */
-  PORTC.PCR.BIT.B4=1; // CS
-  PORTC.PCR.BIT.B5=1; // CLK
-  PORTC.PCR.BIT.B6=1; // MOSI
-  PORTC.PCR.BIT.B7=1; // MISO
-#endif
-  
+    
   /* RSPI B */
   PORTE.PMR.BIT.B1=0; // CLK
   PORTE.PMR.BIT.B4=0; // CS
   PORTE.PMR.BIT.B6=0; // MOSI
   PORTE.PMR.BIT.B7=0; // MISO
-
-#if 0
-  /* enable pullups */
-  PORTE.PCR.BIT.B1=1; // CLK
-  PORTE.PCR.BIT.B4=1; // CS
-  PORTE.PCR.BIT.B6=1; // MOSI
-  PORTE.PCR.BIT.B7=1; // MISO
-#endif
   
   /* Disable MPC register protection */
   MPC.PWPR.BIT.B0WI = 0; // Enable writing to PFSWE bit
@@ -280,6 +258,7 @@ void Init_SPI(void) {
   /* Configure SPI to operate in 4-wire mode. CONFUSING! This is not MOSI-MISO on same wire!  */
   RSPI0.SPCR.BIT.SPMS = 0;
   RSPI1.SPCR.BIT.SPMS = 0;
+
   /* Full duplex mode */
   RSPI0.SPCR.BIT.TXMD = 0;
   RSPI1.SPCR.BIT.TXMD = 0;
@@ -303,16 +282,6 @@ void Init_SPI(void) {
   RSPI0.SPCR.BIT.SPRIE = 0;
   RSPI1.SPCR.BIT.SPRIE = 0;
   
-  /* Enable receive interrupt for both channels */
-//  ICU.IER[4].BIT.IEN7 = 1;
-//  ICU.IER[5].BIT.IEN2 = 1;
-//  RSPI1.SPCR.BIT.SPRIE = 1;
-//  RSPI0.SPCR.BIT.SPRIE = 1;
-  
-  /* Set receive interrupt priority for both channels */
-//  ICU.IPR[39].BYTE = 5u;
-//  ICU.IPR[42].BYTE = 6u;
-
   /* Empty the transmit buffer for both channels */
   RSPI0.SPDR.LONG = 0x00000000;
   RSPI1.SPDR.LONG = 0x00000000;
@@ -321,28 +290,6 @@ void Init_SPI(void) {
   RSPI0.SPCR.BIT.SPE = 1;
   RSPI1.SPCR.BIT.SPE = 1;
 }
-
-#if 0
-void MasterSend_SPI(uint16_t num_bytes, uint8_t * message) {
-    /* Load message byte into transmit container variable */
-    uint8_t tx_byte = 0x55;
-    
-    /* Write to data register */
-    RSPI1.SPDR.LONG = (uint32_t) 0xA5000000 | (tx_byte << 16);
-    
-    /* Wait until transmission is complete */
-    while(RSPI1.SPSR.BIT.IDLNF);
-    
-    /* Increment loop counter */
-  
-    /* Send a dummy transmission to receive the final byte from the slave */
-    RSPI1.SPDR.LONG = 0xA3000000;
-  
-    /* Wait until transmission is complete */
-    while(RSPI1.SPSR.BIT.IDLNF);
-  
-}
-#endif
 
 /*******************************************************************************
 * Outline     : Excep_RSPI0_SPRI0

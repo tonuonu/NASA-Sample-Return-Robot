@@ -72,20 +72,20 @@
         <option>
           <name>GenLibInFormatter</name>
           <version>1</version>
-          <state>1</state>
+          <state>2</state>
         </option>
         <option>
           <name>GenLibInFormatterDescription</name>
-          <state>Full formatting.</state>
+          <state>Full formatting, without multibyte support.</state>
         </option>
         <option>
           <name>GenLibOutFormatter</name>
           <version>1</version>
-          <state>1</state>
+          <state>2</state>
         </option>
         <option>
           <name>GenLibOutFormatterDescription</name>
-          <state>Full formatting.</state>
+          <state>Full formatting, without multibyte support.</state>
         </option>
         <option>
           <name>GeneralEnableMisra</name>

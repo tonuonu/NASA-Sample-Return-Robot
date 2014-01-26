@@ -58,6 +58,7 @@
 #define MPUREG_INT_ENABLE           0x38
 #define MPUREG_USER_CTRL            0x6A
 #define MPUREG_PWR_MGMT_1           0x6B
+#define MPUREG_PWR_MGMT_2           0x6C
 #define MPUREG_WHOAMI               0x75
 
 #define MPUREG_TEMP_OUT             0x41
