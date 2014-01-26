@@ -83,7 +83,7 @@ sendspi32(uint8_t cmd) {
 }
 #endif
 
-//extern volatile bool mems_realtime;
+extern volatile bool mems_realtime;
 
 void 
 read_gyro(void) {
@@ -110,6 +110,20 @@ read_gyro(void) {
         sendspi24(MPUREG_ACCEL_ZOUT | 0x80 /* read bit*/);
         accel0[2]=(int16_t)RSPI0.SPDR.LONG ; 
         accel1[2]=(int16_t)RSPI1.SPDR.LONG ;
+        
+        if(mems_realtime==true) {
+                char buf[128];
+                snprintf(buf,sizeof(buf),"g:" 
+                          "%x %x %x "
+                          "%x %x %x "
+                          "%x %x %x "
+                          "%x %x %x \r\n",
+                          gyro0[0],gyro0[1],gyro0[2],
+                          gyro1[0],gyro1[1],gyro1[2],
+                          accel0[0],accel0[1],accel0[2],
+                          accel1[0],accel1[1],accel1[2]);
+                USBCDC_Write_Async(strlen((char*)buf), (uint8_t*)buf, CBDoneWrite);
+        }
 }
 
 void
