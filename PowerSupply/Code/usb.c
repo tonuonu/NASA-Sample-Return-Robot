@@ -199,7 +199,7 @@ LED2=LED_ON;
     g_pBuffEmpty = g_Buffer2;
     g_pBuffFull = g_Buffer1;
   }
-  logerror((char *) g_pBuffFull);
+  //logerror((char *) g_pBuffFull);
       
   /* Echo what was read back */
   if(USB_ERR_OK == _err) {

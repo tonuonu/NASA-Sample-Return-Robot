@@ -45,8 +45,13 @@ void
 shell(uint32_t _NumBytes, const uint8_t* _Buffer) {
     strncat((char *)shellbuf,(char *)_Buffer,_NumBytes);
     char * enter=strchr((char *)shellbuf,13); // search for "Enter"
+    char * ctrlc=strchr((char *)shellbuf,3); // search for "Ctrl-C"
     char * error="";
-    if(enter) {
+    if(ctrlc) {
+      mems_realtime=false;
+      *ctrlc=0;
+      shellbuf[0]=0;
+    } else if(enter) {
         char pnferr[80];
         *enter=0;
         logerror((char *)shellbuf);

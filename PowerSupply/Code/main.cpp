@@ -108,22 +108,27 @@ int main() {
 
             } 
 
+#if 0
             if(mems_realtime==true) {
-                char buf[80];
-                LED1=LED_ON;
-                LED2=LED_ON;
-                LED3=LED_ON;
-                sprintf(buf,"g:%x %x %x %x %x %x %x %x %x %x %x %x \r\n",gyro0[0],gyro0[1],gyro0[2],gyro1[0],gyro1[1],gyro1[2]
-                        ,accel0[0],accel0[1],accel0[2],accel1[0],accel1[1],accel1[2]);
-                //USBCDC_WriteString("\r\nx\r\n");
-                LED4=LED_ON;
+                char buf[128];
+                snprintf(buf,sizeof(buf),"g:" 
+                          "%x %x %x "
+                          "%x %x %x "
+                          "%x %x %x "
+                          "%x %x %x \r\n",
+                          gyro0[0],gyro0[1],gyro0[2],
+                          gyro1[0],gyro1[1],gyro1[2],
+                          accel0[0],accel0[1],accel0[2],
+                          accel1[0],accel1[1],accel1[2]);
                 USBCDC_Write_Async(strlen((char*)buf), (uint8_t*)buf, CBDoneWrite);
-            } else {
+            }
+#endif
+            //else {
                 LED0=LED_ON;
                 /*Start a Read*/
                 USBCDC_Read_Async(BUFFER_SIZE, g_pBuffEmpty, CBDoneRead);
                 /*This continues in the CBDoneRead function...*/
-            }
+//            }
         } else {
             done=false;
             mems_realtime=false;
