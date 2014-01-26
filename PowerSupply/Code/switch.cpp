@@ -170,10 +170,10 @@ __interrupt void Excep_IRQ0(void) {
     
         /* Set global switch flag to indicate SW4 press complete */
         gSwitchFlag |= SWITCHPRESS_4;
-LED3=LED_OFF;
+//LED3=LED_OFF;
         /* Check if switch release callback function is not NULL */
         if(gSwitchReleaseCallbackFunc) {
-LED6=LED_ON;
+//LED6=LED_ON;
             /* Execute user callback function */
             gSwitchReleaseCallbackFunc();
         }
@@ -209,7 +209,7 @@ __interrupt void Excep_IRQ1(void) {
     
         /* Set global switch flag to indicate SW3 press complete */
         gSwitchFlag |= SWITCHPRESS_3;
-LED2=LED_OFF;
+//LED2=LED_OFF;
         /* Check if switch release callback function is not NULL */
         if(gSwitchReleaseCallbackFunc) {
             /* Execute user callback function */
@@ -247,7 +247,7 @@ __interrupt void Excep_IRQ2(void) {
     
         /* Set global switch flag to indicate SW2 press complete */
         gSwitchFlag |= SWITCHPRESS_2;
-LED1=LED_OFF;  
+//LED1=LED_OFF;  
         /* Check if switch release callback function is not NULL */
         if(gSwitchReleaseCallbackFunc) {
             /* Execute user callback function */
@@ -285,7 +285,6 @@ __interrupt void Excep_IRQ3(void) {
     
         /* Set global switch flag to indicate SW1 press complete */
         gSwitchFlag |= SWITCHPRESS_1;
-LED0=LED_OFF;  
         /* Check if switch release callback function is not NULL */
         if(gSwitchReleaseCallbackFunc) {
             /* Execute user callback function */
@@ -354,7 +353,6 @@ __interrupt void Excep_CMTU0_CMT0(void) {
             /* Increment detected switch faults counter */
             gSwitchFaultsDetected++;
         } else { /* Switch 4 pin level is low (valid switch press) */
-LED3=LED_ON;
             /* Check if switch press callback function is not NULL */
             if(gSwitchPressCallbackFunc) {
                 /* Execute user callback function */
@@ -377,7 +375,6 @@ LED3=LED_ON;
             /* Increment detected switch faults counter */
             gSwitchFaultsDetected++;
         } else { /* Switch 3 pin level is low (valid switch press) */
-LED2=LED_ON;
             if(mode != MAX_MODE) {
                 mode++;
                 mode_just_changed=1;
@@ -404,7 +401,6 @@ LED2=LED_ON;
             /* Increment detected switch faults counter */
             gSwitchFaultsDetected++;
         } else { /* Switch 2 pin level is low (valid switch press) */
-LED1=LED_ON;
             if(mode!=1) {
                 mode--; 
                 mode_just_changed=1;
@@ -431,7 +427,6 @@ LED1=LED_ON;
             /* Increment detected switch faults counter */
             gSwitchFaultsDetected++;
         } else { /* Switch 1 pin level is low (valid switch press) */
-LED0=LED_ON;
             /* Check if switch press callback function is not NULL */
             if(gSwitchPressCallbackFunc) {
                 /* Execute user callback function */

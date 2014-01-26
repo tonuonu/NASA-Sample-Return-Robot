@@ -391,7 +391,7 @@
         </option>
         <option>
           <name>NoSizeConstraints</name>
-          <state>0</state>
+          <state>1</state>
         </option>
       </data>
     </settings>

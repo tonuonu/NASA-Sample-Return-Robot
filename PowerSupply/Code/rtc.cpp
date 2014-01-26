@@ -385,17 +385,8 @@ void readstime(char *buf) {
     );
 }
 
-/*******************************************************************************
-* Outline     : CB_1HZ_RTC
-* Description   : RTC periodic interrupt handler generated every 1 sec. It is 
-*          used to update the time on the debug OLED. It read the RTC 
-*          register values and converts them into a string before 
-*          displaying on the OLED.
-* Argument    : none
-* Return value  : none
-*******************************************************************************/
-#pragma vector=VECT_RTC_PRD
-__interrupt void Excep_RTC_SLEEP(void) {
+void
+refresh(void) {
 
     if(mode_just_changed) {
         OLED_Fill_RAM(0x00); // clear screen
@@ -413,6 +404,21 @@ __interrupt void Excep_RTC_SLEEP(void) {
         mode_e_gyro();
         break;
     }      
+  
+}
+
+/*******************************************************************************
+* Outline     : CB_1HZ_RTC
+* Description   : RTC periodic interrupt handler generated every 1 sec. It is 
+*          used to update the time on the debug OLED. It read the RTC 
+*          register values and converts them into a string before 
+*          displaying on the OLED.
+* Argument    : none
+* Return value  : none
+*******************************************************************************/
+#pragma vector=VECT_RTC_PRD
+__interrupt void Excep_RTC_SLEEP(void) {
+    refresh();
     char buf[SCREENWIDTH+1];
     readtime(buf);
     OLED_Show_String(  1,buf, 0, 7*8);

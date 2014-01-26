@@ -21,6 +21,12 @@
 
 #include "spi.h"
 #include "iorx630.h"
+#include "stdio.h"
+#include "stdbool.h"
+#include "string.h"
+#include "usb_hal.h"
+#include "usb.h"
+#include "usb_cdc.h"
 
 
 volatile int16_t  gyro0[3] = {0,0,0};
@@ -73,6 +79,7 @@ sendspi32(uint8_t cmd) {
     while(RSPI0.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
     while(RSPI1.SPSR.BIT.IDLNF); /* Wait until transmission is complete */
 }
+extern volatile bool mems_realtime;
 
 void read_gyro(void) {
         sendspi24(MPUREG_GYRO_XOUT | 0x80 /* read bit*/);
@@ -98,6 +105,7 @@ void read_gyro(void) {
         sendspi24(MPUREG_ACCEL_ZOUT | 0x80 /* read bit*/);
         accel0[2]=(int16_t)RSPI0.SPDR.LONG ; 
         accel1[2]=(int16_t)RSPI1.SPDR.LONG ; 
+        
 }
 
 void

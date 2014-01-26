@@ -34,6 +34,7 @@
 #include "low_voltage_detection.h"
 #include "rskrx630def.h"
 #include "iorx630.h"
+#include "stdbool.h"
 
 
 /* Dclare a variable to hold the periodic delay specified */

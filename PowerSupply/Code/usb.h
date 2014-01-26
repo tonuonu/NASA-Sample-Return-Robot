@@ -43,6 +43,9 @@ extern uint8_t g_Buffer2[BUFFER_SIZE];
 extern uint8_t* g_pBuffEmpty ;
 extern uint8_t* g_pBuffFull ;
 
+/*Delay between cable connecting and starting and starting repeating message.
+This allows enumeration to complete before we try and communicate.*/
+#define DELAY_VALUE_INITIAL 0x01000000UL
 
 
 /********************************************************************************
@@ -50,7 +53,7 @@ Function Prototypes
 ********************************************************************************/
 //void USB_CDC_APP_Main(void);
 void CBDoneRead(USB_ERR _err, uint32_t _NumBytes);
-
+void CBDoneWrite(USB_ERR _err);
 /* End of multiple inclusion prevention macro */
 #endif
 

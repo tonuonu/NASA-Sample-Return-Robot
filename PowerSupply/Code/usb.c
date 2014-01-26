@@ -30,21 +30,16 @@
 #include "usb_hal.h"
 #include "usb_cdc.h"
 #include "usb.h"
+#include "log.h"
+#include "rskrx630def.h"
 
-/***********************************************************************************
-Defines
-***********************************************************************************/
-/*Delay between cable connecting and starting and starting repeating message.
-This allows enumeration to complete before we try and communicate.*/
-#define DELAY_VALUE_INITIAL 0x01000000UL
+
 
 /*Delay between repeating initial message*/
 #define DELAY_VALUE 0x00500000UL
 
-
-
 /*Flags*/
-static volatile bool g_bEcho = false;
+//static volatile bool g_bEcho = false;
 
 /*Data Buffers*/
 uint8_t g_Buffer1[BUFFER_SIZE];
@@ -191,7 +186,8 @@ void USB_CDC_APP_Main(void)
 ***********************************************************************************/
 void 
 CBDoneRead(USB_ERR _err, uint32_t _NumBytes) {  
-  /*Toggle buffers - as now the empty buffer has been filled
+LED2=LED_ON;  
+/*Toggle buffers - as now the empty buffer has been filled
   by this read completing*/
   if(g_pBuffEmpty == g_Buffer2)
   {
@@ -204,17 +200,14 @@ CBDoneRead(USB_ERR _err, uint32_t _NumBytes) {
     g_pBuffFull = g_Buffer1;
   }
   logerror((char *) g_pBuffFull);
-  //if(true == g_bEcho)
-  {
-    /*Setup another read*/
-    USBCDC_Read_Async(BUFFER_SIZE, g_pBuffEmpty, CBDoneRead);
       
-    /*Echo what was read back*/
-    if(USB_ERR_OK == _err) {
-         shell(_NumBytes, g_pBuffFull);
-   //   USBCDC_Write_Async(_NumBytes, g_pBuffFull, CBDoneWrite);
-    }
+  /* Echo what was read back */
+  if(USB_ERR_OK == _err) {
+      LED3=LED_ON;
+      shell(_NumBytes, g_pBuffFull);
   }
+  /*Setup another read*/
+  USBCDC_Read_Async(BUFFER_SIZE, g_pBuffEmpty, CBDoneRead);
 }
 
 
@@ -225,18 +218,16 @@ CBDoneRead(USB_ERR _err, uint32_t _NumBytes) {
 * Argument    : none
 * Return value  : none
 ***********************************************************************************/
-#if 0
-static void CBDoneWrite(USB_ERR _err)
+void CBDoneWrite(USB_ERR _err)
 {
   assert(USB_ERR_OK == _err);
   /*Write has completed*/
   /*Nothing to do*/
 }
-#endif
 
 
 #if 0
-static void InitialiseData(void)
+void InitialiseData(void)
 {
   g_bEcho = false;
   gSwitchFlag = 0;

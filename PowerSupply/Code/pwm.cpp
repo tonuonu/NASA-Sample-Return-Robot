@@ -364,7 +364,7 @@ void Init_PWM(void) {
 *******************************************************************************/
 void CB_Switch_Press(void) {  
 //  uint32_t calc_duty_percent = 0;
-LED4=LED_ON;
+//LED4=LED_ON;
 #if 0  
   /* Has switch SW1 been pressed and LCD clearance allowed? */
   if(!(gSwitchFlag & SWITCHPRESS_1)) {  

@@ -582,16 +582,6 @@ OLED_Set_Linear_Gray_Scale_Table() {
 
 void
 Init_OLED() {
-/*  
-    LED0 = LED_ON;
-    LED1 = LED_ON;
-    LED2 = LED_ON;
-    LED3 = LED_ON;
-    LED4 = LED_ON;
-    LED5 = LED_ON;
-    LED6 = LED_ON;
-    LED7 = LED_ON;
-*/
   
     OLED_DC_PORT_DIR=1;
     OLED_CS_PORT_DIR=1;

@@ -51,6 +51,7 @@ Function Prototypes
 ******************************************************************************/
 USB_ERR USBCDC_Init(void);
 bool USBCDC_IsConnected(void);
+bool USBCDC_IsBusy(void);
 USB_ERR USBCDC_WriteString(const char* const _sz);
 USB_ERR USBCDC_PutChar(uint8_t _Char);
 USB_ERR USBCDC_GetChar(uint8_t* _pChar);

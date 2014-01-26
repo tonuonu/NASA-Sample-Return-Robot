@@ -29,6 +29,9 @@
 #include "usb_cdc.h"
 #include "usb.h"
 #include "log.h"
+#include "shell.h"
+#include "string.h"
+#include "stdio.h"
 #include "adc12repeat.h"
 #include "low_voltage_detection.h"
 #include "interrupt-main.h"
@@ -38,6 +41,7 @@
 #define ENABLE_PWR                  PORT1.PODR.BIT.B2
 #define ENABLE_PWR_DIR              PORT1.PDR.BIT.B2
 
+extern volatile bool mems_realtime;
 int main() {
     BAT0_EN = MAX1614_OFF; // Make sure battery inputs are NOT enabled here.
     BAT1_EN = MAX1614_OFF; // They may have problems like low voltage, high voltage etc.,  
@@ -89,20 +93,40 @@ int main() {
     __delay_cycles(96UL*2000UL); // 2000us delay    
     OLED_Fill_RAM(0x00);				   // Clear Screen
     while(1) {
-        // __wait_for_interrupt();
+        __wait_for_interrupt();
         static bool done=false;
         if(USBCDC_IsConnected()) {
-            LED6=LED_ON;
+            volatile uint32_t DelayPreWrite = DELAY_VALUE_INITIAL;
+
+            /*
+             * Wait for enmeration to happen before starting to send data
+             */
             if(!done) {
                 done=true;
+                while(0 != DelayPreWrite){DelayPreWrite--;}
                 USBCDC_WriteString("\r\nRobot!\r\n");
+
+            } 
+
+            if(mems_realtime==true) {
+                char buf[80];
+                LED1=LED_ON;
+                LED2=LED_ON;
+                LED3=LED_ON;
+                sprintf(buf,"g:%x %x %x %x %x %x %x %x %x %x %x %x \r\n",gyro0[0],gyro0[1],gyro0[2],gyro1[0],gyro1[1],gyro1[2]
+                        ,accel0[0],accel0[1],accel0[2],accel1[0],accel1[1],accel1[2]);
+                //USBCDC_WriteString("\r\nx\r\n");
+                LED4=LED_ON;
+                USBCDC_Write_Async(strlen((char*)buf), (uint8_t*)buf, CBDoneWrite);
+            } else {
+                LED0=LED_ON;
                 /*Start a Read*/
                 USBCDC_Read_Async(BUFFER_SIZE, g_pBuffEmpty, CBDoneRead);
                 /*This continues in the CBDoneRead function...*/
             }
         } else {
-            LED6=LED_OFF;
             done=false;
+            mems_realtime=false;
         }
         
     }
