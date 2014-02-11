@@ -76,7 +76,7 @@ SPI2_Init(void) {
 
     u6smr4 = 0x00;
 
-    DISABLE_IRQ
+    __disable_interrupt();
     /* 
      * Lowest interrupt priority
      * we do not care about speed
@@ -85,5 +85,5 @@ SPI2_Init(void) {
     ir_s6ric   =0;            
     ilvl_s6tic =0;
     ir_s6tic   =0;            
-    ENABLE_IRQ
+    __enable_interrupt();
 }

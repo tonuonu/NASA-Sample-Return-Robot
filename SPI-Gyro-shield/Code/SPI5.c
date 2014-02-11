@@ -25,19 +25,17 @@
 #include "main.h"
 #include "SPI.h"
 
-unsigned char tmp_speed;
-unsigned char tmp_target_acceleration;
-unsigned char tmp_ticks;
+static unsigned char tmp_speed;
+static unsigned char tmp_acceleration;
+static volatile signed short int ticks;
+static volatile unsigned char recv_buf_ardu;
+static volatile unsigned char command=CMD_NONE;
+static union u16 ticks_u = {0,0};
 
-volatile unsigned char speed[2]={0,0};
-volatile unsigned char target_acceleration[2]={0,0};
-union u16 ticks_u = {0,0};
-
-volatile signed short int ticks;
-volatile unsigned char recv_buf_ardu;
 volatile unsigned char recv_bytenum=0;
-volatile unsigned char command=CMD_NONE;
 volatile unsigned char fpga_in=FPGA_EMPTY;
+volatile unsigned char speed[2]={0,0};
+volatile unsigned char acceleration[2]={0,0};
 
 #if 1
 __fast_interrupt void _uart5_receive(void) {
@@ -63,9 +61,9 @@ LED4=0;
 LED1=1;
             command=recv_buf_ardu & 0xFC;
             switch(command) {
-            case CMD_STEADY_SPEED:
+            case CMD_SPEED:
                 break;
-            case CMD_TARGET_ACCELERATION:
+            case CMD_ACCELERATION:
                 break;
             case CMD_GET_CUR_TARGET_SPEED:
                 break;
@@ -78,11 +76,11 @@ LED1=0;
         case 1:
 LED2=1;
             switch(command) {
-            case CMD_STEADY_SPEED:
+            case CMD_SPEED:
                 tmp_speed=recv_buf_ardu;
                 break;
-            case CMD_TARGET_ACCELERATION:
-                tmp_target_acceleration=recv_buf_ardu;
+            case CMD_ACCELERATION:
+                tmp_acceleration=recv_buf_ardu;
                 break;
             case CMD_GET_CUR_TARGET_SPEED:
                 /* ? */
@@ -96,13 +94,13 @@ LED2=0;
         case 2:
 LED3=1;
             switch(command) {
-            case CMD_STEADY_SPEED:
+            case CMD_SPEED:
                 speed[0]=tmp_speed ;
                 speed[1]=recv_buf_ardu;
                 break;
-            case CMD_TARGET_ACCELERATION:
-                target_acceleration[0]=tmp_target_acceleration;
-                target_acceleration[1]=recv_buf_ardu;
+            case CMD_ACCELERATION:
+                acceleration[0]=tmp_acceleration;
+                acceleration[1]=recv_buf_ardu;
                 break;
             case CMD_GET_CUR_TARGET_SPEED:
                 /* ? */
@@ -189,7 +187,7 @@ SPI5_Init(void) {
 
     u5smr4 = 0x00;
 
-    DISABLE_IRQ
+    __disable_interrupt();
     /* 
      * Middle interrupt priority
      */
@@ -204,6 +202,6 @@ SPI5_Init(void) {
     ir_s5ric   =0;            
     ilvl_s5tic =4;
     ir_s5tic   =0;            
-    ENABLE_IRQ
+    __enable_interrupt();
 }
 

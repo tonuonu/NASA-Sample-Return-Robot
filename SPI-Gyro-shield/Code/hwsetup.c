@@ -128,22 +128,13 @@ HardwareSetup(void) {
     /* 
      * Configures CPU clock 
      */
-    DISABLE_IRQ;
+    __disable_interrupt();
     ConfigureOperatingFrequency(1);
-    ENABLE_IRQ;
+    __enable_interrupt();
     pu26=1; // Just to make sure unused P9_1 and P9_3 are not floating
     Led_Init();
-    MotorIO_Init(); // Reset and DONE pins. SPI is separate
-    //Heartbeat_Init();
-    
-    ifsr00=1; // INT0 in both edges. RESET input from Atmega2560 for motors
-    ifsr02=1; // INT2 in both edges. CS pin for us
-    pol_int0ic  = 0; // This should be 0, "falling edge" to make both edges work
-    pol_int2ic  = 0; // This should be 0, "falling edge" to make both edges work
-    ilvl_int0ic = 6; // level 6 int, very high
-    ilvl_int2ic = 6; // level 6 int, very high
-    lvs_int0ic  = 0; // edge sensitive
-    lvs_int2ic  = 0; // edge sensitive
+    MotorIO_Init(); // Configure RESET and DONE pins. SPI conf is elsewhere
+    Int_Init(); // Configure INT0 and INT2 interrupts
 
     /* Four motor ports, masters */
     SPI0_Init(); 

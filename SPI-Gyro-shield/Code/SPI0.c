@@ -77,7 +77,7 @@ SPI0_Init(void) {
 
     u0smr4 = 0x00;
 
-    DISABLE_IRQ
+    __disable_interrupt();
     /* 
      * Lowest interrupt priority
      * we do not care about speed
@@ -86,7 +86,7 @@ SPI0_Init(void) {
     ir_s0ric   =0;
     ilvl_s0tic =0;
     ir_s0tic   =0;
-    ENABLE_IRQ
+    __enable_interrupt();
 }
 
 

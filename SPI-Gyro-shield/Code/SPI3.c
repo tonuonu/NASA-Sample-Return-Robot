@@ -78,7 +78,7 @@ SPI3_Init(void) {
 
     u3smr4 = 0x00;
 
-    DISABLE_IRQ
+    __disable_interrupt();
     /* 
      * Lowest interrupt priority
      * we do not care about speed
@@ -87,7 +87,7 @@ SPI3_Init(void) {
     ir_s3ric   =0;            
     ilvl_s3tic =0;
     ir_s3tic   =0;            
-    ENABLE_IRQ
+    __enable_interrupt();
 }
 
 

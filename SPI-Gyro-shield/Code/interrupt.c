@@ -27,7 +27,17 @@
 #include "hwsetup.h"
 #include "intrinsics.h"
 
-extern volatile unsigned char recv_bytenum;
+void
+Int_Init(void) {
+    ifsr00=1; // INT0 in both edges. RESET input from Atmega2560 for motors
+    ifsr02=1; // INT2 in both edges. CS pin for us
+    pol_int0ic  = 0; // This should be 0, "falling edge" to make both edges work
+    pol_int2ic  = 0; // This should be 0, "falling edge" to make both edges work
+    ilvl_int0ic = 6; // level 6 int, very high
+    ilvl_int2ic = 6; // level 6 int, very high
+    lvs_int0ic  = 0; // edge sensitive
+    lvs_int2ic  = 0; // edge sensitive
+}
 
 #pragma vector = INT0 // RESET pin is connected here
 __interrupt void _int0(void) {
