@@ -132,59 +132,6 @@ __interrupt void _uart5_transmit(void) {
 }
 
 
-#pragma vector = INT0 // RESET pin is connected here
-__interrupt void _int0(void) {
-   recv_bytenum=0;
-   
-   if(RESET5==1) {
-       /* If reset just came up but CS is already low,
-        * FPGA code will be loaded in. 
-        */
-       if(CS5==0) {
-           LED5 = 1;
-           fpga_in=FPGA_LOADING;       
-       }
-   } else { // RESET is LOW, flush everything
-       fpga_in=FPGA_EMPTY;
-   }
-
-    // Copy RESET5 pin to all four motor outputs
-    RESET0=RESET1=RESET2=RESET3 = RESET5;
-    /* Clear the interrupt flag. */
-    ir_int0ic = 0;
-}
-
-#pragma vector = INT2 // CS pin is connected here
-__interrupt void _int2(void) {
-    recv_bytenum=0;
-
-    /*
-     * TXEPT (TX buffer EmPTy)
-     * 0: Data held in the transmit shift
-     * register (transmission in progress)
-     * 1: No data held in the transmit shift
-     * register (transmission completed)
-     */
-    while(txept_u0c0 == 0);
-    while(txept_u6c0 == 0);
-    while(txept_u3c0 == 0);
-    while(txept_u4c0 == 0);
-
-    if(fpga_in != FPGA_LOADED) {
-        // Copy CS5 pin to all four motor outputs
-        CS0=CS6=CS3=CS4 = CS5;
-    }
- 
-    
-    /* If we load FPGA bytes in and then CS goes up, code is loaded */
-    if(fpga_in==FPGA_LOADING && CS5==1) {
-        LED5 = 0;
-        fpga_in=FPGA_LOADED;
-    }
-
-    /* Clear the interrupt flag. */
-    ir_int2ic = 0;
-}
 
 void
 SPI5_Init(void) {

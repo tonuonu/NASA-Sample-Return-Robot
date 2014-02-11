@@ -52,7 +52,6 @@ set_steady_speed(unsigned char motor_idx) {
     u0tb=u6tb=u3tb=u4tb=steady_speed[0];
     complete_tx();
     
-    //    u0tb=u6tb=u3tb=u4tb=100;
     u0tb=u6tb=u3tb=u4tb=steady_speed[1];
     complete_tx();
 
