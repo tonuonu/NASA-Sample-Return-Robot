@@ -137,10 +137,10 @@ HardwareSetup(void) {
     Int_Init(); // Configure INT0 and INT2 interrupts
 
     /* Four motor ports, masters */
-    SPI0_Init(); 
-    SPI2_Init(); 
-    SPI3_Init(); 
+    SPI0_Init();
+    SPI3_Init();
     SPI4_Init();
+    SPI6_Init();
 
     /* Interface to Arduino, slave */
     SPI5_Init();

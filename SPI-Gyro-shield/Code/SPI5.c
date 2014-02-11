@@ -37,13 +37,7 @@ volatile unsigned char fpga_in=FPGA_EMPTY;
 volatile unsigned char speed[2]={0,0};
 volatile unsigned char acceleration[2]={0,0};
 
-#if 1
-__fast_interrupt void _uart5_receive(void) {
-#else
-#pragma vector = UART5_RX
-__interrupt void _uart5_receive(void) {
-#endif
-    
+__fast_interrupt void _uart5_receive(void) {    
     recv_buf_ardu=u5rb & 0xff;
     
     /* Process this only if FPGA is loaded */
@@ -133,12 +127,6 @@ LED3=0;
     ir_s5ric = 0;
 }
 
-#pragma vector = UART5_TX
-__interrupt void _uart5_transmit(void) {
-    /* Clear the 'reception complete' flag.	*/
-    ir_s5tic = 0;
-}
-
 void
 SPI5_Init(void) {
     pu27=1; // Enable pullup to avoid floating pin noise on p7_7 (clock)
@@ -189,18 +177,14 @@ SPI5_Init(void) {
 
     __disable_interrupt();
     /* 
-     * Middle interrupt priority
+     * Fastest interrupt priority
      */
-#if 1
     fsit_ripl1 = 1;
     fsit_ripl2 = 1;
     __set_VCT_register((unsigned long)&_uart5_receive);
     ilvl_s5ric =7; // fast interrupt
-#else
-    ilvl_s5ric =5; 
-#endif
     ir_s5ric   =0;            
-    ilvl_s5tic =4;
+    ilvl_s5tic =0;
     ir_s5tic   =0;            
     __enable_interrupt();
 }

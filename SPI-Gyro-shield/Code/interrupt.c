@@ -44,7 +44,8 @@ __interrupt void _int0(void) {
     recv_bytenum=0;
    
     if(RESET5==1) {
-        /* If reset just came up but CS is already low,
+        /* 
+         * If reset just came up but CS is already low,
          * FPGA code will be loaded in. 
          */
         if(CS5==0) {
@@ -73,15 +74,14 @@ __interrupt void _int2(void) {
      * register (transmission completed)
      */
     while(txept_u0c0 == 0);
-    while(txept_u6c0 == 0);
     while(txept_u3c0 == 0);
     while(txept_u4c0 == 0);
+    while(txept_u6c0 == 0);
 
     if(fpga_in != FPGA_LOADED) {
         // Copy CS5 pin to all four motor outputs
-        CS0=CS6=CS3=CS4 = CS5;
+        CS0=CS3=CS4=CS6 = CS5;
     }
- 
     
     /* If we load FPGA bytes in and then CS goes up, code is loaded */
     if(fpga_in==FPGA_LOADING && CS5==1) {

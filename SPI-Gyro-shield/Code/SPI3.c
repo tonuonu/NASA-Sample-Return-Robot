@@ -80,8 +80,7 @@ SPI3_Init(void) {
 
     __disable_interrupt();
     /* 
-     * Lowest interrupt priority
-     * we do not care about speed
+     * No interrupts
      */
     ilvl_s3ric =0;
     ir_s3ric   =0;            

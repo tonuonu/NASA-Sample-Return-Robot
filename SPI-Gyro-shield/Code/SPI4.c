@@ -86,8 +86,7 @@ SPI4_Init(void) {
 
     __disable_interrupt();
     /* 
-     * Lowest interrupt priority
-     * we do not care about speed
+     * No interrupts
      */
     ilvl_s4ric =0;
     ir_s4ric   =0;            

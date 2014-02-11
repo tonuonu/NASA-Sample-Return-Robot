@@ -79,8 +79,7 @@ SPI0_Init(void) {
 
     __disable_interrupt();
     /* 
-     * Lowest interrupt priority
-     * we do not care about speed
+     * No interrupts
      */
     ilvl_s0ric =0;
     ir_s0ric   =0;

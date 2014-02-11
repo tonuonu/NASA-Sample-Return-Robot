@@ -26,7 +26,7 @@
 #include "SPI.h"
 
 void
-SPI2_Init(void) {
+SPI6_Init(void) {
     u6brg =  (unsigned char)(((base_freq)/(1*MOTORS_SPI_SPEED))-1);
     CS6d = PD_OUTPUT;
     CS6=1;
@@ -78,8 +78,7 @@ SPI2_Init(void) {
 
     __disable_interrupt();
     /* 
-     * Lowest interrupt priority
-     * we do not care about speed
+     * No interrupts
      */
     ilvl_s6ric =0;
     ir_s6ric   =0;            

@@ -23,9 +23,9 @@
 
 /* Four motor ports */
 void SPI0_Init(void); 
-void SPI2_Init(void); 
 void SPI3_Init(void); 
-void SPI4_Init(void);
+void SPI4_Init(void); 
+void SPI6_Init(void);
 
 /* Interface to Arduino */
 void SPI5_Init(void);
