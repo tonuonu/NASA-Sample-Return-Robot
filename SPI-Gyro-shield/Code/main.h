@@ -22,6 +22,21 @@
 #include "intrinsics.h"
 void Int_Init(void);
 
+static inline void 
+complete_tx(void) {
+    /*
+     * TXEPT (TX buffer EmPTy)
+     * 0: Data held in the transmit shift
+     * register (transmission in progress)
+     * 1: No data held in the transmit shift
+     * register (transmission completed)
+     */
+    while((txept_u0c0 == 0) ||
+          (txept_u3c0 == 0) ||
+          (txept_u4c0 == 0) ||
+          (txept_u6c0 == 0));
+}
+
 /*
  * This union is used in every context where we need to receive two separate 
  * bytes into single short int (16 bit signed)

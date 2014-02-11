@@ -36,22 +36,6 @@ short int recv_buf_u3=0;
 short int recv_buf_u4=0;
 short int recv_buf_u6=0;
 
-
-static void 
-complete_tx(void) {
-    /*
-     * TXEPT (TX buffer EmPTy)
-     * 0: Data held in the transmit shift
-     * register (transmission in progress)
-     * 1: No data held in the transmit shift
-     * register (transmission completed)
-     */
-    while((txept_u0c0 == 0) ||
-          (txept_u3c0 == 0) ||
-          (txept_u4c0 == 0) ||
-          (txept_u6c0 == 0));
-}
-
 static void 
 set_acceleration(unsigned char motor_idx) {
     complete_tx();

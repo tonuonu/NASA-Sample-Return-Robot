@@ -65,18 +65,8 @@ __interrupt void _int0(void) {
 #pragma vector = INT2 // CS pin is connected here
 __interrupt void _int2(void) {
     recv_bytenum=0;
-
-    /*
-     * TXEPT (TX buffer EmPTy)
-     * 0: Data held in the transmit shift
-     * register (transmission in progress)
-     * 1: No data held in the transmit shift
-     * register (transmission completed)
-     */
-    while(txept_u0c0 == 0);
-    while(txept_u3c0 == 0);
-    while(txept_u4c0 == 0);
-    while(txept_u6c0 == 0);
+    
+    complete_tx();
 
     if(fpga_in != FPGA_LOADED) {
         // Copy CS5 pin to all four motor outputs
