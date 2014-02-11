@@ -32,7 +32,6 @@ volatile unsigned char steady_speed[2]={0,0};
 volatile unsigned char target_acceleration[2]={0,0};
 
 volatile unsigned char recv_buf;
-//volatile unsigned char recv_flag=0;
 volatile unsigned char recv_bytenum=0;
 volatile unsigned char command=CMD_NONE;
 volatile unsigned char fpga_in=FPGA_EMPTY;
@@ -135,8 +134,6 @@ __interrupt void _uart5_transmit(void) {
 
 #pragma vector = INT0 // RESET pin is connected here
 __interrupt void _int0(void) {
-//   LED1 ^= 1;
-   //recv_flag = 0; // clear any receive buffers
    recv_bytenum=0;
    
    if(RESET5==1) {
@@ -159,7 +156,6 @@ __interrupt void _int0(void) {
 
 #pragma vector = INT2 // CS pin is connected here
 __interrupt void _int2(void) {
-    //recv_flag = 0; // clear any receive buffers
     recv_bytenum=0;
 
     /*
@@ -192,14 +188,6 @@ __interrupt void _int2(void) {
 
 void
 SPI5_Init(void) {
-    // u5brg =  (unsigned char)(((base_freq)/(1*MOTORS_SPI_SPEED))-1);
-    // u5brg does not matter because clock is external
-  
-  //CS5d = PD_OUTPUT; Input!!
-    //CS5=1;
-    //CLOCK5d = PD_OUTPUT;
-    
-    //p7_1 (miso) has hardware pullup on board;
     pu27=1; // Enable pullup to avoid floating pin noise on p7_7 (clock)
     CLOCK5s = PF_UART;
     TX5d = PD_OUTPUT;

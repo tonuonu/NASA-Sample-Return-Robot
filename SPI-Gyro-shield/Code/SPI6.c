@@ -28,8 +28,6 @@
 void
 SPI2_Init(void) {
     u6brg =  (unsigned char)(((base_freq)/(1*MOTORS_SPI_SPEED))-1);
-//#define CLOCK2       p7_2
-//    pu62=1; // pullup for p7_2 and p7_3. CLOCK2 may need it
     CS6d = PD_OUTPUT;
     CS6=1;
     CLOCK6d = PD_OUTPUT;

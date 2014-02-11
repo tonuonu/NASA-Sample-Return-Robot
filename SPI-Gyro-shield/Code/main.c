@@ -26,9 +26,6 @@
 #include "main.h"
 #include "hwsetup.h"
 
-//extern int alarm;
-//volatile unsigned short ticks;
-
 static void 
 complete_tx(void) {
     /*
