@@ -25,7 +25,6 @@
 #include <string.h>
 #include "main.h"
 #include "hwsetup.h"
-#include "SPI.h"
 #include "intrinsics.h"
 
 extern volatile unsigned char recv_bytenum;

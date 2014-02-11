@@ -26,6 +26,17 @@
 #include "main.h"
 #include "hwsetup.h"
 
+union u16 recv_u_u0={0,0};
+union u16 recv_u_u6={0,0};
+union u16 recv_u_u3={0,0};
+union u16 recv_u_u4={0,0};
+
+short int recv_buf_u0=0;
+short int recv_buf_u6=0;
+short int recv_buf_u3=0;
+short int recv_buf_u4=0;
+
+
 static void 
 complete_tx(void) {
     /*
@@ -42,28 +53,42 @@ complete_tx(void) {
 }
 
 void 
-set_steady_speed(unsigned char motor_idx) {
+set_speed(unsigned char motor_idx) {
     complete_tx();
     CS0=CS6=CS3=CS4 = 0;
 
     u0tb=u6tb=u3tb=u4tb=CMD_STEADY_SPEED | motor_idx;
     complete_tx();
 
-    u0tb=u6tb=u3tb=u4tb=steady_speed[0];
+    u0tb=u6tb=u3tb=u4tb=speed[0];
     complete_tx();
+
+    u0tb=u6tb=u3tb=u4tb=speed[1];
+    complete_tx();
+
+    u0tb=u6tb=u3tb=u4tb=0;
+    complete_tx();
+
+    recv_u_u0.ticks[0]=u0rb & 0xff;
+    recv_u_u6.ticks[0]=u6rb & 0xff;
+    recv_u_u3.ticks[0]=u3rb & 0xff;
+    recv_u_u4.ticks[0]=u4rb & 0xff;
+
+    u0tb=u6tb=u3tb=u4tb=0;
+    complete_tx();
+
+    recv_u_u0.ticks[1]=u0rb & 0xff;
+    recv_u_u6.ticks[1]=u6rb & 0xff;
+    recv_u_u3.ticks[1]=u3rb & 0xff;
+    recv_u_u4.ticks[1]=u4rb & 0xff;
+
+    recv_buf_u0+=recv_u_u0.x;
+    recv_buf_u6+=recv_u_u6.x;
+    recv_buf_u3+=recv_u_u3.x;
+    recv_buf_u4+=recv_u_u4.x;
     
-    u0tb=u6tb=u3tb=u4tb=steady_speed[1];
-    complete_tx();
-
-    u0tb=u6tb=u3tb=u4tb=0;
-    complete_tx();
-
-    u0tb=u6tb=u3tb=u4tb=0;
-    complete_tx();
-
     CS0=CS6=CS3=CS4 = 1;
 }
-
 
 int
 main(void) {
@@ -76,10 +101,10 @@ main(void) {
  //       __wait_for_interrupt();
 #if 1        
         if(fpga_in==FPGA_LOADED) {
-            set_steady_speed(0);
-            set_steady_speed(1);
-            set_steady_speed(2);
-            set_steady_speed(3);
+            set_speed(0); 
+            set_speed(1);
+            set_speed(2);
+            set_speed(3);
         }
 #endif
     }

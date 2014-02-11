@@ -23,33 +23,24 @@
 #include "intrinsics.h"
 #define PI 3.1415926535897932384626433832795028841971693993751058
 
+/*
+ * This union is used in every context where we need to receive two separate 
+ * bytes int single short int (16 bit signed)
+ */
+union u16 {
+   unsigned char ticks[2];
+   signed short int x;
+};
+
 enum {FPGA_EMPTY,FPGA_LOADING,FPGA_LOADED};
 enum {CMD_NONE=0, CMD_STEADY_SPEED=0x04, CMD_TARGET_ACCELERATION=0x08, CMD_GET_CUR_TARGET_SPEED=0x10 };
 
-extern volatile unsigned char steady_speed[2];
+extern volatile unsigned char speed[2];
 extern volatile unsigned char target_acceleration[2];
 
-extern volatile unsigned char recv_buf;
-//extern volatile unsigned char recv_flag;
+extern volatile unsigned char recv_buf_ardu;
 extern volatile unsigned char fpga_in;
-extern volatile unsigned short ticks;
-
-/*
- * IAR-HEW compatibility 
- */
-#define _asm asm
-
-/*
- * 1 cycle delay 
- */
-#define	NOP()			{_asm("nop");}
-
-static inline void
-uDelay(unsigned char l) {
-    while (l--)
-        NOP();
-
-}
+extern volatile signed short int ticks;
 
 static inline void udelay(unsigned int usec) {
     // On 48 Mhz we do 48 000 000 cycles per second
@@ -57,13 +48,7 @@ static inline void udelay(unsigned int usec) {
     __delay_cycles(48UL*(unsigned long)usec);
 }
 
-#define ENABLE_IRQ   	{_asm("FSET I");}
-#define DISABLE_IRQ	{_asm("FCLR I");}
-
-void
-Delay(unsigned char n);
-
-size_t __write(int, unsigned const char*, size_t);
-size_t __read(int Handle, unsigned char *Buf, size_t BufSize);
+#define ENABLE_IRQ   	{asm("FSET I");}
+#define DISABLE_IRQ	{asm("FCLR I");}
 
 

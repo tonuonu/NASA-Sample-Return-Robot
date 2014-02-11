@@ -116,7 +116,7 @@ MotorIO_Init(void) {
     RESET1d = PD_OUTPUT;
     RESET2d = PD_OUTPUT;
     RESET3d = PD_OUTPUT;
-    
+
     RESET0=1;
     RESET1=1;
     RESET2=1;
@@ -155,4 +155,3 @@ HardwareSetup(void) {
     SPI5_Init();
 
 }
-

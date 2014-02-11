@@ -25,13 +25,16 @@
 #include "main.h"
 #include "SPI.h"
 
-unsigned char tmp_steady_speed;
+unsigned char tmp_speed;
 unsigned char tmp_target_acceleration;
+unsigned char tmp_ticks;
 
-volatile unsigned char steady_speed[2]={0,0};
+volatile unsigned char speed[2]={0,0};
 volatile unsigned char target_acceleration[2]={0,0};
+union u16 ticks_u = {0,0};
 
-volatile unsigned char recv_buf;
+volatile signed short int ticks;
+volatile unsigned char recv_buf_ardu;
 volatile unsigned char recv_bytenum=0;
 volatile unsigned char command=CMD_NONE;
 volatile unsigned char fpga_in=FPGA_EMPTY;
@@ -43,7 +46,7 @@ __fast_interrupt void _uart5_receive(void) {
 __interrupt void _uart5_receive(void) {
 #endif
     
-    recv_buf=u5rb & 0xff;
+    recv_buf_ardu=u5rb & 0xff;
     
     /* Process this only if FPGA is loaded */
     if(fpga_in == FPGA_LOADING) {
@@ -52,13 +55,13 @@ LED4=1;
         u0tb=
         u6tb=
         u3tb=
-        u4tb=recv_buf;
+        u4tb=recv_buf_ardu;
 LED4=0;
     } else { // Probably FPGA_LOADED
         switch(recv_bytenum) {
         case 0:
 LED1=1;
-            command=recv_buf & 0xFC;
+            command=recv_buf_ardu & 0xFC;
             switch(command) {
             case CMD_STEADY_SPEED:
                 break;
@@ -76,10 +79,10 @@ LED1=0;
 LED2=1;
             switch(command) {
             case CMD_STEADY_SPEED:
-                tmp_steady_speed=recv_buf;
+                tmp_speed=recv_buf_ardu;
                 break;
             case CMD_TARGET_ACCELERATION:
-                tmp_target_acceleration=recv_buf;
+                tmp_target_acceleration=recv_buf_ardu;
                 break;
             case CMD_GET_CUR_TARGET_SPEED:
                 /* ? */
@@ -94,12 +97,12 @@ LED2=0;
 LED3=1;
             switch(command) {
             case CMD_STEADY_SPEED:
-                steady_speed[0]=tmp_steady_speed ;
-                steady_speed[1]=recv_buf;
+                speed[0]=tmp_speed ;
+                speed[1]=recv_buf_ardu;
                 break;
             case CMD_TARGET_ACCELERATION:
                 target_acceleration[0]=tmp_target_acceleration;
-                target_acceleration[1]=recv_buf;
+                target_acceleration[1]=recv_buf_ardu;
                 break;
             case CMD_GET_CUR_TARGET_SPEED:
                 /* ? */
@@ -109,6 +112,13 @@ LED3=1;
                 break;
             }
 LED3=0;
+            break;
+        case 3:
+            ticks_u.ticks[0]=recv_buf_ardu;
+            break;
+        case 4:
+            ticks_u.ticks[1]=recv_buf_ardu;
+            ticks=ticks_u.x;
             break;
         default:
             LED5=1;
@@ -130,8 +140,6 @@ __interrupt void _uart5_transmit(void) {
     /* Clear the 'reception complete' flag.	*/
     ir_s5tic = 0;
 }
-
-
 
 void
 SPI5_Init(void) {
@@ -198,5 +206,4 @@ SPI5_Init(void) {
     ir_s5tic   =0;            
     ENABLE_IRQ
 }
-
 

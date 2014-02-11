@@ -87,5 +87,3 @@ SPI2_Init(void) {
     ir_s6tic   =0;            
     ENABLE_IRQ
 }
-
-

@@ -83,9 +83,9 @@ SPI0_Init(void) {
      * we do not care about speed
      */
     ilvl_s0ric =0;
-    ir_s0ric   =0;            
+    ir_s0ric   =0;
     ilvl_s0tic =0;
-    ir_s0tic   =0;            
+    ir_s0tic   =0;
     ENABLE_IRQ
 }
 
