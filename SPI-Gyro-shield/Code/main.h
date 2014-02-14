@@ -37,15 +37,6 @@ complete_tx(void) {
           (txept_u6c0 == 0));
 }
 
-/*
- * This union is used in every context where we need to receive two separate 
- * bytes into single short int (16 bit signed)
- */
-union u16 {
-   unsigned char ticks[2];
-   signed short int x;
-};
-
 enum {
     FPGA_EMPTY,
     FPGA_LOADING,
@@ -59,6 +50,10 @@ enum {
     CMD_GET_CUR_TARGET_SPEED=0x10 
 };
 
+/*
+ * This union is used in every context where we need to receive two separate 
+ * bytes into single short int (16 bit signed)
+ */
 struct twobyte_st {
 //    char dirty;
     union {
@@ -72,6 +67,8 @@ extern volatile struct twobyte_st acceleration;
 
 extern volatile unsigned char fpga_in;
 extern volatile unsigned char recv_bytenum;
+
+extern volatile struct twobyte_st ticks[4];
 
 // On 48 Mhz we do 48 000 000 cycles per second
 // or 48 cycles per microsecond

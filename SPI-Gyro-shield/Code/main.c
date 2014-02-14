@@ -26,15 +26,11 @@
 #include "main.h"
 #include "hwsetup.h"
 
-union u16 recv_u_u0={0,0};
-union u16 recv_u_u3={0,0};
-union u16 recv_u_u4={0,0};
-union u16 recv_u_u6={0,0};
+struct twobyte_st tmprecv[4]={0,0,0,0,0,0,0,0 };
 
-short int recv_buf_u0=0;
-short int recv_buf_u3=0;
-short int recv_buf_u4=0;
-short int recv_buf_u6=0;
+volatile struct twobyte_st ticks[4] = {0,0,0,0,0,0,0,0};
+volatile struct twobyte_st speed={0,0};
+volatile struct twobyte_st acceleration={0,0};
 
 static void 
 set_acceleration(unsigned char motor_idx) {
@@ -59,26 +55,26 @@ set_acceleration(unsigned char motor_idx) {
     u0tb=u3tb=u4tb=u6tb=0;
     complete_tx();
 
-    recv_u_u0.ticks[0]=u0rb & 0xff;
-    recv_u_u3.ticks[0]=u3rb & 0xff;
-    recv_u_u4.ticks[0]=u4rb & 0xff;
-    recv_u_u6.ticks[0]=u6rb & 0xff;
+    tmprecv[0].u.byte[0]=u0rb & 0xff;
+    tmprecv[1].u.byte[0]=u3rb & 0xff;
+    tmprecv[2].u.byte[0]=u4rb & 0xff;
+    tmprecv[3].u.byte[0]=u6rb & 0xff;
 
     u0tb=u3tb=u4tb=u6tb=0;
     complete_tx();
 
-    recv_u_u0.ticks[1]=u0rb & 0xff;
-    recv_u_u3.ticks[1]=u3rb & 0xff;
-    recv_u_u4.ticks[1]=u4rb & 0xff;
-    recv_u_u6.ticks[1]=u6rb & 0xff;
+    tmprecv[0].u.byte[1]=u0rb & 0xff;
+    tmprecv[1].u.byte[1]=u3rb & 0xff;
+    tmprecv[2].u.byte[1]=u4rb & 0xff;
+    tmprecv[3].u.byte[1]=u6rb & 0xff;
 
-    recv_buf_u0+=recv_u_u0.x;
-    recv_buf_u3+=recv_u_u3.x;
-    recv_buf_u4+=recv_u_u4.x;
-    recv_buf_u6+=recv_u_u6.x;
+    ticks[0].u.int16+=tmprecv[0].u.int16;
+    ticks[1].u.int16+=tmprecv[1].u.int16;
+    ticks[2].u.int16+=tmprecv[2].u.int16;
+    ticks[3].u.int16+=tmprecv[3].u.int16;
     
     CS0=CS3=CS4=CS6 = 1;
-    udelay(1); // make sure high CS is notified 
+    udelay(1); // make sure high CS is noticed 
 }
 
 static void 
@@ -104,26 +100,26 @@ set_speed(unsigned char motor_idx) {
     u0tb=u3tb=u4tb=u6tb=0;
     complete_tx();
 
-    recv_u_u0.ticks[0]=u0rb & 0xff;
-    recv_u_u3.ticks[0]=u3rb & 0xff;
-    recv_u_u4.ticks[0]=u4rb & 0xff;
-    recv_u_u6.ticks[0]=u6rb & 0xff;
+    tmprecv[0].u.byte[0]=u0rb & 0xff;
+    tmprecv[1].u.byte[0]=u3rb & 0xff;
+    tmprecv[2].u.byte[0]=u4rb & 0xff;
+    tmprecv[3].u.byte[0]=u6rb & 0xff;
 
     u0tb=u3tb=u4tb=u6tb=0;
     complete_tx();
 
-    recv_u_u0.ticks[1]=u0rb & 0xff;
-    recv_u_u3.ticks[1]=u3rb & 0xff;
-    recv_u_u4.ticks[1]=u4rb & 0xff;
-    recv_u_u6.ticks[1]=u6rb & 0xff;
+    tmprecv[0].u.byte[1]=u0rb & 0xff;
+    tmprecv[1].u.byte[1]=u3rb & 0xff;
+    tmprecv[2].u.byte[1]=u4rb & 0xff;
+    tmprecv[3].u.byte[1]=u6rb & 0xff;
 
-    recv_buf_u0+=recv_u_u0.x;
-    recv_buf_u3+=recv_u_u3.x;
-    recv_buf_u4+=recv_u_u4.x;
-    recv_buf_u6+=recv_u_u6.x;
+    ticks[0].u.int16+=tmprecv[0].u.int16;
+    ticks[1].u.int16+=tmprecv[1].u.int16;
+    ticks[2].u.int16+=tmprecv[2].u.int16;
+    ticks[3].u.int16+=tmprecv[3].u.int16;
     
     CS0=CS3=CS4=CS6 = 1;
-    udelay(1); // make sure high CS is notified 
+    udelay(1); // make sure high CS is noticed 
 }
 
 int

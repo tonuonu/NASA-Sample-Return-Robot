@@ -27,19 +27,15 @@
 
 static unsigned char tmp_speed;
 static unsigned char tmp_acceleration;
-static volatile signed short int ticks;
-static volatile unsigned char recv_buf_ardu;
+static volatile unsigned char recvbyte;
 static volatile unsigned char command=CMD_NONE;
-static union u16 ticks_u = {0,0};
 
 volatile unsigned char recv_bytenum=0;
 volatile unsigned char fpga_in=FPGA_EMPTY;
 
-volatile struct twobyte_st speed={0,0};
-volatile struct twobyte_st acceleration={0,0};
 
 __fast_interrupt void uart5_receive(void) {    
-    recv_buf_ardu=u5rb & 0xff;
+    recvbyte=u5rb & 0xff;
     
     /* Process this only if FPGA is loaded */
     if(fpga_in == FPGA_LOADING) {
@@ -47,11 +43,11 @@ __fast_interrupt void uart5_receive(void) {
         u0tb=
         u6tb=
         u3tb=
-        u4tb=recv_buf_ardu;
+        u4tb=recvbyte;
     } else { // Probably FPGA_LOADED
         switch(recv_bytenum) {
         case 0:
-            command=recv_buf_ardu & 0xFC;
+            command=recvbyte & 0xFC;
             switch(command) {
             case CMD_SPEED:
                 break;
@@ -67,10 +63,10 @@ __fast_interrupt void uart5_receive(void) {
         case 1:
             switch(command) {
             case CMD_SPEED:
-                tmp_speed=recv_buf_ardu;
+                tmp_speed=recvbyte;
                 break;
             case CMD_ACCELERATION:
-                tmp_acceleration=recv_buf_ardu;
+                tmp_acceleration=recvbyte;
                 break;
             case CMD_GET_CUR_TARGET_SPEED:
                 /* ? */
@@ -84,11 +80,11 @@ __fast_interrupt void uart5_receive(void) {
             switch(command) {
             case CMD_SPEED:
                 speed.u.byte[0]=tmp_speed ;
-                speed.u.byte[1]=recv_buf_ardu;
+                speed.u.byte[1]=recvbyte;
                 break;
             case CMD_ACCELERATION:
                 acceleration.u.byte[0]=tmp_acceleration;
-                acceleration.u.byte[1]=recv_buf_ardu;
+                acceleration.u.byte[1]=recvbyte;
                 break;
             case CMD_GET_CUR_TARGET_SPEED:
                 /* ? */
@@ -99,11 +95,10 @@ __fast_interrupt void uart5_receive(void) {
             }
             break;
         case 3:
-            ticks_u.ticks[0]=recv_buf_ardu;
+//            ticks.u.byte[0]=recvbyte;
             break;
         case 4:
-            ticks_u.ticks[1]=recv_buf_ardu;
-            ticks=ticks_u.x;
+//            ticks.u.byte[1]=recvbyte;
             break;
         default:
             LED5=1;
@@ -170,7 +165,7 @@ SPI5_Init(void) {
 
     __disable_interrupt();
     /* 
-     * Fastest interrupt priority
+     * Set fastest interrupt priority
      */
     fsit_ripl1 = 1;
     fsit_ripl2 = 1;
