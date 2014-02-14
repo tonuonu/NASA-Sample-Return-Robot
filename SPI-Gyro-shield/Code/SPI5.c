@@ -25,16 +25,14 @@
 #include "main.h"
 #include "SPI.h"
 
-
 volatile unsigned char recv_bytenum=0;
 volatile unsigned char fpga_in=FPGA_EMPTY;
 
-
 __fast_interrupt void uart5_receive(void) {    
-    static unsigned char tmp_speed;
-    static unsigned char tmp_acceleration;
-    static volatile unsigned char command=CMD_NONE;
-    static volatile unsigned char motor_idx;
+    static unsigned char tmp;
+    
+    static unsigned char command;
+    static int motor_idx;
     unsigned char recvbyte=u5rb & 0xff;
     
     /* Process this only if FPGA is loaded */
@@ -46,8 +44,8 @@ __fast_interrupt void uart5_receive(void) {
         u4tb=
         u6tb=recvbyte;
         break;
-//    case FPGA_LOADED:
-    default:
+    case FPGA_LOADED:
+//    default:
         switch(recv_bytenum) {
         case 0:
             command=recvbyte & 0xFC;
@@ -67,10 +65,10 @@ __fast_interrupt void uart5_receive(void) {
         case 1:
             switch(command) {
             case CMD_SPEED:
-                tmp_speed=recvbyte;
+                tmp=recvbyte;
                 break;
             case CMD_ACCELERATION:
-                tmp_acceleration=recvbyte;
+                tmp=recvbyte;
                 break;
             case CMD_GET_CUR_TARGET_SPEED:
                 /* ? */
@@ -83,12 +81,12 @@ __fast_interrupt void uart5_receive(void) {
         case 2:
             switch(command) {
             case CMD_SPEED:
-                speed.u.byte[0]=tmp_speed ;
-                speed.u.byte[1]=recvbyte;
+                speed[motor_idx].u.byte[0]=tmp;
+                speed[motor_idx].u.byte[1]=recvbyte;
                 break;
             case CMD_ACCELERATION:
-                acceleration.u.byte[0]=tmp_acceleration;
-                acceleration.u.byte[1]=recvbyte;
+                acceleration[motor_idx].u.byte[0]=tmp;
+                acceleration[motor_idx].u.byte[1]=recvbyte;
                 break;
             case CMD_GET_CUR_TARGET_SPEED:
                 /* ? */
@@ -171,10 +169,12 @@ SPI5_Init(void) {
     fsit_ripl1 = 1;
     fsit_ripl2 = 1;
     __set_VCT_register((unsigned long)&uart5_receive);
-    ilvl_s5ric =7; // fast interrupt
-    ir_s5ric   =0;            
-    ilvl_s5tic =0;
-    ir_s5tic   =0;            
+//    ilvl_s5ric = 0; // fast interrupt
+    ilvl_s5ric = 7; // fast interrupt
+    ir_s5ric   = 0;            
+    ilvl_s5tic = 0;
+//    ilvl_s5tic = 7;
+    ir_s5tic   = 0;            
     __enable_interrupt();
 }
 

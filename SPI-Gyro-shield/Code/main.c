@@ -26,18 +26,18 @@
 #include "main.h"
 #include "hwsetup.h"
 
-struct twobyte_st tmprecv[4]={0,0,0,0,0,0,0,0 };
+struct twobyte_st tmprecv[4] = {0,0,0,0,0,0,0,0};
 
 volatile struct twobyte_st ticks[4] = {0,0,0,0,0,0,0,0};
-volatile struct twobyte_st speed={0,0};
-volatile struct twobyte_st acceleration={0,0};
+volatile struct twobyte_st speed[4] = {0,0,0,0,0,0,0,0};
+volatile struct twobyte_st acceleration[4] = {0,0,0,0,0,0,0,0};
 
 static void 
 set_acceleration(unsigned char motor_idx) {
     complete_tx();
     CS0=CS3=CS4=CS6 = 0;
 
-    u0tb=u3tb=u4tb=u6tb=CMD_ACCELERATION | motor_idx;
+    u0tb=u3tb=u4tb=u6tb = CMD_ACCELERATION | motor_idx;
     complete_tx();
 
     /* 
@@ -45,7 +45,7 @@ set_acceleration(unsigned char motor_idx) {
      * value while we send it 
      */
     struct twobyte_st tmp;
-    tmp.u.int16=acceleration.u.int16;
+    tmp.u.int16=acceleration[motor_idx].u.int16;
     u0tb=u3tb=u4tb=u6tb=tmp.u.byte[0];
     complete_tx();
 
@@ -83,19 +83,19 @@ set_speed(unsigned char motor_idx) {
     CS0=CS3=CS4=CS6 = 0;
 
     u0tb=u3tb=u4tb=u6tb=CMD_SPEED | motor_idx;
-    complete_tx();
+    complete_pretx();
     
     /* 
      * Use temporary variable to ensure interrupts to not overwrite
      * value while we send it 
      */
     struct twobyte_st tmp;
-    tmp.u.int16=speed.u.int16;
+    tmp.u.int16=speed[motor_idx].u.int16;
     u0tb=u3tb=u4tb=u6tb=tmp.u.byte[0];
-    complete_tx();
+    complete_pretx();
 
     u0tb=u3tb=u4tb=u6tb=tmp.u.byte[1];
-    complete_tx();
+    complete_pretx();
 
     u0tb=u3tb=u4tb=u6tb=0;
     complete_tx();
@@ -113,13 +113,14 @@ set_speed(unsigned char motor_idx) {
     tmprecv[2].u.byte[1]=u4rb & 0xff;
     tmprecv[3].u.byte[1]=u6rb & 0xff;
 
+    CS0=CS3=CS4=CS6 = 1;
+    
     ticks[0].u.int16+=tmprecv[0].u.int16;
     ticks[1].u.int16+=tmprecv[1].u.int16;
     ticks[2].u.int16+=tmprecv[2].u.int16;
-    ticks[3].u.int16+=tmprecv[3].u.int16;
-    
-    CS0=CS3=CS4=CS6 = 1;
-    udelay(1); // make sure high CS is noticed 
+    ticks[3].u.int16+=tmprecv[3].u.int16;    
+
+    //udelay(1); // make sure high CS is noticed 
 }
 
 int
@@ -133,13 +134,13 @@ main(void) {
  //       __wait_for_interrupt();
 
         if(fpga_in==FPGA_LOADED) {
-            set_acceleration(0); 
-            set_acceleration(1);
-            set_acceleration(2);
-            set_acceleration(3);
-            set_speed(0); 
-            set_speed(1);
-            set_speed(2);
+//            set_acceleration(0); 
+//            set_acceleration(1);
+//            set_acceleration(2);
+//            set_acceleration(3);
+//            set_speed(0); 
+//            set_speed(1);
+//            set_speed(2);
             set_speed(3);
         }
 

@@ -22,8 +22,25 @@
 #include "intrinsics.h"
 void Int_Init(void);
 
+
+static inline void 
+complete_pretx(void) {
+  
+    while((ti_u0c1 == 0) ||
+          (ti_u3c1 == 0) ||
+          (ti_u4c1 == 0) ||
+          (ti_u6c1 == 0));
+
+}
+
+
 static inline void 
 complete_tx(void) {
+  
+    while((ti_u0c1 == 0) ||
+          (ti_u3c1 == 0) ||
+          (ti_u4c1 == 0) ||
+          (ti_u6c1 == 0));
     /*
      * TXEPT (TX buffer EmPTy)
      * 0: Data held in the transmit shift
@@ -31,10 +48,12 @@ complete_tx(void) {
      * 1: No data held in the transmit shift
      * register (transmission completed)
      */
+    
     while((txept_u0c0 == 0) ||
           (txept_u3c0 == 0) ||
           (txept_u4c0 == 0) ||
-          (txept_u6c0 == 0));
+          (txept_u6c0 == 0)); 
+
 }
 
 enum {
@@ -62,8 +81,8 @@ struct twobyte_st {
     } u;
 };
 
-extern volatile struct twobyte_st speed;
-extern volatile struct twobyte_st acceleration;
+extern volatile struct twobyte_st speed[4];
+extern volatile struct twobyte_st acceleration[4];
 
 extern volatile unsigned char fpga_in;
 extern volatile unsigned char recv_bytenum;
