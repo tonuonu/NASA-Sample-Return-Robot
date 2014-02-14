@@ -38,13 +38,16 @@ __fast_interrupt void uart5_receive(void) {
     recvbyte=u5rb & 0xff;
     
     /* Process this only if FPGA is loaded */
-    if(fpga_in == FPGA_LOADING) {
+    switch(fpga_in) {
+    case FPGA_LOADING:
         /* bypass byte transparently */
         u0tb=
         u6tb=
         u3tb=
         u4tb=recvbyte;
-    } else { // Probably FPGA_LOADED
+        break;
+//    case FPGA_LOADED:
+    default:
         switch(recv_bytenum) {
         case 0:
             command=recvbyte & 0xFC;
@@ -102,10 +105,7 @@ __fast_interrupt void uart5_receive(void) {
             break;
         default:
             LED5=1;
-            __no_operation();
-            __no_operation();
-            __no_operation();
-            __no_operation();
+            udelay(1UL);
             LED5=0; 
         }
         recv_bytenum++;
