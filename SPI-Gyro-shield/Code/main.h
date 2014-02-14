@@ -59,16 +59,22 @@ enum {
     CMD_GET_CUR_TARGET_SPEED=0x10 
 };
 
-extern volatile unsigned char speed[2];
-extern volatile unsigned char acceleration[2];
+struct twobyte_st {
+//    char dirty;
+    union {
+        char byte[2];
+        short int int16;
+    } u;
+};
+
+extern volatile struct twobyte_st speed;
+extern volatile struct twobyte_st acceleration;
+
 extern volatile unsigned char fpga_in;
 extern volatile unsigned char recv_bytenum;
 
-#if 0  // unused 
-static inline void udelay(unsigned int usec) {
-    // On 48 Mhz we do 48 000 000 cycles per second
-    // or 48 cycles per microsecond
-    __delay_cycles(48UL*(unsigned long)usec);
-}
-#endif
+// On 48 Mhz we do 48 000 000 cycles per second
+// or 48 cycles per microsecond
+#define udelay(a) __delay_cycles(48UL*a);
+
 

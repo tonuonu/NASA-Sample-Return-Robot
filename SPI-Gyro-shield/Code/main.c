@@ -44,10 +44,16 @@ set_acceleration(unsigned char motor_idx) {
     u0tb=u3tb=u4tb=u6tb=CMD_ACCELERATION | motor_idx;
     complete_tx();
 
-    u0tb=u3tb=u4tb=u6tb=acceleration[0];
+    /* 
+     * Use temporary variable to ensure interrupts to not overwrite
+     * value while we send it 
+     */
+    struct twobyte_st tmp;
+    tmp.u.int16=acceleration.u.int16;
+    u0tb=u3tb=u4tb=u6tb=tmp.u.byte[0];
     complete_tx();
 
-    u0tb=u3tb=u4tb=u6tb=acceleration[1];
+    u0tb=u3tb=u4tb=u6tb=tmp.u.byte[1];
     complete_tx();
 
     u0tb=u3tb=u4tb=u6tb=0;
@@ -72,6 +78,7 @@ set_acceleration(unsigned char motor_idx) {
     recv_buf_u6+=recv_u_u6.x;
     
     CS0=CS3=CS4=CS6 = 1;
+    udelay(1); // make sure high CS is notified 
 }
 
 static void 
@@ -81,11 +88,17 @@ set_speed(unsigned char motor_idx) {
 
     u0tb=u3tb=u4tb=u6tb=CMD_SPEED | motor_idx;
     complete_tx();
-
-    u0tb=u3tb=u4tb=u6tb=speed[0];
+    
+    /* 
+     * Use temporary variable to ensure interrupts to not overwrite
+     * value while we send it 
+     */
+    struct twobyte_st tmp;
+    tmp.u.int16=speed.u.int16;
+    u0tb=u3tb=u4tb=u6tb=tmp.u.byte[0];
     complete_tx();
 
-    u0tb=u3tb=u4tb=u6tb=speed[1];
+    u0tb=u3tb=u4tb=u6tb=tmp.u.byte[1];
     complete_tx();
 
     u0tb=u3tb=u4tb=u6tb=0;
@@ -110,6 +123,7 @@ set_speed(unsigned char motor_idx) {
     recv_buf_u6+=recv_u_u6.x;
     
     CS0=CS3=CS4=CS6 = 1;
+    udelay(1); // make sure high CS is notified 
 }
 
 int

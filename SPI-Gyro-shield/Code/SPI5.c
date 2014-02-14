@@ -34,25 +34,23 @@ static union u16 ticks_u = {0,0};
 
 volatile unsigned char recv_bytenum=0;
 volatile unsigned char fpga_in=FPGA_EMPTY;
-volatile unsigned char speed[2]={0,0};
-volatile unsigned char acceleration[2]={0,0};
 
-__fast_interrupt void _uart5_receive(void) {    
+volatile struct twobyte_st speed={0,0};
+volatile struct twobyte_st acceleration={0,0};
+
+__fast_interrupt void uart5_receive(void) {    
     recv_buf_ardu=u5rb & 0xff;
     
     /* Process this only if FPGA is loaded */
     if(fpga_in == FPGA_LOADING) {
-LED4=1;
         /* bypass byte transparently */
         u0tb=
         u6tb=
         u3tb=
         u4tb=recv_buf_ardu;
-LED4=0;
     } else { // Probably FPGA_LOADED
         switch(recv_bytenum) {
         case 0:
-LED1=1;
             command=recv_buf_ardu & 0xFC;
             switch(command) {
             case CMD_SPEED:
@@ -65,10 +63,8 @@ LED1=1;
                 LED5=1; // ERROR!!!
                 break;
             }
-LED1=0;
             break;
         case 1:
-LED2=1;
             switch(command) {
             case CMD_SPEED:
                 tmp_speed=recv_buf_ardu;
@@ -83,18 +79,16 @@ LED2=1;
                 LED5=1; // ERROR!!!
                 break;
             }
-LED2=0;
             break;
         case 2:
-LED3=1;
             switch(command) {
             case CMD_SPEED:
-                speed[0]=tmp_speed ;
-                speed[1]=recv_buf_ardu;
+                speed.u.byte[0]=tmp_speed ;
+                speed.u.byte[1]=recv_buf_ardu;
                 break;
             case CMD_ACCELERATION:
-                acceleration[0]=tmp_acceleration;
-                acceleration[1]=recv_buf_ardu;
+                acceleration.u.byte[0]=tmp_acceleration;
+                acceleration.u.byte[1]=recv_buf_ardu;
                 break;
             case CMD_GET_CUR_TARGET_SPEED:
                 /* ? */
@@ -103,7 +97,6 @@ LED3=1;
                 LED5=1; // ERROR!!!
                 break;
             }
-LED3=0;
             break;
         case 3:
             ticks_u.ticks[0]=recv_buf_ardu;
@@ -181,7 +174,7 @@ SPI5_Init(void) {
      */
     fsit_ripl1 = 1;
     fsit_ripl2 = 1;
-    __set_VCT_register((unsigned long)&_uart5_receive);
+    __set_VCT_register((unsigned long)&uart5_receive);
     ilvl_s5ric =7; // fast interrupt
     ir_s5ric   =0;            
     ilvl_s5tic =0;
