@@ -25,32 +25,33 @@
 #include "main.h"
 #include "SPI.h"
 
-static unsigned char tmp_speed;
-static unsigned char tmp_acceleration;
-static volatile unsigned char recvbyte;
-static volatile unsigned char command=CMD_NONE;
 
 volatile unsigned char recv_bytenum=0;
 volatile unsigned char fpga_in=FPGA_EMPTY;
 
 
 __fast_interrupt void uart5_receive(void) {    
-    recvbyte=u5rb & 0xff;
+    static unsigned char tmp_speed;
+    static unsigned char tmp_acceleration;
+    static volatile unsigned char command=CMD_NONE;
+    static volatile unsigned char motor_idx;
+    unsigned char recvbyte=u5rb & 0xff;
     
     /* Process this only if FPGA is loaded */
     switch(fpga_in) {
     case FPGA_LOADING:
         /* bypass byte transparently */
         u0tb=
-        u6tb=
         u3tb=
-        u4tb=recvbyte;
+        u4tb=
+        u6tb=recvbyte;
         break;
 //    case FPGA_LOADED:
     default:
         switch(recv_bytenum) {
         case 0:
             command=recvbyte & 0xFC;
+            motor_idx=recvbyte & 0x03;
             switch(command) {
             case CMD_SPEED:
                 break;
