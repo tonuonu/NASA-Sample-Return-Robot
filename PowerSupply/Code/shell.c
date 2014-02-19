@@ -82,6 +82,23 @@ shell(uint32_t _NumBytes, const uint8_t* _Buffer) {
             }
         } else if(strcmp((char*)shellbuf,"cat /mems/realtime")==0) {
             mems_realtime=true;
+        } else if(strncmp((char*)shellbuf,"setsteering ",12)==0) {
+            int leftsteering,rightsteering;
+            sscanf((char*)shellbuf+12,"%d %d",&leftsteering,&rightsteering);
+                /* 
+                 * http://en.wikipedia.org/wiki/Servo_control 
+                 * recommends using 20ms (50Hz) cycle.
+                 * 48Mhz/64/15000 == 50Hz
+                 * Same page says 1.5ms high pulse keeps servo at middle 
+                 * 15000/20*1.5=1125
+                 * Side limits are 1 and 2ms (750 and 1500).
+                 */
+            if(abs(leftsteering) <= 100 && abs(rightsteering) <= 100 ) {
+                TPU4.TGRA = (15000-1125)+ leftsteering*(750/2)/100; // left steering servo
+                TPU5.TGRA = (15000-1125)+rightsteering*(750/2)/100; // right steering servo
+            } else {
+                error="Error in arguments. Usage: steering L R, where L and R are integers between -100 and 100\r\n";
+            }
         } else {
             error="Syntax error\r\n";
         }
