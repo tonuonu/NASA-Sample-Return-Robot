@@ -82,17 +82,39 @@ shell(uint32_t _NumBytes, const uint8_t* _Buffer) {
             }
         } else if(strcmp((char*)shellbuf,"cat /mems/realtime")==0) {
             mems_realtime=true;
+        } else if(strncmp((char*)shellbuf,"date ",5)==0) {
+            int day,month,year,weekday;
+            int hour,minute,second;
+            sscanf((char*)shellbuf+5,"%x/%x/%x %x %x:%x:%x",&day,&month,&year,&weekday,&hour,&minute,&second);
+            
+            
+
+            RTC.RSECCNT.BYTE = second;
+            RTC.RMINCNT.BYTE = minute;
+            RTC.RHRCNT.BYTE = hour;
+  
+            RTC.RDAYCNT.BYTE = day;
+            RTC.RMONCNT.BYTE = month;
+            RTC.RYRCNT.WORD = year;
+            RTC.RWKCNT.BYTE = weekday; // Saturday - 6, Sunday 7
+
+            
+            char buf[80];
+            sprintf(buf,"\r\nSet date to: %02x/%02x/%04x %x %02x:%02x:%02x\r\n",RTC.RDAYCNT.BYTE,RTC.RMONCNT.BYTE,RTC.RYRCNT.WORD,RTC.RWKCNT.BYTE,RTC.RHRCNT.BYTE,RTC.RMINCNT.BYTE,RTC.RSECCNT.BYTE);
+            USBCDC_Write_Async(strlen((char*)buf),(uint8_t*)buf , CBDoneWrite);
+            
+          
         } else if(strncmp((char*)shellbuf,"setsteering ",12)==0) {
             int leftsteering,rightsteering;
             sscanf((char*)shellbuf+12,"%d %d",&leftsteering,&rightsteering);
-                /* 
-                 * http://en.wikipedia.org/wiki/Servo_control 
-                 * recommends using 20ms (50Hz) cycle.
-                 * 48Mhz/64/15000 == 50Hz
-                 * Same page says 1.5ms high pulse keeps servo at middle 
-                 * 15000/20*1.5=1125
-                 * Side limits are 1 and 2ms (750 and 1500).
-                 */
+            /* 
+             * http://en.wikipedia.org/wiki/Servo_control 
+             * recommends using 20ms (50Hz) cycle.
+             * 48Mhz/64/15000 == 50Hz
+             * Same page says 1.5ms high pulse keeps servo at middle 
+             * 15000/20*1.5=1125
+             * Side limits are 1 and 2ms (750 and 1500).
+             */
             if(abs(leftsteering) <= 100 && abs(rightsteering) <= 100 ) {
                 TPU4.TGRA = (15000-1125)+ leftsteering*(750/2)/100; // left steering servo
                 TPU5.TGRA = (15000-1125)+rightsteering*(750/2)/100; // right steering servo
