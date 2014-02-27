@@ -31,8 +31,8 @@
 
 volatile float adc[8] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
 volatile float adapter = 0.0;
-volatile float imon1 = 0.0;
-volatile float imon2 = 0.0;
+volatile float imon1 = 0.0, imon1max = 0.0;
+volatile float imon2 = 0.0, imon2max = 0.0;
 
 /* The variable gADC_Result is used to contain the value of the 12 bit ADC */
 volatile uint16_t gADC_Result;

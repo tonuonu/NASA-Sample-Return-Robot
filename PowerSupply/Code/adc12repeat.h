@@ -10,8 +10,8 @@ extern "C" {
 #define PERIODIC_MODE 0x1
 volatile extern float adc[8] ;
 volatile extern float adapter;
-volatile extern float imon1 ;
-volatile extern float imon2 ;
+volatile extern float imon1, imon1max ;
+volatile extern float imon2, imon2max ;
 
 /*******************************************************************************
 * Global Function Prototypes

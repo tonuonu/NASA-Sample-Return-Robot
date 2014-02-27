@@ -85,9 +85,7 @@ shell(uint32_t _NumBytes, const uint8_t* _Buffer) {
         } else if(strncmp((char*)shellbuf,"date ",5)==0) {
             int day,month,year,weekday;
             int hour,minute,second;
-            sscanf((char*)shellbuf+5,"%x/%x/%x %x %x:%x:%x",&day,&month,&year,&weekday,&hour,&minute,&second);
-            
-            
+            sscanf((char*)shellbuf+5,"%2x/%2x/%2x %1x %2x:%2x:%2x",&day,&month,&year,&weekday,&hour,&minute,&second);
 
             RTC.RSECCNT.BYTE = second;
             RTC.RMINCNT.BYTE = minute;
@@ -97,13 +95,11 @@ shell(uint32_t _NumBytes, const uint8_t* _Buffer) {
             RTC.RMONCNT.BYTE = month;
             RTC.RYRCNT.WORD = year;
             RTC.RWKCNT.BYTE = weekday; // Saturday - 6, Sunday 7
-
             
             char buf[80];
-            sprintf(buf,"\r\nSet date to: %02x/%02x/%04x %x %02x:%02x:%02x\r\n",RTC.RDAYCNT.BYTE,RTC.RMONCNT.BYTE,RTC.RYRCNT.WORD,RTC.RWKCNT.BYTE,RTC.RHRCNT.BYTE,RTC.RMINCNT.BYTE,RTC.RSECCNT.BYTE);
+            sprintf(buf,"\r\nSet date to: %02x/%02x/20%02x %x %02x:%02x:%02x\r\n",RTC.RDAYCNT.BYTE,RTC.RMONCNT.BYTE,RTC.RYRCNT.WORD,RTC.RWKCNT.BYTE,RTC.RHRCNT.BYTE,RTC.RMINCNT.BYTE,RTC.RSECCNT.BYTE);
             USBCDC_Write_Async(strlen((char*)buf),(uint8_t*)buf , CBDoneWrite);
             
-          
         } else if(strncmp((char*)shellbuf,"setsteering ",12)==0) {
             int leftsteering,rightsteering;
             sscanf((char*)shellbuf+12,"%d %d",&leftsteering,&rightsteering);
@@ -114,10 +110,11 @@ shell(uint32_t _NumBytes, const uint8_t* _Buffer) {
              * Same page says 1.5ms high pulse keeps servo at middle 
              * 15000/20*1.5=1125
              * Side limits are 1 and 2ms (750 and 1500).
+             * UPDATE: We want wider! Here we use +-500 from center
              */
             if(abs(leftsteering) <= 100 && abs(rightsteering) <= 100 ) {
-                TPU4.TGRA = (15000-1125)+ leftsteering*(750/2)/100; // left steering servo
-                TPU5.TGRA = (15000-1125)+rightsteering*(750/2)/100; // right steering servo
+                TPU4.TGRA = (15000-1125)+ leftsteering*(1000/2)/100; // left steering servo
+                TPU5.TGRA = (15000-1125)+rightsteering*(1000/2)/100; // right steering servo
             } else {
                 error="Error in arguments. Usage: steering L R, where L and R are integers between -100 and 100\r\n";
             }

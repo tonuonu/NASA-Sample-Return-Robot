@@ -110,23 +110,21 @@ __interrupt void Excep_CMTU1_CMT2(void) {
      * 13.3/(2^12)*4095=13.3V etc
      */
 #define VCOEFF (((100.0+33.0)/33.0*3.3)/(4095.0))
-  
-    /* ACS712 5A version outputs 185mV for each A
-     * Center is at VCC/2, so 2.5V
-     * Maximum current we can measure is (3.3-2.5)/0.185=4.32A
-     * ACS711 can do 3.3V. ACS711EEXLT-15AB-T3 90 mv/A
-     * Zero current point is 2.5/3.3/(2^12-1)*reading
-     * 2.5/3.3*4095 = 3102 is middle point
-     * For every volt 4095/3.3=1240.90909091 units
-     * For every amper change is 4095/3.3*0.185=229.568181818
-     */
-#define ICOEFF (4095.0/3.3*   0.185)
-#define IZBASE (   2.5/3.3*4095.0  )
     adc[0] =  (float)(S12AD.ADDR0>>4)*VCOEFF; // VBAT0_AD 
     adc[1] =  (float)(S12AD.ADDR1>>4)*VCOEFF; // VBAT1_AD
     adc[2] =  (float)(S12AD.ADDR2>>4)*VCOEFF; // VBAT2_AD
     adc[3] =  (float)(S12AD.ADDR3>>4)*VCOEFF; // VBAT3_AD
-
+  
+    /* ACS712 20A version outputs 100mV for each A
+     * Center is at VCC/2, so 5V/2=2.5V
+     * Theoretical maximum current we can measure is 2.5/0.1=25A?
+     * Zero current point is (2^12-1)/3.3*2.5
+     * 4095/3.3*2.5 = ~3102 
+     * For every volt 4095/3.3=1240.90909091 units
+     * For every amper change is 4095/3.3*0.1=~124.09 units on ADC
+     */
+#define ICOEFF (4095.0/3.3*   0.025*-1)
+#define IZBASE (   4095.0/3.3*2.36  )
     adc[4] =  ((float)(S12AD.ADDR4>>4)-IZBASE)/ICOEFF; // IBAT0_AD
     adc[5] =  ((float)(S12AD.ADDR5>>4)-IZBASE)/ICOEFF; // IBAT1_AD
     adc[6] =  ((float)(S12AD.ADDR6>>4)-IZBASE)/ICOEFF; // IBAT2_AD
@@ -142,10 +140,20 @@ __interrupt void Excep_CMTU1_CMT2(void) {
      * Ohms law states I = U/R.
      * In our ADC maximum reading of 1023 means 3.3V. 3.3V/50= 0.066V and this  
      * is maximum drop we can measure on inductor. 
-     *I = 0.066V / 0.015ohm = 4.4A 
+     * I = 0.066V / 0.015ohm = 4.4A 
+     * Additionally there is a resistor divider on board from 10k and 3k9. 
+     * This means we need to multiply value by ~3.564
      */
-    imon1 = (float) AD.ADDRC / 1023.0 * 4.4;
-    imon2 = (float) AD.ADDRD / 1023.0 * 4.4;
+    imon1 = (float) AD.ADDRC / 1023.0 * 4.4 * ((10.0+3.9)/3.9);
+    imon2 = (float) AD.ADDRD / 1023.0 * 4.4 * ((10.0+3.9)/3.9);
+    
+    if(imon2 > 5.0) { // Excess current on steering power supply
+        LED_RED = LED_ON;
+    } else {
+        LED_RED = LED_OFF;
+    }
+    imon1max = imon1 > imon1max ? imon1 : imon1max;
+    imon2max = imon2 > imon2max ? imon2 : imon2max;
     
 #define CURRENT_MAX     3.0
 #define CURRENT_MIN     -3.0
@@ -211,7 +219,6 @@ __interrupt void Excep_CMTU1_CMT2(void) {
         logerror(buf);
     }    
 
-    
     int PWM0,PWM1,PWM2,PWM3;
     /* Check if adapter voltage exceeds any battery voltage. 
        If yes, we can charge! */

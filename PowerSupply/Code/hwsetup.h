@@ -40,6 +40,10 @@
 #ifndef HWSETUP_H
 #define HWSETUP_H
 
+#define ENABLE_PWR                  PORT1.PODR.BIT.B2
+#define ENABLE_PWR_DIR              PORT1.PDR.BIT.B2
+
+
 /*******************************************************************************
 * Global Function Prototypes
 *******************************************************************************/

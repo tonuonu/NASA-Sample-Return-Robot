@@ -51,8 +51,9 @@ void OLED_Fill_RAM(unsigned char Data);
 #define E_BAT      (1)
 #define E_ERR      (2)
 #define E_GYRO     (3)
+#define E_SUPPLY   (4)
 /* Update this to largest from previous defines */
-#define MAX_MODE   (3)
+#define MAX_MODE   (E_SUPPLY)
 
 extern volatile char mode;
 extern volatile char mode_just_changed;

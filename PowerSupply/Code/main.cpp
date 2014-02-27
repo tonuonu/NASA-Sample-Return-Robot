@@ -38,8 +38,6 @@
 #include "rskrx630def.h"
 #include "iorx630.h"
 
-#define ENABLE_PWR                  PORT1.PODR.BIT.B2
-#define ENABLE_PWR_DIR              PORT1.PDR.BIT.B2
 
 extern volatile bool mems_realtime;
 int main() {

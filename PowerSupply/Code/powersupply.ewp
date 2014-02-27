@@ -571,7 +571,7 @@
         <option>
           <name>OOCOutputFormat</name>
           <version>0</version>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>OCOutputOverride</name>
@@ -579,7 +579,7 @@
         </option>
         <option>
           <name>OOCOutputFile</name>
-          <state>powersupply.hex</state>
+          <state>powersupply.srec</state>
         </option>
         <option>
           <name>OOCCommandLineProducer</name>

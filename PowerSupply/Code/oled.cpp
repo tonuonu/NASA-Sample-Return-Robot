@@ -23,6 +23,7 @@
 #include "hwsetup.h"
 #include "oled.h"
 #include "spi.h"
+#include "switch.h"
 #include "adc12repeat.h"
 #include "stdio.h"
 #include "tnroman.h"
@@ -582,7 +583,7 @@ void
 OLED_Set_Linear_Gray_Scale_Table() {
     Write_Instruction(0xB9);				   // Set Default Linear Gray Scale Table
 }
-volatile char mode=E_GYRO;
+volatile char mode=E_BAT;
 volatile char mode_just_changed=1;
 
 static void 
@@ -595,7 +596,57 @@ mode_e_err(void) {
     }
 }
 
+static void 
+mode_e_supply(void) {
+    char buf[SCREENWIDTH+1];
+    snprintf(buf,sizeof(buf),"Power supply");
+    OLED_Show_String(  1,buf, 0, 0*8);
+    
+//    OUT1_EN = MAX1614_OFF; // Configure all power supply main outputs   
+//    OUT2_EN = MAX1614_OFF; 
+//    OUT3_EN = MAX1614_OFF;
 
+#if 0    
+    ENABLE_PWR=1; /* Enable TPS51222. 
+                   * Basically 5V is enabled to ACS712 current sensors
+                   */
+    OUT4_EN = 1; // Configure TPS51222 DC DC outputs
+    OUT5_EN = 1; // 1 is enable, 0 is disable
+#endif
+    
+    
+    snprintf(buf,sizeof(buf),"Main EN %d",ENABLE_PWR);
+    OLED_Show_String(  1,buf, 0, 1*8);
+
+    snprintf(buf,sizeof(buf),"EN1 %d",OUT4_EN);
+    OLED_Show_String(  1,buf, 0, 2*8);
+    snprintf(buf,sizeof(buf),"EN2 %d",OUT5_EN);
+    OLED_Show_String(  1,buf, 0, 3*8);
+
+    snprintf(buf,sizeof(buf),"SW1 %d",(SWITCHHOLD_1 & gSwitchFlag) ? 1:0);
+    OLED_Show_String(  1,buf, 0, 4*8);
+    snprintf(buf,sizeof(buf),"PGOOD1 %d",PGOOD1);
+    OLED_Show_String(  1,buf, 0, 5*8);
+    snprintf(buf,sizeof(buf),"PGOOD2 %d",PGOOD2);
+    OLED_Show_String(  1,buf, 0, 6*8);
+
+#if 1
+    if(SWITCHHOLD_1 & gSwitchFlag) {
+        if(OUT4_EN == 1 && ENABLE_PWR==1) {
+            OUT4_EN=0;
+            OUT5_EN=0;
+            ENABLE_PWR=0;
+        } else if(ENABLE_PWR==0) {
+            ENABLE_PWR=1;
+        } else {
+            OUT4_EN = 1;
+            OUT5_EN = 1;
+            gSwitchFlag &= (SWITCHPRESS_ALL | ~SWITCHHOLD_1);
+            gSwitchFlag |= SWITCHPRESS_1;
+        }
+    }
+#endif    
+}
 static void 
 mode_e_gyro(void) {
     char buf[SCREENWIDTH+1];
@@ -623,7 +674,7 @@ mode_e_gyro(void) {
 static void 
 mode_e_bat(void) {
     char buf[SCREENWIDTH+1]; 
-    snprintf(buf,sizeof(buf),"DC in:%4.1fV imon1 %3.1fA imon2 %3.1fA",adapter,imon1,imon2);
+    snprintf(buf,sizeof(buf),"steering %3.1fA (max %3.1fA)",imon2,imon2max);
     OLED_Show_String(  1,buf, 0, 6*8);
 #define BAT_MISSING_THRESHOLD (2.5f*3.f) 
 #define BAT_CRIT_THRESHOLD (3.3f*3.f) 
@@ -698,6 +749,9 @@ refresh(void) {
     case E_GYRO:
         mode_e_gyro();
         break;
+    case E_SUPPLY:
+        mode_e_supply();
+        break;   
     }      
   
 }
