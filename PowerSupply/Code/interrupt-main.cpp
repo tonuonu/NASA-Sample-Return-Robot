@@ -123,7 +123,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
      * For every volt 4095/3.3=1240.90909091 units
      * For every amper change is 4095/3.3*0.1=~124.09 units on ADC
      */
-#define ICOEFF (4095.0/3.3*   0.025*-1)
+#define ICOEFF (4095.0/3.3*   0.1*-1)
 #define IZBASE (   4095.0/3.3*2.36  )
     adc[4] =  ((float)(S12AD.ADDR4>>4)-IZBASE)/ICOEFF; // IBAT0_AD
     adc[5] =  ((float)(S12AD.ADDR5>>4)-IZBASE)/ICOEFF; // IBAT1_AD
