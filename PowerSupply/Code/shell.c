@@ -100,6 +100,12 @@ shell(uint32_t _NumBytes, const uint8_t* _Buffer) {
             sprintf(buf,"\r\nSet date to: %02x/%02x/20%02x %x %02x:%02x:%02x\r\n",RTC.RDAYCNT.BYTE,RTC.RMONCNT.BYTE,RTC.RYRCNT.WORD,RTC.RWKCNT.BYTE,RTC.RHRCNT.BYTE,RTC.RMINCNT.BYTE,RTC.RSECCNT.BYTE);
             USBCDC_Write_Async(strlen((char*)buf),(uint8_t*)buf , CBDoneWrite);
             
+        } else if(strncmp((char*)shellbuf,"setsteering off",15)==0) {
+                SYSTEM.PRCR.WORD = 0xA503;
+                TPUA.TSTR.BIT.CST4=0; // stop counter
+                TPUA.TSTR.BIT.CST5=0; // stop counter
+                /* Protection on */
+                SYSTEM.PRCR.WORD = 0xA500;
         } else if(strncmp((char*)shellbuf,"setsteering ",12)==0) {
             int leftsteering,rightsteering;
             sscanf((char*)shellbuf+12,"%d %d",&leftsteering,&rightsteering);
@@ -113,8 +119,15 @@ shell(uint32_t _NumBytes, const uint8_t* _Buffer) {
              * UPDATE: We want wider! Here we use +-500 from center
              */
             if(abs(leftsteering) <= 100 && abs(rightsteering) <= 100 ) {
-                TPU4.TGRA = (15000-1125)+ leftsteering*(1000/2)/100; // left steering servo
-                TPU5.TGRA = (15000-1125)+rightsteering*(1000/2)/100; // right steering servo
+                TPU5.TGRA = (15000-1125)+ leftsteering*(1000/2)/100; // left steering servo
+                TPU4.TGRA = (15000-1125)+rightsteering*(1000/2)/100; // right steering servo
+                
+                SYSTEM.PRCR.WORD = 0xA503;
+                TPUA.TSTR.BIT.CST4=1; // start counter
+                TPUA.TSTR.BIT.CST5=1; // start counter
+                /* Protection on */
+                SYSTEM.PRCR.WORD = 0xA500;
+
             } else {
                 error="Error in arguments. Usage: steering L R, where L and R are integers between -100 and 100\r\n";
             }

@@ -340,11 +340,13 @@ void Init_PWM(void) {
     TPU5.TGRA = 15000-1125;
     TPU5.TGRB = 15000;
 
+#if 0 // not yet.
     SYSTEM.PRCR.WORD = 0xA503;
     TPUA.TSTR.BIT.CST4=1; // start counter
     TPUA.TSTR.BIT.CST5=1; // start counter
     /* Protection on */
     SYSTEM.PRCR.WORD = 0xA500;
+#endif
 }
 
 /*******************************************************************************
