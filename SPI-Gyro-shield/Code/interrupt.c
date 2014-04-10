@@ -51,12 +51,7 @@ __interrupt void _int0(void) {
 __interrupt void _int2(void) {
   
     //LED5=1;  
-    recv_bytenum=0;
-    
-    complete_tx();
-
-    // Copy CS5 pin to all four motor outputs
-    CS0=CS3=CS4=CS6 = CS5;
+    recv_bytenum=0;    
 
     LED5=0;
     /* Clear the interrupt flag. */
