@@ -203,7 +203,7 @@ main(void) {
             udelay(1000);            
         } else {
             __enable_interrupt();
-            udelay(3000);
+//            udelay(3000);
             send_cur_cmd(); 
             get_voltage(); 
         }
