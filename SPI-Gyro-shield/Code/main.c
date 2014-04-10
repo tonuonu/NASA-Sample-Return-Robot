@@ -30,9 +30,11 @@ struct twobyte_st tmprecv[4] = {0,0,0,0,0,0,0,0};
 
 volatile unsigned char motor_load[4] = {0,0,0,0};
 volatile struct twobyte_st ticks[4] = {0,0,0,0,0,0,0,0};
-volatile struct twobyte_st speed[4] = {0,0,0,0,0,0,0,0};
+volatile struct twobyte_st cur_cmd_param[4] = {0,0,0,0,0,0,0,0};
+volatile unsigned char cur_cmd[4] = {CMD_SPEED,CMD_SPEED,CMD_SPEED,CMD_SPEED};
 volatile struct twobyte_st voltage[4] = {0,0,0,0,0,0,0,0};
-volatile struct twobyte_st acceleration[4] = {0,0,0,0,0,0,0,0};
+volatile struct twobyte_st cur_target_speed[4] = {0,0,0,0,0,0,0,0};
+
 
 static void
 receive_ticks(void) {
@@ -79,83 +81,56 @@ receive_ticks(void) {
 }
 
 static void 
-set_acceleration() {
-  
+send_cur_cmd() {
     if(RESET5 == 0) {
         return;
     }
     complete_tx(); // make sure we are not transmitting garbage already
 
     CS0=CS3=CS4=CS6 = 0;
-    M0TX=CMD_ACCELERATION | 0;
-    M1TX=CMD_ACCELERATION | 1;
-    M2TX=CMD_ACCELERATION | 2;
-    M3TX=CMD_ACCELERATION | 3;
+    M0TX=cur_cmd[0] | 0;
+    M1TX=cur_cmd[1] | 1;
+    M2TX=cur_cmd[2] | 2;
+    M3TX=cur_cmd[3] | 3;
     
     /* 
      * Use temporary variable to ensure interrupts to not overwrite
      * value while we send it. 
      */
     struct twobyte_st tmp[4];
-    tmp[0].u.int16=acceleration[0].u.int16;
-    tmp[1].u.int16=acceleration[1].u.int16;
-    tmp[2].u.int16=acceleration[2].u.int16;
-    tmp[3].u.int16=acceleration[3].u.int16;
+    tmp[0].u.int16=cur_cmd_param[0].u.int16;
+    tmp[1].u.int16=cur_cmd_param[1].u.int16;
+    tmp[2].u.int16=cur_cmd_param[2].u.int16;
+    tmp[3].u.int16=cur_cmd_param[3].u.int16;
 
     complete_pretx();
+
+    tmprecv[0].u.byte[1]=u0rb & 0xff;
+    tmprecv[1].u.byte[1]=u3rb & 0xff;
+    tmprecv[2].u.byte[1]=u4rb & 0xff;
+    tmprecv[3].u.byte[1]=u6rb & 0xff;
+
     M0TX=tmp[0].u.byte[1];
     M1TX=tmp[1].u.byte[1];
     M2TX=tmp[2].u.byte[1];
     M3TX=tmp[3].u.byte[1]; 
 
     complete_pretx();
+
+    tmprecv[0].u.byte[0]=u0rb & 0xff;
+    tmprecv[1].u.byte[0]=u3rb & 0xff;
+    tmprecv[2].u.byte[0]=u4rb & 0xff;
+    tmprecv[3].u.byte[0]=u6rb & 0xff;
+
     M0TX=tmp[0].u.byte[0];
     M1TX=tmp[1].u.byte[0];
     M2TX=tmp[2].u.byte[0];
     M3TX=tmp[3].u.byte[0];
-    
-    receive_ticks();
-}
 
+    for(int i=0;i<=3;i++)
+        cur_target_speed[i].u.int16 = tmprecv[i].u.int16;
 
-static void 
-set_speed() {
-    if(RESET5 == 0) {
-        return;
-    }
-    complete_tx(); // make sure we are not transmitting garbage already
-
-    CS0=CS3=CS4=CS6 = 0;
-    M0TX=CMD_SPEED | 0;
-    M1TX=CMD_SPEED | 1;
-    M2TX=CMD_SPEED | 2;
-    M3TX=CMD_SPEED | 3;
-    
-    /* 
-     * Use temporary variable to ensure interrupts to not overwrite
-     * value while we send it. 
-     */
-    struct twobyte_st tmp[4];
-    tmp[0].u.int16=speed[0].u.int16;
-    tmp[1].u.int16=speed[1].u.int16;
-    tmp[2].u.int16=speed[2].u.int16;
-    tmp[3].u.int16=speed[3].u.int16;
-
-    complete_pretx();
-    M0TX=tmp[0].u.byte[1];
-    M1TX=tmp[1].u.byte[1];
-    M2TX=tmp[2].u.byte[1];
-    M3TX=tmp[3].u.byte[1]; 
-
-    complete_pretx();
-    M0TX=tmp[0].u.byte[0];
-    M1TX=tmp[1].u.byte[0];
-    M2TX=tmp[2].u.byte[0];
-    M3TX=tmp[3].u.byte[0];
-    
-receive_ticks();
-
-
+	receive_ticks();
 }
 
 static void 
@@ -229,9 +204,8 @@ main(void) {
         } else {
             __enable_interrupt();
             udelay(3000);
-            set_speed(); 
+            send_cur_cmd(); 
             get_voltage(); 
-            //set_acceleration(); 
         }
         LED1 = CDONE0;
         LED2 = CDONE1;
