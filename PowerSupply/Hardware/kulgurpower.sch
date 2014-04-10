@@ -18114,25 +18114,25 @@ Source: coiltronics_dr_series.pdf</description>
 <part name="U$3" library="FDMS8558S" deviceset="FDMS8558S" device="" value="AON6500"/>
 <part name="U$4" library="SparkFun-AnalogIC" deviceset="ACS712" device=""/>
 <part name="GND5" library="supply1" deviceset="GND" device=""/>
-<part name="C7" library="rcl" deviceset="C-EU" device="C0603" value="0.1"/>
+<part name="C7" library="rcl" deviceset="C-EU" device="C0603" value="1n"/>
 <part name="GND15" library="supply1" deviceset="GND" device=""/>
 <part name="U$6" library="FDMS8558S" deviceset="FDMS8558S" device="" value="AON6500"/>
 <part name="U$7" library="FDMS8558S" deviceset="FDMS8558S" device="" value="AON6500"/>
 <part name="U$8" library="SparkFun-AnalogIC" deviceset="ACS712" device=""/>
 <part name="GND2" library="supply1" deviceset="GND" device=""/>
-<part name="C4" library="rcl" deviceset="C-EU" device="C0603" value="0.1"/>
+<part name="C4" library="rcl" deviceset="C-EU" device="C0603" value="1n"/>
 <part name="GND10" library="supply1" deviceset="GND" device=""/>
 <part name="U$9" library="FDMS8558S" deviceset="FDMS8558S" device="" value="AON6500"/>
 <part name="U$10" library="FDMS8558S" deviceset="FDMS8558S" device="" value="AON6500"/>
 <part name="U$11" library="SparkFun-AnalogIC" deviceset="ACS712" device=""/>
 <part name="GND12" library="supply1" deviceset="GND" device=""/>
-<part name="C11" library="rcl" deviceset="C-EU" device="C0603" value="0.1"/>
+<part name="C11" library="rcl" deviceset="C-EU" device="C0603" value="1n"/>
 <part name="GND18" library="supply1" deviceset="GND" device=""/>
 <part name="U$5" library="FDMS8558S" deviceset="FDMS8558S" device="" value="AON6500"/>
 <part name="U$12" library="FDMS8558S" deviceset="FDMS8558S" device="" value="AON6500"/>
 <part name="U$13" library="SparkFun-AnalogIC" deviceset="ACS712" device=""/>
 <part name="GND23" library="supply1" deviceset="GND" device=""/>
-<part name="C18" library="rcl" deviceset="C-EU" device="C0603" value="0.1"/>
+<part name="C18" library="rcl" deviceset="C-EU" device="C0603" value="1n"/>
 <part name="GND34" library="supply1" deviceset="GND" device=""/>
 <part name="PC" library="con-phoenix-508" deviceset="MST2V" device=""/>
 <part name="MISC" library="con-phoenix-508" deviceset="MST2V" device=""/>
@@ -18218,12 +18218,12 @@ Source: coiltronics_dr_series.pdf</description>
 <part name="GND19" library="SparkFun" deviceset="GND" device="" value="GND"/>
 <part name="GND22" library="SparkFun" deviceset="GND" device="" value="GND"/>
 <part name="R3" library="rcl" deviceset="R-EU_" device="R0603" value="300k"/>
-<part name="R39" library="rcl" deviceset="R-EU_" device="R0603" value="30k"/>
+<part name="R39" library="rcl" deviceset="R-EU_" device="R0603" value="24k"/>
 <part name="R23" library="rcl" deviceset="R-EU_" device="R0603" value="18k"/>
 <part name="R4" library="rcl" deviceset="R-EU_" device="R0603" value="30k"/>
-<part name="R5" library="rcl" deviceset="R-EU_" device="R0603" value="30k"/>
+<part name="R5" library="rcl" deviceset="R-EU_" device="R0603" value="24.3"/>
 <part name="R21" library="rcl" deviceset="R-EU_" device="R0603" value="120k"/>
-<part name="R40" library="rcl" deviceset="R-EU_" device="R0603" value="270k"/>
+<part name="R40" library="rcl" deviceset="R-EU_" device="R0603" value="143k"/>
 <part name="C5" library="rcl" deviceset="C-EU" device="C1210" value="10u"/>
 <part name="GND25" library="SparkFun" deviceset="GND" device=""/>
 <part name="C21" library="rcl" deviceset="C-EU" device="C0603" value="0,1u"/>
@@ -18234,11 +18234,11 @@ Source: coiltronics_dr_series.pdf</description>
 <part name="C17" library="rcl" deviceset="C-EU" device="C1210" value="10uF/6.3V"/>
 <part name="GND50" library="SparkFun" deviceset="GND" device=""/>
 <part name="SJ104" library="rcl" deviceset="R-EU_" device="R0603" value="0R"/>
-<part name="R31" library="rcl" deviceset="R-EU_" device="R0603" value="3k16"/>
-<part name="R32" library="rcl" deviceset="R-EU_" device="R0603" value="3k16"/>
-<part name="R25" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
+<part name="R31" library="rcl" deviceset="R-EU_" device="R0603" value="10k"/>
+<part name="R32" library="rcl" deviceset="R-EU_" device="R0603" value="10k"/>
+<part name="R25" library="rcl" deviceset="R-EU_" device="R0603" value="3k9"/>
 <part name="C16" library="rcl" deviceset="C-EU" device="C0603" value="0,1u"/>
-<part name="R33" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
+<part name="R33" library="rcl" deviceset="R-EU_" device="R0603" value="3k9"/>
 <part name="C20" library="rcl" deviceset="C-EU" device="C0603" value="0,1u"/>
 <part name="SJ114" library="rcl" deviceset="R-EU_" device="R0603" value="0R"/>
 <part name="SJ100" library="rcl" deviceset="R-EU_" device="R0603" value="0R"/>
@@ -20502,7 +20502,7 @@ D4 avoids flowing LiPo voltage to 19V socket.</text>
 <text x="35.56" y="-12.7" size="1.778" layer="91">R1 = (VOUT -1.0) * R2
 120 = 4 * 30</text>
 <text x="109.22" y="-12.7" size="1.778" layer="91">R1 = (VOUT -1.0) * R2
-270 = 9 * 30</text>
+143 = 5.9 * 24.3</text>
 </plain>
 <instances>
 <instance part="U$17" gate="G$1" x="83.82" y="27.94"/>

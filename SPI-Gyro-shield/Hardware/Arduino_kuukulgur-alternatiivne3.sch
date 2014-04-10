@@ -31934,8 +31934,8 @@ Source: &lt;a href="http://www.national.com/ds/LM/LM2936.pdf"&gt; Data sheet&lt;
 </net>
 <net name="SCLK_3V" class="0">
 <segment>
-<wire x1="132.08" y1="15.24" x2="109.22" y2="15.24" width="0.1524" layer="91"/>
-<label x="109.22" y="15.24" size="1.778" layer="95"/>
+<wire x1="132.08" y1="15.24" x2="104.14" y2="15.24" width="0.1524" layer="91"/>
+<label x="104.14" y="15.24" size="1.778" layer="95"/>
 <pinref part="U2" gate="G$1" pin="A5"/>
 </segment>
 <segment>
@@ -31946,8 +31946,8 @@ Source: &lt;a href="http://www.national.com/ds/LM/LM2936.pdf"&gt; Data sheet&lt;
 </net>
 <net name="MOSI_3V" class="0">
 <segment>
-<wire x1="132.08" y1="12.7" x2="109.22" y2="12.7" width="0.1524" layer="91"/>
-<label x="109.22" y="12.7" size="1.778" layer="95"/>
+<wire x1="132.08" y1="12.7" x2="104.14" y2="12.7" width="0.1524" layer="91"/>
+<label x="104.14" y="12.7" size="1.778" layer="95"/>
 <pinref part="U2" gate="G$1" pin="A6"/>
 </segment>
 <segment>
@@ -31958,8 +31958,8 @@ Source: &lt;a href="http://www.national.com/ds/LM/LM2936.pdf"&gt; Data sheet&lt;
 </net>
 <net name="MISO_3V" class="0">
 <segment>
-<wire x1="132.08" y1="22.86" x2="109.22" y2="22.86" width="0.1524" layer="91"/>
-<label x="109.22" y="22.86" size="1.778" layer="95"/>
+<wire x1="132.08" y1="22.86" x2="104.14" y2="22.86" width="0.1524" layer="91"/>
+<label x="104.14" y="22.86" size="1.778" layer="95"/>
 <pinref part="U2" gate="G$1" pin="A2"/>
 </segment>
 <segment>
@@ -31970,8 +31970,8 @@ Source: &lt;a href="http://www.national.com/ds/LM/LM2936.pdf"&gt; Data sheet&lt;
 </net>
 <net name="CS_GYRO_3V" class="0">
 <segment>
-<wire x1="132.08" y1="25.4" x2="109.22" y2="25.4" width="0.1524" layer="91"/>
-<label x="109.22" y="25.4" size="1.778" layer="95"/>
+<wire x1="132.08" y1="25.4" x2="104.14" y2="25.4" width="0.1524" layer="91"/>
+<label x="104.14" y="25.4" size="1.778" layer="95"/>
 <pinref part="U2" gate="G$1" pin="A1"/>
 </segment>
 <segment>
@@ -32518,21 +32518,21 @@ Source: &lt;a href="http://www.national.com/ds/LM/LM2936.pdf"&gt; Data sheet&lt;
 <net name="CS_MOTOR_5V_D49" class="0">
 <segment>
 <wire x1="110.49" y1="57.15" x2="107.95" y2="57.15" width="0.1524" layer="91"/>
-<label x="102.362" y="56.134" size="1.778" layer="95"/>
+<label x="82.042" y="56.134" size="1.778" layer="95"/>
 <pinref part="JP8" gate="G$1" pin="3"/>
 </segment>
 </net>
 <net name="MOSI_5V_D51" class="0">
 <segment>
 <wire x1="110.49" y1="59.69" x2="107.95" y2="59.69" width="0.1524" layer="91"/>
-<label x="102.362" y="58.674" size="1.778" layer="95"/>
+<label x="82.042" y="58.674" size="1.778" layer="95"/>
 <pinref part="JP8" gate="G$1" pin="2"/>
 </segment>
 </net>
 <net name="CS_GYRO_5V_D53" class="0">
 <segment>
 <wire x1="110.49" y1="62.23" x2="107.95" y2="62.23" width="0.1524" layer="91"/>
-<label x="102.362" y="61.214" size="1.778" layer="95"/>
+<label x="82.042" y="61.214" size="1.778" layer="95"/>
 <pinref part="JP8" gate="G$1" pin="1"/>
 </segment>
 </net>

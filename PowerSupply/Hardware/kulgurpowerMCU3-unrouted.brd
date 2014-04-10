@@ -29,13 +29,13 @@
 <layer number="19" name="Unrouted" color="6" fill="1" visible="no" active="yes"/>
 <layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="22" name="bPlace" color="7" fill="1" visible="no" active="yes"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
-<layer number="24" name="bOrigins" color="15" fill="1" visible="no" active="yes"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="26" name="bNames" color="7" fill="1" visible="no" active="yes"/>
-<layer number="27" name="tValues" color="7" fill="1" visible="no" active="yes"/>
-<layer number="28" name="bValues" color="7" fill="1" visible="no" active="yes"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="no" active="yes"/>
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="yes"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="yes"/>
@@ -6199,8 +6199,8 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="83.89" y="0.055" size="1.27" layer="28" rot="MR0"/>
 </element>
 <element name="C12" library="SparkFun" package="0603-CAP" value="0.1" x="56.0257" y="34.3957" smashed="yes" rot="R270"/>
-<element name="AN0" library="testpad" package="B1,27" value="TPB1,27" x="55.0467" y="36.9215" smashed="yes" rot="R90">
-<attribute name="TP_SIGNAL_NAME" value="" x="56.9517" y="36.2865" size="1" layer="37" rot="R90"/>
+<element name="AN0" library="testpad" package="B1,27" value="TPB1,27" x="55.0467" y="36.4215" smashed="yes" rot="R90">
+<attribute name="TP_SIGNAL_NAME" value="" x="56.9517" y="35.7865" size="1" layer="37" rot="R90"/>
 </element>
 <element name="R18" library="rcl" package="R0603" value="100k" x="53.9152" y="34.4035" smashed="yes" rot="R270"/>
 <element name="R23" library="rcl" package="R0603" value="680k" x="43.1368" y="36.3333" smashed="yes" rot="R180"/>
@@ -6341,18 +6341,22 @@ design rules under a new name.</description>
 <element name="C49" library="SparkFun" package="0603-CAP" value="0,1" x="99" y="21" smashed="yes"/>
 <element name="D1" library="diode" package="SMC" value="MBRS320T3" x="28.544" y="53.0799" smashed="yes" rot="MR0"/>
 <element name="C50" library="rcl" package="C1210" value="22uF/25V" x="36.75" y="54.75" smashed="yes" rot="MR180"/>
-<element name="U$4" library="crystal" package="ASE" value="ASE" x="53.25" y="17">
+<element name="U$4" library="crystal" package="ASE" value="ASE" x="53.25" y="17" smashed="yes">
 <attribute name="OC_NEWARK" value="unknown" x="53.25" y="17" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="53.25" y="17" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="53.25" y="17" size="1.778" layer="27" display="off"/>
 <attribute name="OC_FARNELL" value="unknown" x="53.25" y="17" size="1.778" layer="27" display="off"/>
 </element>
-<element name="TP1" library="testpad" package="B1,27" value="TPB1,27" x="50.75" y="15.5">
-<attribute name="TP_SIGNAL_NAME" value="" x="50.75" y="15.5" size="1.778" layer="27" display="off"/>
+<element name="TP1" library="testpad" package="B1,27" value="TPB1,27" x="50.75" y="15.5" smashed="yes">
+<attribute name="TP_SIGNAL_NAME" value="" x="50.115" y="13.595" size="1" layer="37"/>
+<attribute name="VALUE" x="50.115" y="14.738" size="0.0254" layer="27"/>
 </element>
-<element name="U$6" library="XCL202" package="CL2025" value="XCL202B331BR-G" x="50.25" y="45.75" rot="R90"/>
-<element name="C53" library="rcl" package="C0603" value="10uF / 6.3V" x="52.75" y="45.75" rot="R90"/>
-<element name="C54" library="rcl" package="C0603" value="4.7uF / 10V" x="47.75" y="45.75" rot="R270"/>
+<element name="U$6" library="XCL202" package="CL2025" value="XCL202B331BR-G" x="50.25" y="45.75" smashed="yes" rot="R90">
+<attribute name="NAME" x="52.25" y="43.75" size="0.8128" layer="51" rot="R180"/>
+<attribute name="VALUE" x="52.25" y="48.25" size="0.8128" layer="51" rot="R180"/>
+</element>
+<element name="C53" library="rcl" package="C0603" value="10uF / 6.3V" x="52.75" y="45.75" smashed="yes" rot="R90"/>
+<element name="C54" library="rcl" package="C0603" value="4.7uF / 10V" x="47.75" y="45.75" smashed="yes" rot="R270"/>
 <element name="U$5" library="tonu" package="SO8" value="TPS54332" x="17.5" y="14.25" smashed="yes" rot="MR90"/>
 <element name="C28" library="SparkFun" package="0603-CAP" value="0.1" x="14.5" y="10.75" smashed="yes" rot="MR0"/>
 <element name="C51" library="SparkFun" package="0603-CAP" value="12pF" x="23.5" y="14.75" smashed="yes" rot="MR180"/>
@@ -6368,7 +6372,9 @@ design rules under a new name.</description>
 <element name="C57" library="rcl" package="C1210" value="GRM32ER71E226KE15L" x="20.1918" y="4.8879" smashed="yes" rot="MR90"/>
 <element name="C58" library="rcl" package="C/6032-28R" value="100uF/16V" x="6.9767" y="8.0394" smashed="yes" rot="MR90"/>
 <element name="R45" library="SparkFun" package="0603-RES" value="21k5" x="11.25" y="17.25" smashed="yes" rot="MR180"/>
-<element name="L7" library="inductors" package="DR73" value="4,7uH" x="26.0374" y="6.3985" rot="MR270"/>
+<element name="L7" library="inductors" package="DR73" value="4,7uH" x="26.0374" y="6.3985" smashed="yes" rot="MR270">
+<attribute name="NAME" x="22.0374" y="9.8985" size="1.27" layer="26" rot="MR270"/>
+</element>
 </elements>
 <signals>
 <signal name="N$98">
@@ -6940,7 +6946,7 @@ design rules under a new name.</description>
 <via x="11.213090625" y="3.51981875" extent="1-16" drill="0.6" diameter="0.6096"/>
 <via x="6.97933125" y="5.4862" extent="1-16" drill="0.6" diameter="0.6096"/>
 <via x="24.138159375" y="11.41869375" extent="1-16" drill="0.3048" diameter="0.6096"/>
-<via x="25.138159375" y="11.41869375" extent="1-16" drill="0.3048" diameter="0.6096"/>
+<wire x1="25.138159375" y1="11.41869375" x2="25.138159375" y2="11.41869375" width="0" layer="19" extent="1-16"/>
 <via x="28.638159375" y="10.66869375" extent="1-16" drill="0.3048" diameter="0.6096"/>
 <via x="28.638159375" y="9.66869375" extent="1-16" drill="0.3048" diameter="0.6096"/>
 <via x="28.638159375" y="8.66869375" extent="1-16" drill="0.3048" diameter="0.6096"/>
@@ -7952,9 +7958,9 @@ design rules under a new name.</description>
 <wire x1="62.9649" y1="32.4704" x2="55.5952" y2="32.4704" width="0.2032" layer="1"/>
 <wire x1="55.5952" y1="32.4704" x2="51.6248" y2="28.5" width="0.2032" layer="1"/>
 <wire x1="51.6248" y1="28.5" x2="31.8453" y2="28.5" width="0.2032" layer="1"/>
-<wire x1="31.8453" y1="28.5" x2="31.0358" y2="27.6905" width="0.2032" layer="1"/>
-<wire x1="31.0358" y1="27.6905" x2="31.0358" y2="27.3224" width="0.2032" layer="1"/>
-<wire x1="31.0358" y1="27.3224" x2="29.9175" y2="26.2041" width="0.2032" layer="1"/>
+<wire x1="31.8453" y1="28.5" x2="30.7858" y2="27.4405" width="0.2032" layer="1"/>
+<wire x1="30.7858" y1="27.4405" x2="30.7858" y2="27.0724" width="0.2032" layer="1"/>
+<wire x1="30.7858" y1="27.0724" x2="29.9175" y2="26.2041" width="0.2032" layer="1"/>
 <wire x1="29.9175" y1="26.2041" x2="20.3659" y2="26.2041" width="0.2032" layer="1"/>
 <wire x1="20.3659" y1="26.2041" x2="19.34" y2="27.23" width="0.2032" layer="1"/>
 <wire x1="63.969" y1="32.4704" x2="62.9649" y2="32.4704" width="0.2032" layer="1"/>
@@ -8669,7 +8675,7 @@ design rules under a new name.</description>
 <wire x1="56.0257" y1="35.2457" x2="56.7798" y2="35.2457" width="0.2032" layer="1"/>
 <via x="57.0037" y="35.3496" extent="1-16" drill="0.3048" diameter="0.6096"/>
 <via x="60.5619" y="24.4583" extent="1-16" drill="0.3048" diameter="0.6096"/>
-<wire x1="55.0467" y1="35.2535" x2="55.0467" y2="36.9215" width="0.2032" layer="1"/>
+<wire x1="55.0467" y1="35.2535" x2="55.0467" y2="36.4215" width="0.2032" layer="1"/>
 <wire x1="56.0257" y1="35.2457" x2="55.0545" y2="35.2457" width="0.2032" layer="1"/>
 <wire x1="55.0545" y1="35.2457" x2="55.0467" y2="35.2535" width="0.2032" layer="1"/>
 <wire x1="55.0467" y1="35.2535" x2="54.7193" y2="35.2535" width="0.2032" layer="1"/>
