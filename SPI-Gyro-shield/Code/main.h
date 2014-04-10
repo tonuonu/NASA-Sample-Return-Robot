@@ -70,6 +70,7 @@ struct twobyte_st {
 extern volatile struct twobyte_st voltage[4];
 extern volatile struct twobyte_st cur_cmd_param[4];
 extern volatile unsigned char cur_cmd[4];
+extern volatile struct twobyte_st cur_target_speed[4];
 
 extern volatile unsigned char fpga_in;
 extern volatile unsigned char recv_bytenum;

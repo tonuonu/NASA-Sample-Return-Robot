@@ -42,7 +42,7 @@ __fast_interrupt void uart5_receive(void) {
             motor_idx=recvbyte & 0x03;
             tmp2.u.int16 = (command == CMD_GET_VOLTAGE) ?
 							voltage[motor_idx].u.int16 :
-							cur_cmd_param[motor_idx].u.int16;
+							cur_target_speed[motor_idx].u.int16;
             u5tb=tmp2.u.byte[1];
             break;
         case 1:  // second byte received
