@@ -67,7 +67,7 @@ enum {
  */
 struct twobyte_st {
     union {
-        int8_t byte[2];
+        uint8_t byte[2];
         int16_t int16;
     } u;
 };

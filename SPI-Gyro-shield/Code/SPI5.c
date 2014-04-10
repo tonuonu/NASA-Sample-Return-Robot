@@ -37,7 +37,7 @@ __fast_interrupt void uart5_receive(void) {
         unsigned char recvbyte=u5rb & 0xff;
 
         switch(recv_bytenum) {
-        case 0:
+        case 0: // first byte received
             command=recvbyte & 0xFC;
             motor_idx=recvbyte & 0x03;
             switch(command) {
@@ -47,23 +47,24 @@ __fast_interrupt void uart5_receive(void) {
                 break;
             case CMD_GET_CUR_TARGET_SPEED:
                 break;
-            case CMD_GET_VOLTAGE:
+            case CMD_GET_VOLTAGE: 
+                tmp2.u.int16 = voltage[motor_idx].u.int16;
+                u5tb=tmp2.u.byte[1];
                 break;
             default:
                 
                 break;
             }
             break;
-        case 1:
+        case 1:  // second byte received
             switch(command) {
-            case CMD_SPEED:
+            case CMD_SPEED: // first byte of speed
                 tmp=recvbyte;
                 break;
             case CMD_ACCELERATION:
                 tmp=recvbyte;
                 break;
             case CMD_GET_VOLTAGE:
-                tmp2.u.int16 = voltage[motor_idx].u.int16;
                 u5tb=tmp2.u.byte[0];
                 break;
             case CMD_GET_CUR_TARGET_SPEED:
@@ -76,38 +77,43 @@ __fast_interrupt void uart5_receive(void) {
             break;
         case 2:
             switch(command) {
-            case CMD_SPEED:
-                speed[motor_idx].u.byte[0]=tmp;
-                speed[motor_idx].u.byte[1]=recvbyte;
+            case CMD_SPEED: // second byte of speed
+                speed[motor_idx].u.byte[1]=tmp;
+                speed[motor_idx].u.byte[0]=recvbyte;
                 tmp2.u.int16 = ticks[motor_idx].u.int16;
+                u5tb=tmp2.u.byte[1];
                 ticks[motor_idx].u.int16=0; // clear accumulator
-                u5tb=tmp2.u.byte[0];
                 break;
             case CMD_ACCELERATION:
-                acceleration[motor_idx].u.byte[0]=tmp;
-                acceleration[motor_idx].u.byte[1]=recvbyte;
+                acceleration[motor_idx].u.byte[1]=tmp;
+                acceleration[motor_idx].u.byte[0]=recvbyte;
                 break;
             case CMD_GET_CUR_TARGET_SPEED:
                 /* ? */
                 break;
             case CMD_GET_VOLTAGE:
-                u5tb=tmp2.u.byte[1];
                 break;
             default:
                 break;
             }
             break;
         case 3:
-            u5tb=tmp2.u.byte[1];
+            switch(command) {
+                case CMD_SPEED: // second byte of speed
+                u5tb=tmp2.u.byte[0];
+                break;
+            }
             break;
         case 4:
+            u5tb=motor_load[motor_idx];
             break;
         default:
             break;
         }
         recv_bytenum++;
 
-   }    
+    }    
+ 
     /* Clear the 'reception complete' flag.	*/
     ir_s5ric = 0;
 }
@@ -144,7 +150,7 @@ SPI5_Init(void) {
     re_u5c1 = 1;                                           // Reception Enable when 1
     ri_u5c1 = 0;                                           // Receive complete flag - U5RB is empty.
     u5irs_u5c1 = 1;                                        // Interrupt when transmission is completed.
-    u5rrm_u5c1 = 1;                                        // Continuous receive mode off
+    u5rrm_u5c1 = 1;                                        // Continuous receive mode on
     u5lch_u5c1 = 1;                                        // Logical inversion off 
 
     u5smr = 0x00;
@@ -171,7 +177,7 @@ SPI5_Init(void) {
     ilvl_s5ric = 7; // fast interrupt
     ir_s5ric   = 0;            
     ilvl_s5tic = 0;
-    ir_s5tic   = 0;            
-//    __enable_interrupt();
+    ir_s5tic   = 0;
+    // we do not enable interrupts until FPGA code is loaded
 }
 

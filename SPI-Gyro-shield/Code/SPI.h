@@ -19,7 +19,7 @@
  *
  */
 
-#define MOTORS_SPI_SPEED 25000000
+#define MOTORS_SPI_SPEED 4000000
 
 /* Four motor ports */
 void SPI0_Init(void); 

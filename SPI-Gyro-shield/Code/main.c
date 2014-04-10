@@ -59,25 +59,18 @@ set_speed(void) {
     tmp[3].u.int16=speed[3].u.int16;
 
     complete_pretx();
-    M0TX=tmp[0].u.byte[0];
-    M1TX=tmp[1].u.byte[0];
-    M2TX=tmp[2].u.byte[0];
-    M3TX=tmp[3].u.byte[0]; 
-
-    complete_pretx();
     M0TX=tmp[0].u.byte[1];
     M1TX=tmp[1].u.byte[1];
     M2TX=tmp[2].u.byte[1];
-    M3TX=tmp[3].u.byte[1];
+    M3TX=tmp[3].u.byte[1]; 
+
+    complete_pretx();
+    M0TX=tmp[0].u.byte[0];
+    M1TX=tmp[1].u.byte[0];
+    M2TX=tmp[2].u.byte[0];
+    M3TX=tmp[3].u.byte[0];
     
     complete_pretx();
-    M0TX=M1TX=M2TX=M3TX = 0;
-    complete_tx();
-    tmprecv[0].u.byte[0]=u0rb & 0xff;
-    tmprecv[1].u.byte[0]=u3rb & 0xff;
-    tmprecv[2].u.byte[0]=u4rb & 0xff;
-    tmprecv[3].u.byte[0]=u6rb & 0xff;
-
     M0TX=M1TX=M2TX=M3TX = 0;
     complete_tx();
     tmprecv[0].u.byte[1]=u0rb & 0xff;
@@ -85,20 +78,36 @@ set_speed(void) {
     tmprecv[2].u.byte[1]=u4rb & 0xff;
     tmprecv[3].u.byte[1]=u6rb & 0xff;
 
-    CS0=CS3=CS4=CS6 = 1;
+    M0TX=M1TX=M2TX=M3TX = 0;
+    complete_tx();
+    tmprecv[0].u.byte[0]=u0rb & 0xff;
+    tmprecv[1].u.byte[0]=u3rb & 0xff;
+    tmprecv[2].u.byte[0]=u4rb & 0xff;
+    tmprecv[3].u.byte[0]=u6rb & 0xff;
 
-    for(int i=1;i<=3;i++) {
+    CS0=CS3=CS4=CS6 = 1;
+    
+    for(int i=0;i<=3;i++) {
         /*
          * Sign extending happens automagically!
          * Look for SurrealWombat post on
          * http://stackoverflow.com/questions/6215256/sign-extension-from-16-to-32-bits-in-c
          * for details.
          */
-        motor_load[i] = abs(tmprecv[i].u.byte[0] >> 1); 
+        int8_t y=tmprecv[i].u.int16 >> 9;
+        if(y & 0x40)
+            y |= 0x80;
+        motor_load[i] = abs(y); 
         /* make sure ticks[i].u.int16 does not change while we work */
         __disable_interrupt();
         /* Sign extending magic again! */
-        int32_t x = (uint32_t)ticks[i].u.int16 + (uint32_t)((tmprecv[i].u.int16 << 7) >> 7);
+        
+        int16_t kala2 = tmprecv[i].u.int16;
+        int16_t kala1 = kala2 & 0x1f;
+        if (kala1 & 0x80) 
+            kala1 = 0xff00 | kala1;
+
+        int32_t x = (uint32_t)ticks[i].u.int16 + (uint32_t)kala1; 
         /* Check for possible overflow of INT16 and lit red LED */
         if(x > INT16_MAX || x < INT16_MIN) {
             LED5=1;
@@ -106,7 +115,7 @@ set_speed(void) {
             ticks[i].u.int16=x;
         }
         __enable_interrupt();
-    }
+    }   
 }
 
 static void 
@@ -127,18 +136,18 @@ get_voltage(void) {
     M0TX=M1TX=M2TX=M3TX=0;
     complete_tx();
 
-    tmprecv[0].u.byte[0]=u0rb & 0xff;
-    tmprecv[1].u.byte[0]=u3rb & 0xff;
-    tmprecv[2].u.byte[0]=u4rb & 0xff;
-    tmprecv[3].u.byte[0]=u6rb & 0xff;
-
-    M0TX=M1TX=M2TX=M3TX=0;
-    complete_tx();
-
     tmprecv[0].u.byte[1]=u0rb & 0xff;
     tmprecv[1].u.byte[1]=u3rb & 0xff;
     tmprecv[2].u.byte[1]=u4rb & 0xff;
     tmprecv[3].u.byte[1]=u6rb & 0xff;
+
+    M0TX=M1TX=M2TX=M3TX=0;
+    complete_tx();
+
+    tmprecv[0].u.byte[0]=u0rb & 0xff;
+    tmprecv[1].u.byte[0]=u3rb & 0xff;
+    tmprecv[2].u.byte[0]=u4rb & 0xff;
+    tmprecv[3].u.byte[0]=u6rb & 0xff;
 
     CS0=CS3=CS4=CS6 = 1;
 
@@ -183,7 +192,7 @@ main(void) {
             udelay(1000);            
         } else {
             __enable_interrupt();
-            udelay(5000);
+            udelay(3000);
             set_speed(); 
             get_voltage(); 
         }
