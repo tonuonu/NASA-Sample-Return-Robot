@@ -31,8 +31,9 @@ struct twobyte_st tmprecv[4] = {0,0,0,0,0,0,0,0};
 volatile unsigned char motor_load[4] = {0,0,0,0};
 volatile struct twobyte_st ticks[4] = {0,0,0,0,0,0,0,0};
 volatile struct twobyte_st cur_cmd_param[4] = {0,0,0,0,0,0,0,0};
-volatile struct unsigned char cur_cmd[4] = {CMD_SPEED,CMD_SPEED,CMD_SPEED,CMD_SPEED};
+volatile unsigned char cur_cmd[4] = {CMD_SPEED,CMD_SPEED,CMD_SPEED,CMD_SPEED};
 volatile struct twobyte_st voltage[4] = {0,0,0,0,0,0,0,0};
+
 
 static void
 receive_ticks(void) {
