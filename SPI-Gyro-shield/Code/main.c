@@ -34,9 +34,92 @@ volatile struct twobyte_st speed[4] = {0,0,0,0,0,0,0,0};
 volatile struct twobyte_st voltage[4] = {0,0,0,0,0,0,0,0};
 volatile struct twobyte_st acceleration[4] = {0,0,0,0,0,0,0,0};
 
-static void 
-set_speed(void) {
+static void
+receive_ticks(void) {
   
+    complete_pretx();
+    M0TX=M1TX=M2TX=M3TX = 0;
+    complete_tx();
+    tmprecv[0].u.byte[1]=u0rb & 0xff;
+    tmprecv[1].u.byte[1]=u3rb & 0xff;
+    tmprecv[2].u.byte[1]=u4rb & 0xff;
+    tmprecv[3].u.byte[1]=u6rb & 0xff;
+
+    M0TX=M1TX=M2TX=M3TX = 0;
+    complete_tx();
+    tmprecv[0].u.byte[0]=u0rb & 0xff;
+    tmprecv[1].u.byte[0]=u3rb & 0xff;
+    tmprecv[2].u.byte[0]=u4rb & 0xff;
+    tmprecv[3].u.byte[0]=u6rb & 0xff;
+
+    CS0=CS3=CS4=CS6 = 1;
+    
+    for(int i=0;i<=3;i++) {
+        int8_t y=tmprecv[i].u.int16 >> 9;
+        if(y & 0x40)   // if   x1xx xxxx 
+            y |= 0x80; // then 11xx xxxx
+        motor_load[i] = abs(y); 
+        /* make sure ticks[i].u.int16 does not change while we work */
+        __disable_interrupt();
+        
+        int16_t kala2 = tmprecv[i].u.int16;
+        int16_t kala1 = kala2 & 0x01ff; // keep 9 bits only
+        if (kala1 & 0x0100)       // if   xxxx xxx1 xxxx xxxx
+            kala1 |= 0xff00 ;     // then 1111 1111 xxxx xxxx
+
+        int32_t x = (uint32_t)ticks[i].u.int16 + (uint32_t)kala1; 
+        /* Check for possible overflow of INT16 and lit red LED */
+        if(x > INT16_MAX || x < INT16_MIN) {
+            LED5=1;
+        } else {
+            ticks[i].u.int16=x;
+        }
+        __enable_interrupt();
+    }   
+}
+
+static void 
+set_acceleration() {
+  
+    if(RESET5 == 0) {
+        return;
+    }
+    complete_tx(); // make sure we are not transmitting garbage already
+
+    CS0=CS3=CS4=CS6 = 0;
+    M0TX=CMD_ACCELERATION | 0;
+    M1TX=CMD_ACCELERATION | 1;
+    M2TX=CMD_ACCELERATION | 2;
+    M3TX=CMD_ACCELERATION | 3;
+    
+    /* 
+     * Use temporary variable to ensure interrupts to not overwrite
+     * value while we send it. 
+     */
+    struct twobyte_st tmp[4];
+    tmp[0].u.int16=acceleration[0].u.int16;
+    tmp[1].u.int16=acceleration[1].u.int16;
+    tmp[2].u.int16=acceleration[2].u.int16;
+    tmp[3].u.int16=acceleration[3].u.int16;
+
+    complete_pretx();
+    M0TX=tmp[0].u.byte[1];
+    M1TX=tmp[1].u.byte[1];
+    M2TX=tmp[2].u.byte[1];
+    M3TX=tmp[3].u.byte[1]; 
+
+    complete_pretx();
+    M0TX=tmp[0].u.byte[0];
+    M1TX=tmp[1].u.byte[0];
+    M2TX=tmp[2].u.byte[0];
+    M3TX=tmp[3].u.byte[0];
+    
+    receive_ticks();
+}
+
+
+static void 
+set_speed() {
     if(RESET5 == 0) {
         return;
     }
@@ -70,52 +153,9 @@ set_speed(void) {
     M2TX=tmp[2].u.byte[0];
     M3TX=tmp[3].u.byte[0];
     
-    complete_pretx();
-    M0TX=M1TX=M2TX=M3TX = 0;
-    complete_tx();
-    tmprecv[0].u.byte[1]=u0rb & 0xff;
-    tmprecv[1].u.byte[1]=u3rb & 0xff;
-    tmprecv[2].u.byte[1]=u4rb & 0xff;
-    tmprecv[3].u.byte[1]=u6rb & 0xff;
+receive_ticks();
 
-    M0TX=M1TX=M2TX=M3TX = 0;
-    complete_tx();
-    tmprecv[0].u.byte[0]=u0rb & 0xff;
-    tmprecv[1].u.byte[0]=u3rb & 0xff;
-    tmprecv[2].u.byte[0]=u4rb & 0xff;
-    tmprecv[3].u.byte[0]=u6rb & 0xff;
 
-    CS0=CS3=CS4=CS6 = 1;
-    
-    for(int i=0;i<=3;i++) {
-        /*
-         * Sign extending happens automagically!
-         * Look for SurrealWombat post on
-         * http://stackoverflow.com/questions/6215256/sign-extension-from-16-to-32-bits-in-c
-         * for details.
-         */
-        int8_t y=tmprecv[i].u.int16 >> 9;
-        if(y & 0x40)
-            y |= 0x80;
-        motor_load[i] = abs(y); 
-        /* make sure ticks[i].u.int16 does not change while we work */
-        __disable_interrupt();
-        /* Sign extending magic again! */
-        
-        int16_t kala2 = tmprecv[i].u.int16;
-        int16_t kala1 = kala2 & 0x1f;
-        if (kala1 & 0x80) 
-            kala1 = 0xff00 | kala1;
-
-        int32_t x = (uint32_t)ticks[i].u.int16 + (uint32_t)kala1; 
-        /* Check for possible overflow of INT16 and lit red LED */
-        if(x > INT16_MAX || x < INT16_MIN) {
-            LED5=1;
-        } else {
-            ticks[i].u.int16=x;
-        }
-        __enable_interrupt();
-    }   
 }
 
 static void 
@@ -195,6 +235,7 @@ main(void) {
             udelay(3000);
             set_speed(); 
             get_voltage(); 
+            //set_acceleration(); 
         }
         LED1 = CDONE0;
         LED2 = CDONE1;

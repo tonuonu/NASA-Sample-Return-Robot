@@ -87,6 +87,9 @@ __fast_interrupt void uart5_receive(void) {
             case CMD_ACCELERATION:
                 acceleration[motor_idx].u.byte[1]=tmp;
                 acceleration[motor_idx].u.byte[0]=recvbyte;
+                tmp2.u.int16 = ticks[motor_idx].u.int16;
+                u5tb=tmp2.u.byte[1];
+                ticks[motor_idx].u.int16=0; // clear accumulator
                 break;
             case CMD_GET_CUR_TARGET_SPEED:
                 /* ? */
@@ -100,6 +103,7 @@ __fast_interrupt void uart5_receive(void) {
         case 3:
             switch(command) {
                 case CMD_SPEED: // second byte of speed
+                case CMD_ACCELERATION: // second byte of acceleration
                 u5tb=tmp2.u.byte[0];
                 break;
             }

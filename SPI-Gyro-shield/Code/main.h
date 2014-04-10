@@ -48,18 +48,13 @@ complete_tx(void) {
           (txept_u6c0 == 0)); 
 }
 
-enum {
-    FPGA_LOADING,
-    FPGA_LOADED
-};
-
-enum {
+enum cmds_e {
     CMD_NONE=0, 
     CMD_SPEED=0x04, 
     CMD_ACCELERATION=0x08, 
     CMD_GET_CUR_TARGET_SPEED=0x10,
     CMD_GET_VOLTAGE=0x18
-};
+} ;
 
 /*
  * This union is used in every context where we need to receive two separate 
