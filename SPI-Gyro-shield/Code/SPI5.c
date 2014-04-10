@@ -40,37 +40,14 @@ __fast_interrupt void uart5_receive(void) {
         case 0: // first byte received
             command=recvbyte & 0xFC;
             motor_idx=recvbyte & 0x03;
-            switch(command) {
-            case CMD_SPEED:
-            case CMD_ACCELERATION:
-                break;
-            case CMD_GET_CUR_TARGET_SPEED:
-                break;
-            case CMD_GET_VOLTAGE: 
-                tmp2.u.int16 = voltage[motor_idx].u.int16;
-                u5tb=tmp2.u.byte[1];
-                break;
-            default:
-                
-                break;
-            }
+            tmp2.u.int16 = (command == CMD_GET_VOLTAGE) ?
+							voltage[motor_idx].u.int16 :
+							cur_target_speed[motor_idx].u.int16;
+            u5tb=tmp2.u.byte[1];
             break;
         case 1:  // second byte received
-            switch(command) {
-            case CMD_SPEED: // first byte of speed/acceleration
-            case CMD_ACCELERATION:
-                tmp=recvbyte;
-                break;
-            case CMD_GET_VOLTAGE:
-                u5tb=tmp2.u.byte[0];
-                break;
-            case CMD_GET_CUR_TARGET_SPEED:
-                /* ? */
-                break;
-            default:
-                
-                break;
-            }
+            tmp=recvbyte;
+            u5tb=tmp2.u.byte[0];
             break;
         case 2:
             switch(command) {
@@ -82,11 +59,6 @@ __fast_interrupt void uart5_receive(void) {
                 tmp2.u.int16 = ticks[motor_idx].u.int16;
                 u5tb=tmp2.u.byte[1];
                 ticks[motor_idx].u.int16=0; // clear accumulator
-                break;
-            case CMD_GET_CUR_TARGET_SPEED:
-                /* ? */
-                break;
-            case CMD_GET_VOLTAGE:
                 break;
             default:
                 break;

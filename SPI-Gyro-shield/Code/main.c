@@ -33,6 +33,7 @@ volatile struct twobyte_st ticks[4] = {0,0,0,0,0,0,0,0};
 volatile struct twobyte_st cur_cmd_param[4] = {0,0,0,0,0,0,0,0};
 volatile unsigned char cur_cmd[4] = {CMD_SPEED,CMD_SPEED,CMD_SPEED,CMD_SPEED};
 volatile struct twobyte_st voltage[4] = {0,0,0,0,0,0,0,0};
+volatile struct twobyte_st cur_target_speed[4] = {0,0,0,0,0,0,0,0};
 
 
 static void
@@ -103,20 +104,33 @@ send_cur_cmd() {
     tmp[3].u.int16=cur_cmd_param[3].u.int16;
 
     complete_pretx();
+
+    tmprecv[0].u.byte[1]=u0rb & 0xff;
+    tmprecv[1].u.byte[1]=u3rb & 0xff;
+    tmprecv[2].u.byte[1]=u4rb & 0xff;
+    tmprecv[3].u.byte[1]=u6rb & 0xff;
+
     M0TX=tmp[0].u.byte[1];
     M1TX=tmp[1].u.byte[1];
     M2TX=tmp[2].u.byte[1];
     M3TX=tmp[3].u.byte[1]; 
 
     complete_pretx();
+
+    tmprecv[0].u.byte[0]=u0rb & 0xff;
+    tmprecv[1].u.byte[0]=u3rb & 0xff;
+    tmprecv[2].u.byte[0]=u4rb & 0xff;
+    tmprecv[3].u.byte[0]=u6rb & 0xff;
+
     M0TX=tmp[0].u.byte[0];
     M1TX=tmp[1].u.byte[0];
     M2TX=tmp[2].u.byte[0];
     M3TX=tmp[3].u.byte[0];
-    
-receive_ticks();
 
+    for(int i=0;i<=3;i++)
+        cur_target_speed[i].u.int16 = tmprecv[i].u.int16;
 
+	receive_ticks();
 }
 
 static void 
