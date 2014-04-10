@@ -76,7 +76,7 @@ SPI0_Init(void) {
     dl2_u0smr3 = 0;                                        // Set 0 for no  delay 
 
     u0smr4 = 0x00;
-
+#if 0
     __disable_interrupt();
     /* 
      * No interrupts
@@ -86,6 +86,7 @@ SPI0_Init(void) {
     ilvl_s0tic =0;
     ir_s0tic   =0;
     __enable_interrupt();
+#endif
 }
 
 

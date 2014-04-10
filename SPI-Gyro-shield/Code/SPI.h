@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013 Tonu Samuel
+ *  Copyright (c) 2013, 2014 Tonu Samuel
  *  All rights reserved.
  *
  *  This file is part of robot "Kuukulgur".
@@ -19,7 +19,7 @@
  *
  */
 
-#define MOTORS_SPI_SPEED 1000000
+#define MOTORS_SPI_SPEED 25000000
 
 /* Four motor ports */
 void SPI0_Init(void); 
@@ -29,5 +29,4 @@ void SPI6_Init(void);
 
 /* Interface to Arduino */
 void SPI5_Init(void);
-
 

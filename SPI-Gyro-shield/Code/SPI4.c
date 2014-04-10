@@ -83,7 +83,7 @@ SPI4_Init(void) {
     dl2_u4smr3 = 0;                                        // Set 0 for no  delay 
 
     u4smr4 = 0x00;
-
+#if 0
     __disable_interrupt();
     /* 
      * No interrupts
@@ -93,6 +93,7 @@ SPI4_Init(void) {
     ilvl_s4tic =0;
     ir_s4tic   =0;            
     __enable_interrupt();
+#endif
 }
 
 

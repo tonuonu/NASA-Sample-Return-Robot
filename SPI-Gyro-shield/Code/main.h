@@ -20,27 +20,21 @@
  */
 
 #include "intrinsics.h"
+#include "stdint.h"
 void Int_Init(void);
 
 
 static inline void 
 complete_pretx(void) {
-  
     while((ti_u0c1 == 0) ||
           (ti_u3c1 == 0) ||
           (ti_u4c1 == 0) ||
           (ti_u6c1 == 0));
-
 }
 
 
 static inline void 
 complete_tx(void) {
-  
-    while((ti_u0c1 == 0) ||
-          (ti_u3c1 == 0) ||
-          (ti_u4c1 == 0) ||
-          (ti_u6c1 == 0));
     /*
      * TXEPT (TX buffer EmPTy)
      * 0: Data held in the transmit shift
@@ -48,16 +42,13 @@ complete_tx(void) {
      * 1: No data held in the transmit shift
      * register (transmission completed)
      */
-    
     while((txept_u0c0 == 0) ||
           (txept_u3c0 == 0) ||
           (txept_u4c0 == 0) ||
           (txept_u6c0 == 0)); 
-
 }
 
 enum {
-    FPGA_EMPTY,
     FPGA_LOADING,
     FPGA_LOADED
 };
@@ -66,7 +57,8 @@ enum {
     CMD_NONE=0, 
     CMD_SPEED=0x04, 
     CMD_ACCELERATION=0x08, 
-    CMD_GET_CUR_TARGET_SPEED=0x10 
+    CMD_GET_CUR_TARGET_SPEED=0x10,
+    CMD_GET_VOLTAGE=0x18
 };
 
 /*
@@ -74,13 +66,13 @@ enum {
  * bytes into single short int (16 bit signed)
  */
 struct twobyte_st {
-//    char dirty;
     union {
-        char byte[2];
-        short int int16;
+        int8_t byte[2];
+        int16_t int16;
     } u;
 };
 
+extern volatile struct twobyte_st voltage[4];
 extern volatile struct twobyte_st speed[4];
 extern volatile struct twobyte_st acceleration[4];
 
@@ -88,6 +80,7 @@ extern volatile unsigned char fpga_in;
 extern volatile unsigned char recv_bytenum;
 
 extern volatile struct twobyte_st ticks[4];
+extern volatile unsigned char motor_load[4];
 
 // On 48 Mhz we do 48 000 000 cycles per second
 // or 48 cycles per microsecond

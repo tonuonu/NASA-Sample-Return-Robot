@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013 Tonu Samuel
+ *  Copyright (c) 2013, 2014 Tonu Samuel
  *  All rights reserved.
  *
  *  This file is part of robot "Kuukulgur".
@@ -26,26 +26,16 @@
 #include "SPI.h"
 
 volatile unsigned char recv_bytenum=0;
-volatile unsigned char fpga_in=FPGA_EMPTY;
 
-__fast_interrupt void uart5_receive(void) {    
-    static unsigned char tmp;
-    
-    static unsigned char command;
-    static int motor_idx;
-    unsigned char recvbyte=u5rb & 0xff;
-    
-    /* Process this only if FPGA is loaded */
-    switch(fpga_in) {
-    case FPGA_LOADING:
-        /* bypass byte transparently */
-        u0tb=
-        u3tb=
-        u4tb=
-        u6tb=recvbyte;
-        break;
-    case FPGA_LOADED:
-//    default:
+__fast_interrupt void uart5_receive(void) {
+    if(CS5==0) {
+        static unsigned char tmp;
+        struct twobyte_st tmp2;
+ 
+        static unsigned char command;
+        static int motor_idx;
+        unsigned char recvbyte=u5rb & 0xff;
+
         switch(recv_bytenum) {
         case 0:
             command=recvbyte & 0xFC;
@@ -57,8 +47,10 @@ __fast_interrupt void uart5_receive(void) {
                 break;
             case CMD_GET_CUR_TARGET_SPEED:
                 break;
+            case CMD_GET_VOLTAGE:
+                break;
             default:
-                LED5=1; // ERROR!!!
+                
                 break;
             }
             break;
@@ -70,11 +62,15 @@ __fast_interrupt void uart5_receive(void) {
             case CMD_ACCELERATION:
                 tmp=recvbyte;
                 break;
+            case CMD_GET_VOLTAGE:
+                tmp2.u.int16 = voltage[motor_idx].u.int16;
+                u5tb=tmp2.u.byte[0];
+                break;
             case CMD_GET_CUR_TARGET_SPEED:
                 /* ? */
                 break;
             default:
-                LED5=1; // ERROR!!!
+                
                 break;
             }
             break;
@@ -83,6 +79,9 @@ __fast_interrupt void uart5_receive(void) {
             case CMD_SPEED:
                 speed[motor_idx].u.byte[0]=tmp;
                 speed[motor_idx].u.byte[1]=recvbyte;
+                tmp2.u.int16 = ticks[motor_idx].u.int16;
+                ticks[motor_idx].u.int16=0; // clear accumulator
+                u5tb=tmp2.u.byte[0];
                 break;
             case CMD_ACCELERATION:
                 acceleration[motor_idx].u.byte[0]=tmp;
@@ -91,32 +90,32 @@ __fast_interrupt void uart5_receive(void) {
             case CMD_GET_CUR_TARGET_SPEED:
                 /* ? */
                 break;
+            case CMD_GET_VOLTAGE:
+                u5tb=tmp2.u.byte[1];
+                break;
             default:
-                LED5=1; // ERROR!!!
                 break;
             }
             break;
         case 3:
-//            ticks.u.byte[0]=recvbyte;
+            u5tb=tmp2.u.byte[1];
             break;
         case 4:
-//            ticks.u.byte[1]=recvbyte;
             break;
         default:
-            LED5=1;
-            udelay(1UL);
-            LED5=0; 
+            break;
         }
         recv_bytenum++;
-    }
-    
+
+   }    
     /* Clear the 'reception complete' flag.	*/
     ir_s5ric = 0;
 }
 
 void
 SPI5_Init(void) {
-    pu27=1; // Enable pullup to avoid floating pin noise on p7_7 (clock)
+//    pu23=1; // Enable pullup to avoid floating pin noise on p7_7 (clock5)
+//    pu24=1; // Enable pullup to avoid floating pin noise on p8_0 (rx5
     CLOCK5s = PF_UART;
     TX5d = PD_OUTPUT;
     TX5s = PF_UART;
@@ -169,12 +168,10 @@ SPI5_Init(void) {
     fsit_ripl1 = 1;
     fsit_ripl2 = 1;
     __set_VCT_register((unsigned long)&uart5_receive);
-//    ilvl_s5ric = 0; // fast interrupt
     ilvl_s5ric = 7; // fast interrupt
     ir_s5ric   = 0;            
     ilvl_s5tic = 0;
-//    ilvl_s5tic = 7;
     ir_s5tic   = 0;            
-    __enable_interrupt();
+//    __enable_interrupt();
 }
 

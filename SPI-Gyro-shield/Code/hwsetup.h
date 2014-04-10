@@ -52,6 +52,14 @@ void HardwareSetup(void);
 #define RESET3       p0_0
 #define RESET3d      pd0_0
 
+#define CDONE0       p0_7
+#define CDONE1       p0_6
+#define CDONE2       p0_5
+#define CDONE3       p0_4
+
+#define MOTOR_ERROR   p5_6
+#define MOTOR_ERRORd   pd5_6
+
 #define RESET5       p8_2
 #define RESET5d      pd8_2
 
@@ -132,7 +140,10 @@ void HardwareSetup(void);
 #define TX5d        pd7_6
 #define TX5s        p7_6s
 
-#define TIMERB2COUNT	2000 // about 12,5kHz
+#define M0TX        u0tb
+#define M1TX        u3tb
+#define M2TX        u4tb
+#define M3TX        u6tb
 
 #define SPI_DELAY (1)
 

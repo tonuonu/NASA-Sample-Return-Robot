@@ -296,7 +296,7 @@
         </option>
         <option>
           <name>IccOptLevel</name>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>IccOptStrategy</name>
@@ -305,7 +305,7 @@
         </option>
         <option>
           <name>IccOptLevelSlave</name>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>IccOptAllowList</name>
@@ -828,7 +828,7 @@
         <debug>0</debug>
         <option>
           <name>OGChipSelectMenu</name>
-          <state>r32c	Generic R32C</state>
+          <state>R5F64112	R5F64112</state>
         </option>
         <option>
           <name>GenDoubleSize</name>
@@ -870,7 +870,7 @@
         </option>
         <option>
           <name>GenRTDescription</name>
-          <state></state>
+          <state>Use the normal configuration of the C/EC++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
         </option>
         <option>
           <name>GenRTConfigPath</name>
@@ -878,25 +878,25 @@
         </option>
         <option>
           <name>GenRTLibraryPath</name>
-          <state></state>
+          <state>$TOOLKIT_DIR$\LIB\dlr32cfsfn.r53</state>
         </option>
         <option>
           <name>GenLibInFormatter</name>
           <version>0</version>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>GenLibInFormatterDescription</name>
-          <state></state>
+          <state>No specifier n, no float or long long.</state>
         </option>
         <option>
           <name>GenLibOutFormatter</name>
           <version>0</version>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>GenLibOutFormatterDescription</name>
-          <state></state>
+          <state>No specifier a or A.</state>
         </option>
         <option>
           <name>GeneralEnableMisra</name>
@@ -908,19 +908,19 @@
         </option>
         <option>
           <name>StackSize</name>
-          <state>###Uninitialized###</state>
+          <state>0x100</state>
         </option>
         <option>
           <name>IStackSize</name>
-          <state>###Uninitialized###</state>
+          <state>0xE0</state>
         </option>
         <option>
           <name>HeapSize</name>
-          <state>###Uninitialized###</state>
+          <state>0x400</state>
         </option>
         <option>
           <name>GenFloatImplementation</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>GeneralMisraVer</name>
@@ -1112,7 +1112,7 @@
         <option>
           <name>IccOptStrategy</name>
           <version>0</version>
-          <state>0</state>
+          <state>2</state>
         </option>
         <option>
           <name>IccOptLevelSlave</name>
@@ -1354,7 +1354,7 @@
         </option>
         <option>
           <name>SecondaryOutputFile</name>
-          <state></state>
+          <state>(None for the selected format)</state>
         </option>
         <option>
           <name>XDefines</name>
@@ -1394,7 +1394,7 @@
         </option>
         <option>
           <name>XIncludes</name>
-          <state>###Uninitialized###</state>
+          <state>$TOOLKIT_DIR$\LIB\</state>
         </option>
         <option>
           <name>ModuleStatus</name>
@@ -1406,7 +1406,7 @@
         </option>
         <option>
           <name>XclFile</name>
-          <state>lnk0t.xcl</state>
+          <state>$TOOLKIT_DIR$\CONFIG\lnkR5F64112.xcl</state>
         </option>
         <option>
           <name>XclFileSlave</name>
@@ -1482,7 +1482,7 @@
         </option>
         <option>
           <name>xcProgramEntryLabel</name>
-          <state></state>
+          <state>__program_start</state>
         </option>
         <option>
           <name>DebugInformation</name>
@@ -1510,7 +1510,7 @@
         </option>
         <option>
           <name>ExtraOutputFile</name>
-          <state></state>
+          <state>SPI-Gyro-shield.a53</state>
         </option>
         <option>
           <name>ExtraOutputFormat</name>

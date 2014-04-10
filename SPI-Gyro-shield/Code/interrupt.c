@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013 Tonu Samuel
+ *  Copyright (c) 2013, 2014 Tonu Samuel
  *  All rights reserved.
  *
  *  This file is part of robot "Kuukulgur".
@@ -41,44 +41,24 @@ Int_Init(void) {
 
 #pragma vector = INT0 // RESET pin is connected here
 __interrupt void _int0(void) {
-    recv_bytenum=0;
-   
-    if(RESET5==1) {
-        /* 
-         * If reset just came up but CS is already low,
-         * FPGA code will be loaded in. 
-         */
-        if(CS5==0) {
-            LED5 = 1;
-            fpga_in=FPGA_LOADING;       
-        }
-    } else { // RESET is LOW, flush everything
-        fpga_in=FPGA_EMPTY;
-    }
 
-    // Copy RESET5 pin to all four motor outputs
-    RESET0=RESET1=RESET2=RESET3 = RESET5;
+    
     /* Clear the interrupt flag. */
     ir_int0ic = 0;
 }
 
 #pragma vector = INT2 // CS pin is connected here
 __interrupt void _int2(void) {
+  
+    //LED5=1;  
     recv_bytenum=0;
     
     complete_tx();
 
-    if(fpga_in != FPGA_LOADED) {
-        // Copy CS5 pin to all four motor outputs
-        CS0=CS3=CS4=CS6 = CS5;
-    }
-    
-    /* If we load FPGA bytes in and then CS goes up, code is loaded */
-    if(fpga_in==FPGA_LOADING && CS5==1) {
-        LED5 = 0;
-        fpga_in=FPGA_LOADED;
-    }
+    // Copy CS5 pin to all four motor outputs
+    CS0=CS3=CS4=CS6 = CS5;
 
+    LED5=0;
     /* Clear the interrupt flag. */
     ir_int2ic = 0;
 }

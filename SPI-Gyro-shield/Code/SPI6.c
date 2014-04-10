@@ -75,7 +75,7 @@ SPI6_Init(void) {
     dl2_u6smr3 = 0;                                        // Set 0 for no  delay 
 
     u6smr4 = 0x00;
-
+#if 0
     __disable_interrupt();
     /* 
      * No interrupts
@@ -85,4 +85,5 @@ SPI6_Init(void) {
     ilvl_s6tic =0;
     ir_s6tic   =0;            
     __enable_interrupt();
+#endif
 }

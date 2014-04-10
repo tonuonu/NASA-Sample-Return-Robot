@@ -117,10 +117,18 @@ MotorIO_Init(void) {
     RESET2d = PD_OUTPUT;
     RESET3d = PD_OUTPUT;
 
+#if 0
     RESET0=1;
     RESET1=1;
     RESET2=1;
     RESET3=1;
+#endif    
+    /* CDONE0...CDONE3 are inputs by default, skipping */
+    
+    MOTOR_ERRORd = PD_OUTPUT;
+    
+    udelay(1); // make sure high RESET* is noticed 
+    
 }
 
 void
@@ -130,7 +138,7 @@ HardwareSetup(void) {
      */
     __disable_interrupt();
     ConfigureOperatingFrequency(1);
-    __enable_interrupt();
+//    __enable_interrupt();
     pu26=1; // Just to make sure unused P9_1 and P9_3 are not floating
     Led_Init();
     MotorIO_Init(); // Configure RESET and DONE pins. SPI conf is elsewhere

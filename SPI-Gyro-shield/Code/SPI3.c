@@ -77,7 +77,7 @@ SPI3_Init(void) {
     dl2_u3smr3 = 0;                                        // Set 0 for no  delay 
 
     u3smr4 = 0x00;
-
+#if 0
     __disable_interrupt();
     /* 
      * No interrupts
@@ -87,6 +87,7 @@ SPI3_Init(void) {
     ilvl_s3tic =0;
     ir_s3tic   =0;            
     __enable_interrupt();
+#endif
 }
 
 
