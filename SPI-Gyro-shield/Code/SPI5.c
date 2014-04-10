@@ -42,7 +42,6 @@ __fast_interrupt void uart5_receive(void) {
             motor_idx=recvbyte & 0x03;
             switch(command) {
             case CMD_SPEED:
-                break;
             case CMD_ACCELERATION:
                 break;
             case CMD_GET_CUR_TARGET_SPEED:
@@ -58,9 +57,7 @@ __fast_interrupt void uart5_receive(void) {
             break;
         case 1:  // second byte received
             switch(command) {
-            case CMD_SPEED: // first byte of speed
-                tmp=recvbyte;
-                break;
+            case CMD_SPEED: // first byte of speed/acceleration
             case CMD_ACCELERATION:
                 tmp=recvbyte;
                 break;
@@ -77,16 +74,11 @@ __fast_interrupt void uart5_receive(void) {
             break;
         case 2:
             switch(command) {
-            case CMD_SPEED: // second byte of speed
-                speed[motor_idx].u.byte[1]=tmp;
-                speed[motor_idx].u.byte[0]=recvbyte;
-                tmp2.u.int16 = ticks[motor_idx].u.int16;
-                u5tb=tmp2.u.byte[1];
-                ticks[motor_idx].u.int16=0; // clear accumulator
-                break;
+            case CMD_SPEED: // second byte of speed/acceleration
             case CMD_ACCELERATION:
-                acceleration[motor_idx].u.byte[1]=tmp;
-                acceleration[motor_idx].u.byte[0]=recvbyte;
+                cur_cmd[motor_idx]=command;
+                cur_cmd_param[motor_idx].u.byte[1]=tmp;
+                cur_cmd_param[motor_idx].u.byte[0]=recvbyte;
                 tmp2.u.int16 = ticks[motor_idx].u.int16;
                 u5tb=tmp2.u.byte[1];
                 ticks[motor_idx].u.int16=0; // clear accumulator
@@ -102,8 +94,8 @@ __fast_interrupt void uart5_receive(void) {
             break;
         case 3:
             switch(command) {
-                case CMD_SPEED: // second byte of speed
-                case CMD_ACCELERATION: // second byte of acceleration
+                case CMD_SPEED:
+                case CMD_ACCELERATION:
                 u5tb=tmp2.u.byte[0];
                 break;
             }
