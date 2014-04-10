@@ -207,17 +207,13 @@ main(void) {
     HardwareSetup();
     // All CS* and RESET* are already pulled up in HW setups.
     // Start reading SPI5 for data
-    volatile unsigned short dummy=u5rb & 0xff;    
+    volatile unsigned short dummy=u5rb;
     while(1) {      
-         /* If any of motor controllers is not ready, reset everything */
+        /* If any of motor controllers is not ready, reset everything */
         if(!CDONE0 || !CDONE1 || !CDONE2 || !CDONE3) {
             /* We ignore input bytes until FPGA is loaded */
             __disable_interrupt(); 
             RESET0=RESET1=RESET2=RESET3 = 0;
-            /*
-             * Just in case we miss CS going low.
-             * Normally interrupt shoud already have taken care
-             */
             CS0=CS3=CS4=CS6 = 0; 
             udelay(1000); // at least 800us 
             RESET0=RESET1=RESET2=RESET3 = 1;
