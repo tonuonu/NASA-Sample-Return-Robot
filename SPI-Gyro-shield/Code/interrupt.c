@@ -41,7 +41,13 @@ Int_Init(void) {
 
 #pragma vector = INT0 // RESET pin is connected here
 __interrupt void _int0(void) {
-
+    /* Remove protection from PM0 register */
+    prc1 = 1; 
+    /* Make software reset of chip */
+    pm03 = 1;   
+    
+    /* We should never get there. But return protection bit just in case */
+    prc1 = 0; 
     
     /* Clear the interrupt flag. */
     ir_int0ic = 0;

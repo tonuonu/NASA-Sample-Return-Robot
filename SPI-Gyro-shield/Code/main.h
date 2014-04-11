@@ -26,6 +26,11 @@ void Int_Init(void);
 
 static inline void 
 complete_pretx(void) {
+    /*
+     * Transmit Buffer Empty Flag 
+     * 0: Data held in the UiTB register
+     * 1: No data held in the UiTB register
+     */
     while((ti_u0c1 == 0) ||
           (ti_u3c1 == 0) ||
           (ti_u4c1 == 0) ||
