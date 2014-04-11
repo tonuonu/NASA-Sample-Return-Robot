@@ -88,17 +88,17 @@ void HardwareSetup(void);
 #define CLOCK6       p4_5
 #define CLOCK6d      pd4_5
 #define CLOCK6s      p4_5s
-#define CS6d         pd7_3
-#define CS6          p7_3
-#define CS6s         p7_3s
+#define CS3d         pd7_3
+#define CS3          p7_3
+#define CS3s         p7_3s
 
 // SPI3, motor 2
 #define CLOCK3       p4_1
 #define CLOCK3d      pd4_1
 #define CLOCK3s      p4_1s
-#define CS3d         pd4_0
-#define CS3          p4_0
-#define CS3s         p4_0s
+#define CS1d         pd4_0
+#define CS1          p4_0
+#define CS1s         p4_0s
 
 #define TX3          p4_3
 #define TX3s         p4_3s
@@ -109,8 +109,8 @@ void HardwareSetup(void);
 
 
 // SPI4, motor 3
-#define CS4         p9_4
-#define CS4d        pd9_4
+#define CS2         p9_4
+#define CS2d        pd9_4
 #define CLOCK4      p9_5
 #define CLOCK4s     p9_5s
 #define CLOCK4d     pd9_5
@@ -144,6 +144,12 @@ void HardwareSetup(void);
 #define M1TX        u3tb
 #define M2TX        u4tb
 #define M3TX        u6tb
+
+#define M0RX        u0rb
+#define M1RX        u3rb
+#define M2RX        u4rb
+#define M3RX        u6rb
+
 
 #define SPI_DELAY (1)
 

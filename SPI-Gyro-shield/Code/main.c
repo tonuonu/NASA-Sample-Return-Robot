@@ -42,19 +42,19 @@ receive_ticks(void) {
     complete_pretx();
     M0TX=M1TX=M2TX=M3TX = 0;
     complete_tx();
-    tmprecv[0].u.byte[1]=u0rb & 0xff;
-    tmprecv[1].u.byte[1]=u3rb & 0xff;
-    tmprecv[2].u.byte[1]=u4rb & 0xff;
-    tmprecv[3].u.byte[1]=u6rb & 0xff;
+    tmprecv[0].u.byte[1]=M0RX & 0xff;
+    tmprecv[1].u.byte[1]=M1RX & 0xff;
+    tmprecv[2].u.byte[1]=M2RX & 0xff;
+    tmprecv[3].u.byte[1]=M3RX & 0xff;
 
     M0TX=M1TX=M2TX=M3TX = 0;
     complete_tx();
-    tmprecv[0].u.byte[0]=u0rb & 0xff;
-    tmprecv[1].u.byte[0]=u3rb & 0xff;
-    tmprecv[2].u.byte[0]=u4rb & 0xff;
-    tmprecv[3].u.byte[0]=u6rb & 0xff;
+    tmprecv[0].u.byte[0]=M0RX & 0xff;
+    tmprecv[1].u.byte[0]=M1RX & 0xff;
+    tmprecv[2].u.byte[0]=M2RX & 0xff;
+    tmprecv[3].u.byte[0]=M3RX & 0xff;
 
-    CS0=CS3=CS4=CS6 = 1;
+    CS0=CS1=CS2=CS3 = 1;
     
     for(int i=0;i<=3;i++) {
         int8_t y=tmprecv[i].u.int16 >> 9;
@@ -87,7 +87,7 @@ send_cur_cmd() {
     }
     complete_tx(); // make sure we are not transmitting garbage already
 
-    CS0=CS3=CS4=CS6 = 0;
+    CS0=CS1=CS2=CS3 = 0;
     M0TX=cur_cmd[0] | 0;
     M1TX=cur_cmd[1] | 1;
     M2TX=cur_cmd[2] | 2;
@@ -105,10 +105,10 @@ send_cur_cmd() {
 
     complete_pretx();
 
-    tmprecv[0].u.byte[1]=u0rb & 0xff;
-    tmprecv[1].u.byte[1]=u3rb & 0xff;
-    tmprecv[2].u.byte[1]=u4rb & 0xff;
-    tmprecv[3].u.byte[1]=u6rb & 0xff;
+    tmprecv[0].u.byte[1]=M0RX & 0xff;
+    tmprecv[1].u.byte[1]=M1RX & 0xff;
+    tmprecv[2].u.byte[1]=M2RX & 0xff;
+    tmprecv[3].u.byte[1]=M3RX & 0xff;
 
     M0TX=tmp[0].u.byte[1];
     M1TX=tmp[1].u.byte[1];
@@ -117,10 +117,10 @@ send_cur_cmd() {
 
     complete_pretx();
 
-    tmprecv[0].u.byte[0]=u0rb & 0xff;
-    tmprecv[1].u.byte[0]=u3rb & 0xff;
-    tmprecv[2].u.byte[0]=u4rb & 0xff;
-    tmprecv[3].u.byte[0]=u6rb & 0xff;
+    tmprecv[0].u.byte[0]=M0RX & 0xff;
+    tmprecv[1].u.byte[0]=M1RX & 0xff;
+    tmprecv[2].u.byte[0]=M2RX & 0xff;
+    tmprecv[3].u.byte[0]=M3RX & 0xff;
 
     M0TX=tmp[0].u.byte[0];
     M1TX=tmp[1].u.byte[0];
@@ -140,7 +140,7 @@ get_voltage(void) {
         return;
     }
     complete_tx();
-    CS0=CS3=CS4=CS6 = 0;
+    CS0=CS1=CS2=CS3 = 0;
 
     M0TX=CMD_GET_VOLTAGE | 0;
     M1TX=CMD_GET_VOLTAGE | 1;
@@ -151,20 +151,20 @@ get_voltage(void) {
     M0TX=M1TX=M2TX=M3TX=0;
     complete_tx();
 
-    tmprecv[0].u.byte[1]=u0rb & 0xff;
-    tmprecv[1].u.byte[1]=u3rb & 0xff;
-    tmprecv[2].u.byte[1]=u4rb & 0xff;
-    tmprecv[3].u.byte[1]=u6rb & 0xff;
+    tmprecv[0].u.byte[1]=M0RX & 0xff;
+    tmprecv[1].u.byte[1]=M1RX & 0xff;
+    tmprecv[2].u.byte[1]=M2RX & 0xff;
+    tmprecv[3].u.byte[1]=M3RX & 0xff;
 
     M0TX=M1TX=M2TX=M3TX=0;
     complete_tx();
 
-    tmprecv[0].u.byte[0]=u0rb & 0xff;
-    tmprecv[1].u.byte[0]=u3rb & 0xff;
-    tmprecv[2].u.byte[0]=u4rb & 0xff;
-    tmprecv[3].u.byte[0]=u6rb & 0xff;
+    tmprecv[0].u.byte[0]=M0RX & 0xff;
+    tmprecv[1].u.byte[0]=M1RX & 0xff;
+    tmprecv[2].u.byte[0]=M2RX & 0xff;
+    tmprecv[3].u.byte[0]=M3RX & 0xff;
 
-    CS0=CS3=CS4=CS6 = 1;
+    CS0=CS1=CS2=CS3 = 1;
 
     for(int i=0;i<=3;i++) {
         voltage[i].u.int16 = tmprecv[i].u.int16;
@@ -189,17 +189,17 @@ main(void) {
             /* We ignore input bytes until FPGA is loaded */
             __disable_interrupt(); 
             RESET0=RESET1=RESET2=RESET3 = 0;
-            CS0=CS3=CS4=CS6 = 0; 
+            CS0=CS1=CS2=CS3 = 0; 
             udelay(1000); // at least 800us 
             RESET0=RESET1=RESET2=RESET3 = 1;
             udelay(1000); // at least 800us 
             for(int i=0;i<sizeof(fpga_image);i++) {
                 complete_pretx();
-                M0TX=M1TX=M2TX=M3TX=fpga_image[i];
+                M0TX=M1TX=M2TX=M3TX = fpga_image[i];
             }
             complete_tx();
             udelay(1000);
-            CS0=CS3=CS4=CS6 = 1;
+            CS0=CS1=CS2=CS3 = 1;
             udelay(1000);            
         } else {
             __enable_interrupt();
