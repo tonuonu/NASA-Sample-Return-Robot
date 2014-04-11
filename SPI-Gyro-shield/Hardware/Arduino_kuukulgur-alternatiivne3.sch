@@ -30134,7 +30134,7 @@ Source: &lt;a href="http://www.national.com/ds/LM/LM2936.pdf"&gt; Data sheet&lt;
 <wire x1="-17.78" y1="82.55" x2="-17.78" y2="80.01" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="CS1" class="0">
+<net name="CS4" class="0">
 <segment>
 <pinref part="MOTOR1" gate="G$1" pin="1"/>
 <wire x1="17.78" y1="135.89" x2="22.86" y2="135.89" width="0.1524" layer="91"/>
@@ -30144,7 +30144,7 @@ Source: &lt;a href="http://www.national.com/ds/LM/LM2936.pdf"&gt; Data sheet&lt;
 <pinref part="R7" gate="G$1" pin="2"/>
 </segment>
 </net>
-<net name="CLK1" class="0">
+<net name="CLK4" class="0">
 <segment>
 <pinref part="MOTOR1" gate="G$1" pin="3"/>
 <wire x1="17.78" y1="133.35" x2="25.4" y2="133.35" width="0.1524" layer="91"/>
@@ -30154,7 +30154,7 @@ Source: &lt;a href="http://www.national.com/ds/LM/LM2936.pdf"&gt; Data sheet&lt;
 <pinref part="R6" gate="G$1" pin="2"/>
 </segment>
 </net>
-<net name="MOSI1" class="0">
+<net name="MOSI4" class="0">
 <segment>
 <pinref part="MOTOR1" gate="G$1" pin="5"/>
 <wire x1="17.78" y1="130.81" x2="26.67" y2="130.81" width="0.1524" layer="91"/>
