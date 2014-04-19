@@ -27,8 +27,6 @@
 
 volatile unsigned char recv_bytenum=0;
 
-extern volatile int int2_count;	//!!!
-
 static int min(const int a,const int b) {
     return (a < b) ? a : b;
 }
@@ -55,11 +53,11 @@ __fast_interrupt void uart5_receive(void) {
             tmp2.u.int16 = (command == CMD_GET_VOLTAGE) ?
 							voltage[motor_idx].u.int16 :
 							cur_target_speed[motor_idx].u.int16;
-            transmit_byte=command;	//!!! tmp2.u.byte[1];
+            transmit_byte=tmp2.u.byte[1];
             break;
         case 1:  // second byte received
             tmp=recvbyte;
-            transmit_byte=int2_count & 0xff;	//!!! tmp2.u.byte[0];
+            transmit_byte=tmp2.u.byte[0];
             break;
         case 2:
             if (command == CMD_SPEED || command == CMD_ACCELERATION) {

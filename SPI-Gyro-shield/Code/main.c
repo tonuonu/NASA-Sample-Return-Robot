@@ -183,11 +183,6 @@ main(void) {
     // All CS* and RESET* are already pulled up in HW setups.
     // Start reading SPI5 for data
     volatile unsigned short dummy=u5rb;
-
-    __enable_interrupt();		//!!!!
-    while (1);
-        ;
-
     while(1) {      
         /* If any of motor controllers is not ready, reset everything */
         if(!CDONE0 || !CDONE1 || !CDONE2 || !CDONE3) {
