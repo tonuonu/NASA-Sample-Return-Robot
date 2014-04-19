@@ -28,13 +28,14 @@
 volatile unsigned char recv_bytenum=0;
 
 __fast_interrupt void uart5_receive(void) {
+    unsigned int transmit_byte=0xffff;		// Invalid byte value
     if(CS5==0) {
         static unsigned char tmp;
         struct twobyte_st tmp2;
  
         static unsigned char command;
         static int motor_idx;
-        unsigned char recvbyte=u5rb & 0xff;
+        const unsigned char recvbyte=u5rb & 0xff;
 
         switch(recv_bytenum) {
         case 0: // first byte received
@@ -43,45 +44,43 @@ __fast_interrupt void uart5_receive(void) {
             tmp2.u.int16 = (command == CMD_GET_VOLTAGE) ?
 							voltage[motor_idx].u.int16 :
 							cur_target_speed[motor_idx].u.int16;
-            u5tb=tmp2.u.byte[1];
+            transmit_byte=tmp2.u.byte[1];
             break;
         case 1:  // second byte received
             tmp=recvbyte;
-            u5tb=tmp2.u.byte[0];
+            transmit_byte=tmp2.u.byte[0];
             break;
         case 2:
-            switch(command) {
-            case CMD_SPEED: // second byte of speed/acceleration
-            case CMD_ACCELERATION:
+            if (command == CMD_SPEED || command == CMD_ACCELERATION) {
+                    // receive second byte of speed/acceleration
                 cur_cmd[motor_idx]=command;
                 cur_cmd_param[motor_idx].u.byte[1]=tmp;
                 cur_cmd_param[motor_idx].u.byte[0]=recvbyte;
                 tmp2.u.int16 = ticks[motor_idx].u.int16;
-                u5tb=tmp2.u.byte[1];
+                transmit_byte=tmp2.u.byte[1];
                 ticks[motor_idx].u.int16=0; // clear accumulator
-                break;
-            default:
-                break;
             }
             break;
         case 3:
-            switch(command) {
-                case CMD_SPEED:
-                case CMD_ACCELERATION:
-                u5tb=tmp2.u.byte[0];
-                break;
-            }
+            if (command == CMD_SPEED || command == CMD_ACCELERATION)
+                transmit_byte=tmp2.u.byte[0];
             break;
         case 4:
-            u5tb=motor_load[motor_idx];
+            transmit_byte=motor_load[motor_idx];
             break;
         default:
             break;
         }
         recv_bytenum++;
 
-    }    
- 
+    }
+
+    if (transmit_byte <= 0xff) {
+        TX5d=PD_OUTPUT;
+        u5tb=transmit_byte;
+    } else
+        TX5d=PD_INPUT;
+
     /* Clear the 'reception complete' flag.	*/
     ir_s5ric = 0;
 }
@@ -91,7 +90,7 @@ SPI5_Init(void) {
 //    pu23=1; // Enable pullup to avoid floating pin noise on p7_7 (clock5)
 //    pu24=1; // Enable pullup to avoid floating pin noise on p8_0 (rx5
     CLOCK5s = PF_UART;
-    TX5d = PD_OUTPUT;
+    TX5d = PD_INPUT;	// To be changed to PD_OUTPUT for brief periods only, as needed
     TX5s = PF_UART;
     RX5s = PF_UART;
 
