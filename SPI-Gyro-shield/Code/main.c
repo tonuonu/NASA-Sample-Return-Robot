@@ -249,9 +249,9 @@ main(void) {
             LED1=LED2=LED3=LED4=0;
             RESET0=RESET1=RESET2=RESET3 = 0;
             CS0=CS1=CS2=CS3 = 0;
-            udelay(1000); // at least 800us
+            udelay(2000); // at least 800us
             RESET0=RESET1=RESET2=RESET3 = 1;
-            udelay(1000); // at least 800us
+            udelay(2000); // at least 800us
 
             LED1=LED2=LED3=LED4=1;
             for(int i=0;i<sizeof(fpga_image);i++) {
@@ -260,12 +260,14 @@ main(void) {
             }
             complete_tx();
 
-            udelay(1000);
+            udelay(2000);
             CS0=CS1=CS2=CS3 = 1;
-            udelay(1000);
-            LED1=LED2=LED3=LED4=0;
 
             __enable_interrupt();
+
+            udelay(100 * 1000);
+            LED1=LED2=LED3=LED4=0;
+
             continue;
         }
 
