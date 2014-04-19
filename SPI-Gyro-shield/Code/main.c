@@ -57,25 +57,21 @@ receive_ticks(void) {
     CS0=CS1=CS2=CS3 = 1;
     
     for(int i=0;i<=3;i++) {
-        int8_t y=tmprecv[i].u.int16 >> 9;
-        if(y & 0x40)   // if   x1xx xxxx 
-            y |= 0x80; // then 11xx xxxx
-        motor_load[i] = abs(y); 
+        motor_load[i] = (tmprecv[i].u.int16 >> 9);
+
         /* make sure ticks[i].u.int16 does not change while we work */
         __disable_interrupt();
         
-        int16_t kala2 = tmprecv[i].u.int16;
-        int16_t kala1 = kala2 & 0x01ff; // keep 9 bits only
+        int16_t kala1 = tmprecv[i].u.int16 & 0x01ff; // keep 9 bits only
         if (kala1 & 0x0100)       // if   xxxx xxx1 xxxx xxxx
             kala1 |= 0xff00 ;     // then 1111 1111 xxxx xxxx
 
-        int32_t x = (uint32_t)ticks[i].u.int16 + (uint32_t)kala1; 
+        const int32_t x = (uint32_t)ticks[i].u.int16 + (uint32_t)kala1; 
         /* Check for possible overflow of INT16 and lit red LED */
-        if(x > INT16_MAX || x < INT16_MIN) {
+        if(x > INT16_MAX || x < INT16_MIN)
             LED5=1;
-        } else {
+        else
             ticks[i].u.int16=x;
-        }
         __enable_interrupt();
     }   
 }
