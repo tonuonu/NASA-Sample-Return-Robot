@@ -66,8 +66,8 @@ __fast_interrupt void uart5_receive(void) {
                 cur_cmd[motor_idx]=command;
                 cur_cmd_param[motor_idx].u.byte[1]=tmp;
                 cur_cmd_param[motor_idx].u.byte[0]=recvbyte;
-                tmp2.u.int16 = min(255,max(-256,ticks[motor_idx].u.int16)) +
-								(motor_load[motor_idx] << 9);
+                tmp2.u.int16 = min(255,max(-256,ticks[motor_idx].u.int16));
+                tmp2.u.int16+= (motor_load[motor_idx] << 9);
                 transmit_byte=tmp2.u.byte[1];
                 ticks[motor_idx].u.int16=0; // clear accumulator
             }
