@@ -83,6 +83,11 @@ send_cur_cmd() {
     }
     complete_tx(); // make sure we are not transmitting garbage already
 
+    { volatile unsigned char dummy=M0RX; }
+    { volatile unsigned char dummy=M1RX; }
+    { volatile unsigned char dummy=M2RX; }
+    { volatile unsigned char dummy=M3RX; }
+
     CS0=CS1=CS2=CS3 = 0;
     M0TX=cur_cmd[0] | 0;
     M1TX=cur_cmd[1] | 1;
@@ -99,24 +104,28 @@ send_cur_cmd() {
     tmp[2].u.int16=cur_cmd_param[2].u.int16;
     tmp[3].u.int16=cur_cmd_param[3].u.int16;
 
-    complete_pretx();
+    complete_rx();
 
     tmprecv[0].u.byte[1]=M0RX & 0xff;
     tmprecv[1].u.byte[1]=M1RX & 0xff;
     tmprecv[2].u.byte[1]=M2RX & 0xff;
     tmprecv[3].u.byte[1]=M3RX & 0xff;
 
+    complete_pretx();
+
     M0TX=tmp[0].u.byte[1];
     M1TX=tmp[1].u.byte[1];
     M2TX=tmp[2].u.byte[1];
     M3TX=tmp[3].u.byte[1]; 
 
-    complete_pretx();
+    complete_rx();
 
     tmprecv[0].u.byte[0]=M0RX & 0xff;
     tmprecv[1].u.byte[0]=M1RX & 0xff;
     tmprecv[2].u.byte[0]=M2RX & 0xff;
     tmprecv[3].u.byte[0]=M3RX & 0xff;
+
+    complete_pretx();
 
     M0TX=tmp[0].u.byte[0];
     M1TX=tmp[1].u.byte[0];

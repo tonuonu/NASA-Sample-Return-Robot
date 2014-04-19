@@ -53,6 +53,19 @@ complete_tx(void) {
           (txept_u6c0 == 0)); 
 }
 
+static inline void 
+complete_rx(void) {
+    /*
+     * RI (Receive Complete Flag)
+     * 0: No data held in the UiRB register 
+     * 1: Data held in the UiRB register 
+     */
+    while((ri_u0c1 == 0) ||
+          (ri_u3c1 == 0) ||
+          (ri_u4c1 == 0) ||
+          (ri_u6c1 == 0));
+}
+
 enum cmds_e {
     CMD_NONE=0, 
     CMD_SPEED=0x04, 
