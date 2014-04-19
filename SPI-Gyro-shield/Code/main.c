@@ -41,19 +41,23 @@ receive_ticks(void) {
   
     complete_pretx();
     M0TX=M1TX=M2TX=M3TX = 0;
-    complete_tx();
+
+    complete_rx();
     tmprecv[0].u.byte[1]=M0RX & 0xff;
     tmprecv[1].u.byte[1]=M1RX & 0xff;
     tmprecv[2].u.byte[1]=M2RX & 0xff;
     tmprecv[3].u.byte[1]=M3RX & 0xff;
 
+    complete_pretx();
     M0TX=M1TX=M2TX=M3TX = 0;
-    complete_tx();
+
+    complete_rx();
     tmprecv[0].u.byte[0]=M0RX & 0xff;
     tmprecv[1].u.byte[0]=M1RX & 0xff;
     tmprecv[2].u.byte[0]=M2RX & 0xff;
     tmprecv[3].u.byte[0]=M3RX & 0xff;
 
+    complete_tx();
     CS0=CS1=CS2=CS3 = 1;
     
     for(int i=0;i<=3;i++) {
@@ -106,10 +110,10 @@ send_cur_cmd() {
 
     complete_rx();
 
-    tmprecv[0].u.byte[1]=M0RX & 0xff;
-    tmprecv[1].u.byte[1]=M1RX & 0xff;
-    tmprecv[2].u.byte[1]=M2RX & 0xff;
-    tmprecv[3].u.byte[1]=M3RX & 0xff;
+    { volatile unsigned char dummy=M0RX; }
+    { volatile unsigned char dummy=M1RX; }
+    { volatile unsigned char dummy=M2RX; }
+    { volatile unsigned char dummy=M3RX; }
 
     complete_pretx();
 
@@ -120,10 +124,10 @@ send_cur_cmd() {
 
     complete_rx();
 
-    tmprecv[0].u.byte[0]=M0RX & 0xff;
-    tmprecv[1].u.byte[0]=M1RX & 0xff;
-    tmprecv[2].u.byte[0]=M2RX & 0xff;
-    tmprecv[3].u.byte[0]=M3RX & 0xff;
+    tmprecv[0].u.byte[1]=M0RX & 0xff;
+    tmprecv[1].u.byte[1]=M1RX & 0xff;
+    tmprecv[2].u.byte[1]=M2RX & 0xff;
+    tmprecv[3].u.byte[1]=M3RX & 0xff;
 
     complete_pretx();
 
@@ -131,6 +135,13 @@ send_cur_cmd() {
     M1TX=tmp[1].u.byte[0];
     M2TX=tmp[2].u.byte[0];
     M3TX=tmp[3].u.byte[0];
+
+    complete_rx();
+
+    tmprecv[0].u.byte[0]=M0RX & 0xff;
+    tmprecv[1].u.byte[0]=M1RX & 0xff;
+    tmprecv[2].u.byte[0]=M2RX & 0xff;
+    tmprecv[3].u.byte[0]=M3RX & 0xff;
 
     for(int i=0;i<=3;i++)
         cur_target_speed[i].u.int16 = tmprecv[i].u.int16;
