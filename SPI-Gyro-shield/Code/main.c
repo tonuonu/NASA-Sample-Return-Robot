@@ -59,7 +59,16 @@ receive_ticks(void) {
 
     complete_tx();
     CS0=CS1=CS2=CS3 = 1;
-    
+
+    if (!CDONE0)
+        tmprecv[0].u.int16=0;
+    if (!CDONE1)
+        tmprecv[1].u.int16=0;
+    if (!CDONE2)
+        tmprecv[2].u.int16=0;
+    if (!CDONE3)
+        tmprecv[3].u.int16=0;
+
     for(int i=0;i<=3;i++) {
         motor_load[i] = (tmprecv[i].u.int16 >> 9);
 
@@ -143,6 +152,15 @@ send_cur_cmd() {
     tmprecv[2].u.byte[0]=M2RX & 0xff;
     tmprecv[3].u.byte[0]=M3RX & 0xff;
 
+    if (!CDONE0)
+        tmprecv[0].u.int16=0;
+    if (!CDONE1)
+        tmprecv[1].u.int16=0;
+    if (!CDONE2)
+        tmprecv[2].u.int16=0;
+    if (!CDONE3)
+        tmprecv[3].u.int16=0;
+
     for(int i=0;i<=3;i++)
         cur_target_speed[i].u.int16 = tmprecv[i].u.int16;
 
@@ -182,9 +200,17 @@ get_voltage(void) {
 
     CS0=CS1=CS2=CS3 = 1;
 
-    for(int i=0;i<=3;i++) {
+    if (!CDONE0)
+        tmprecv[0].u.int16=0;
+    if (!CDONE1)
+        tmprecv[1].u.int16=0;
+    if (!CDONE2)
+        tmprecv[2].u.int16=0;
+    if (!CDONE3)
+        tmprecv[3].u.int16=0;
+
+    for(int i=0;i<=3;i++)
         voltage[i].u.int16 = tmprecv[i].u.int16;
-    }
 }
 
 static const unsigned char fpga_image[] = {
