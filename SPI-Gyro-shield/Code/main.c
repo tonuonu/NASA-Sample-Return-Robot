@@ -229,7 +229,7 @@ main(void) {
 
         udelay(3000);
         milliseconds_since_last_reset+=3;
-        //!!! send_cur_cmd();
+        send_cur_cmd();
         get_voltage();
     }
 }
