@@ -53,7 +53,7 @@ __interrupt void _int0(void) {
     ir_int0ic = 0;
 }
 
-int int2_count=0;	//!!!
+volatile int int2_count=0;	//!!!
 
 #pragma vector = INT2 // CS pin is connected here
 __interrupt void _int2(void) {
