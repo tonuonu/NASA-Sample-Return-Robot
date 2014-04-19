@@ -180,36 +180,56 @@ static const unsigned char fpga_image[] = {
 int
 main(void) {
     HardwareSetup();
+    __enable_interrupt();
     // All CS* and RESET* are already pulled up in HW setups.
-    // Start reading SPI5 for data
+
+    // Enable SPI5 receive by reading from u5rb
     volatile unsigned short dummy=u5rb;
-    while(1) {      
+
+    unsigned int milliseconds_since_last_reset=0xffffffffU;
+
+    while(1) {
+        LED1 = CDONE0;
+        LED2 = CDONE1;
+        LED3 = CDONE2;
+        LED4 = CDONE3;
+
         /* If any of motor controllers is not ready, reset everything */
-        if(!CDONE0 || !CDONE1 || !CDONE2 || !CDONE3) {
+        if((!CDONE0 || !CDONE1 || !CDONE2 || !CDONE3) &&
+									milliseconds_since_last_reset > 5000) {
+			milliseconds_since_last_reset=0;
+
+            /*!!! Should reset only these controllers that are not ready! */
+
             /* We ignore input bytes until FPGA is loaded */
-            __disable_interrupt(); 
+            __disable_interrupt();
+
+            LED1=LED2=LED3=LED4=0;
             RESET0=RESET1=RESET2=RESET3 = 0;
-            CS0=CS1=CS2=CS3 = 0; 
-            udelay(1000); // at least 800us 
+            CS0=CS1=CS2=CS3 = 0;
+            udelay(1000); // at least 800us
             RESET0=RESET1=RESET2=RESET3 = 1;
-            udelay(1000); // at least 800us 
+            udelay(1000); // at least 800us
+
+            LED1=LED2=LED3=LED4=1;
             for(int i=0;i<sizeof(fpga_image);i++) {
                 complete_pretx();
                 M0TX=M1TX=M2TX=M3TX = fpga_image[i];
             }
             complete_tx();
+
             udelay(1000);
             CS0=CS1=CS2=CS3 = 1;
-            udelay(1000);            
-        } else {
+            udelay(1000);
+            LED1=LED2=LED3=LED4=0;
+
             __enable_interrupt();
-//            udelay(3000);
-            send_cur_cmd(); 
-            get_voltage(); 
+            continue;
         }
-        LED1 = CDONE0;
-        LED2 = CDONE1;
-        LED3 = CDONE2;
-        LED4 = CDONE3;
+
+        udelay(3000);
+        milliseconds_since_last_reset+=3;
+        send_cur_cmd();
+        get_voltage();
     }
 }
