@@ -39,13 +39,14 @@ static int max(const int a,const int b) {
 
 __fast_interrupt void uart5_receive(void) {
     unsigned int transmit_byte=0xffff;		// Invalid byte value
+    volatile unsigned char recvbyte=u5rb & 0xff;	// Reading u5rb enables receive for next byte
+
     if(CS5==0) {
         static unsigned char tmp;
         struct twobyte_st tmp2;
  
         static unsigned char command;
         static int motor_idx;
-        const unsigned char recvbyte=u5rb & 0xff;
 
         switch(recv_bytenum) {
         case 0: // first byte received
