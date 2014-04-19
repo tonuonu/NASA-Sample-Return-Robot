@@ -242,9 +242,6 @@ main(void) {
 
             /*!!! Should reset only these controllers that are not ready! */
 
-            /* We ignore input bytes until FPGA is loaded */
-            __disable_interrupt();
-
             LED1=LED2=LED3=LED4=0;
             RESET0=RESET1=RESET2=RESET3 = 0;
             CS0=CS1=CS2=CS3 = 0;
@@ -264,7 +261,6 @@ main(void) {
             udelay(1000);
             LED1=LED2=LED3=LED4=0;
 
-            __enable_interrupt();
             continue;
         }
 
