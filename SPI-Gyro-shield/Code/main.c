@@ -60,13 +60,13 @@ receive_ticks(void) {
     complete_tx();
     CS0=CS1=CS2=CS3 = 1;
 
-    if (!CDONE0)
+    if (!CDONE0 || !voltage[0].u.int16)
         tmprecv[0].u.int16=0;
-    if (!CDONE1)
+    if (!CDONE1 || !voltage[1].u.int16)
         tmprecv[1].u.int16=0;
-    if (!CDONE2)
+    if (!CDONE2 || !voltage[2].u.int16)
         tmprecv[2].u.int16=0;
-    if (!CDONE3)
+    if (!CDONE3 || !voltage[3].u.int16)
         tmprecv[3].u.int16=0;
 
     for(int i=0;i<=3;i++) {
@@ -152,13 +152,13 @@ send_cur_cmd() {
     tmprecv[2].u.byte[0]=M2RX & 0xff;
     tmprecv[3].u.byte[0]=M3RX & 0xff;
 
-    if (!CDONE0)
+    if (!CDONE0 || !voltage[0].u.int16)
         tmprecv[0].u.int16=0;
-    if (!CDONE1)
+    if (!CDONE1 || !voltage[1].u.int16)
         tmprecv[1].u.int16=0;
-    if (!CDONE2)
+    if (!CDONE2 || !voltage[2].u.int16)
         tmprecv[2].u.int16=0;
-    if (!CDONE3)
+    if (!CDONE3 || !voltage[3].u.int16)
         tmprecv[3].u.int16=0;
 
     for(int i=0;i<=3;i++)
