@@ -29,6 +29,14 @@ volatile unsigned char recv_bytenum=0;
 
 extern volatile int int2_count;	//!!!
 
+static int min(const int a,const int b) {
+    return (a < b) ? a : b;
+}
+
+static int max(const int a,const int b) {
+    return (a > b) ? a : b;
+}
+
 __fast_interrupt void uart5_receive(void) {
     unsigned int transmit_byte=0xffff;		// Invalid byte value
     if(CS5==0) {
