@@ -261,19 +261,22 @@ main(void) {
             udelay(1000);
             LED1=LED2=LED3=LED4=0;
 
-            for (int i=0;i < 10;i++) {
+                // Wait until all motors report nonzero voltage
+
+            { for (int i=0;i < 10;i++) {
                 udelay(30*1000);
                 get_voltage();
                 if (voltage[0].u.int16 && voltage[1].u.int16 &&
                             voltage[2].u.int16 && voltage[3].u.int16)
                     break;
-			}
+			}}
             udelay(30*1000);
             continue;
         }
 
         udelay(3000);
         milliseconds_since_last_reset+=3;
+
         get_voltage();
         send_cur_cmd();
     }
