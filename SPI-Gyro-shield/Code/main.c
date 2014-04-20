@@ -260,8 +260,9 @@ main(void) {
         LED4 = motor_online[3];
 
         /* If any of motor controllers is not ready, reset everything */
-        if((!CDONE0 || !CDONE1 || !CDONE2 || !CDONE3) &&
-									milliseconds_since_last_reset > 5000) {
+        if((!motor_online[0] || !motor_online[1] ||
+								!motor_online[2] || !motor_online[3]) &&
+								milliseconds_since_last_reset > 5000) {
 			milliseconds_since_last_reset=0;
 
             /*!!! Should reset only these controllers that are not ready! */
