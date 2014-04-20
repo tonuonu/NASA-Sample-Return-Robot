@@ -250,10 +250,10 @@ main(void) {
     unsigned int milliseconds_since_last_reset=0xffffffffU;
 
     while(1) {
-        LED1 = CDONE0;
-        LED2 = CDONE1;
-        LED3 = CDONE2;
-        LED4 = CDONE3;
+        LED1 = motor_online[0];
+        LED2 = motor_online[1];
+        LED3 = motor_online[2];
+        LED4 = motor_online[3];
 
         /* If any of motor controllers is not ready, reset everything */
         if((!CDONE0 || !CDONE1 || !CDONE2 || !CDONE3) &&
