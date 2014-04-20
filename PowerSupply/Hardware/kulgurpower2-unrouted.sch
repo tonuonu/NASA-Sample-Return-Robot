@@ -18209,11 +18209,11 @@ Source: coiltronics_dr_series.pdf</description>
 <part name="M3" library="con-phoenix-508" deviceset="MST2V" device=""/>
 <part name="M4" library="con-phoenix-508" deviceset="MST2V" device=""/>
 <part name="P+2" library="supply1" deviceset="V+" device=""/>
-<part name="LED1" library="led" deviceset="LED" device="CHIP-LED0603" value="GREEN"/>
-<part name="LED2" library="led" deviceset="LED" device="CHIP-LED0603" value="GREEN"/>
-<part name="LED3" library="led" deviceset="LED" device="CHIP-LED0603" value="GREEN"/>
-<part name="LED4" library="led" deviceset="LED" device="CHIP-LED0603" value="GREEN"/>
-<part name="PWRLED" library="led" deviceset="LED" device="CHIP-LED0603" value="YELLOW"/>
+<part name="LED1" library="led" deviceset="LED" device="CHIP-LED0603" value="BLUE"/>
+<part name="LED2" library="led" deviceset="LED" device="CHIP-LED0603" value="BLUE"/>
+<part name="LED3" library="led" deviceset="LED" device="CHIP-LED0603" value="BLUE"/>
+<part name="LED4" library="led" deviceset="LED" device="CHIP-LED0603" value="BLUE"/>
+<part name="PWRLED" library="led" deviceset="LED" device="CHIP-LED0603" value="BLUE"/>
 <part name="R12" library="rcl" deviceset="R-EU_" device="R0603" value="3k"/>
 <part name="P+3" library="supply1" deviceset="V+" device=""/>
 <part name="P+6" library="supply1" deviceset="V+" device=""/>
@@ -18268,9 +18268,9 @@ Source: coiltronics_dr_series.pdf</description>
 <part name="U$15" library="FDMS8558S" deviceset="FDMS8558S" device="" value="AON6500"/>
 <part name="F1" library="SparkFun-PowerIC" deviceset="PTC" device="SMD" value="10A FUSE 1206"/>
 <part name="F2" library="SparkFun-PowerIC" deviceset="PTC" device="SMD" value="10A FUSE 1206"/>
-<part name="LED5" library="led" deviceset="LED" device="CHIP-LED0603" value="GREEN"/>
+<part name="LED5" library="led" deviceset="LED" device="CHIP-LED0603" value="BLUE"/>
 <part name="R1" library="rcl" deviceset="R-EU_" device="R0603" value="3k"/>
-<part name="LED6" library="led" deviceset="LED" device="CHIP-LED0603" value="GREEN"/>
+<part name="LED6" library="led" deviceset="LED" device="CHIP-LED0603" value="BLUE"/>
 <part name="R2" library="rcl" deviceset="R-EU_" device="R0603" value="3k"/>
 <part name="GND3" library="supply1" deviceset="GND" device=""/>
 <part name="GND7" library="supply1" deviceset="GND" device=""/>
