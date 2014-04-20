@@ -85,19 +85,21 @@ struct twobyte_st {
     } u;
 };
 
-extern volatile struct twobyte_st voltage[4];
+extern struct twobyte_st voltage[3][4];
+extern struct twobyte_st cur_target_speed[3][4];
+
 extern volatile struct twobyte_st cur_cmd_param[4];
 extern volatile unsigned char cur_cmd[4];
-extern volatile struct twobyte_st cur_target_speed[4];
-
-extern volatile unsigned char fpga_in;
-extern volatile unsigned char recv_bytenum;
 
 extern volatile struct twobyte_st ticks[4];
 extern volatile unsigned char motor_load[4];
 
+extern volatile unsigned char fpga_in;
+extern volatile unsigned char recv_bytenum;
+
+int16_t calc_median3(const struct twobyte_st values[3][4],
+											const unsigned int motor_idx);
+
 // On 48 Mhz we do 48 000 000 cycles per second
 // or 48 cycles per microsecond
 #define udelay(a) __delay_cycles(48UL*a);
-
-

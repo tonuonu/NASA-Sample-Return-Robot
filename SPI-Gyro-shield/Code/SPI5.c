@@ -50,9 +50,8 @@ __fast_interrupt void uart5_receive(void) {
         case 0: // first byte received
             command=recvbyte & 0xFC;
             motor_idx=recvbyte & 0x03;
-            tmp2.u.int16 = (command == CMD_GET_VOLTAGE) ?
-							voltage[motor_idx].u.int16 :
-							cur_target_speed[motor_idx].u.int16;
+            tmp2.u.int16 = calc_median3((command == CMD_GET_VOLTAGE) ?
+									voltage : cur_target_speed,motor_idx);
             transmit_byte=tmp2.u.byte[1];
             break;
         case 1:  // second byte received

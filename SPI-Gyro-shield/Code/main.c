@@ -32,9 +32,29 @@ volatile unsigned char motor_load[4] = {0,0,0,0};
 volatile struct twobyte_st ticks[4] = {0,0,0,0,0,0,0,0};
 volatile struct twobyte_st cur_cmd_param[4] = {0,0,0,0,0,0,0,0};
 volatile unsigned char cur_cmd[4] = {CMD_SPEED,CMD_SPEED,CMD_SPEED,CMD_SPEED};
-volatile struct twobyte_st voltage[4] = {0,0,0,0,0,0,0,0};
-volatile struct twobyte_st cur_target_speed[4] = {0,0,0,0,0,0,0,0};
 
+static int measurement_idx=0;
+struct twobyte_st voltage[3][4]=
+				{{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0}};
+struct twobyte_st cur_target_speed[3][4]=
+				{{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0}};
+
+static unsigned int motor_online[4]={0,0,0,0};
+
+int16_t calc_median3(const struct twobyte_st values[3][4],
+											const unsigned int motor_idx) {
+    const int16_t v[3]={values[0][motor_idx].u.int16,
+						values[1][motor_idx].u.int16,
+						values[2][motor_idx].u.int16};
+
+    unsigned int median_value_idx=(v[0] < v[1]) ? 1 : 0;
+
+    if (v[2] >= v[median_value_idx])
+        return v[median_value_idx];
+    if (v[2] <= v[1-median_value_idx])
+        return v[1-median_value_idx];
+    return v[2];
+}
 
 static void
 receive_ticks(void) {
@@ -59,24 +79,32 @@ receive_ticks(void) {
 
     complete_tx();
     CS0=CS1=CS2=CS3 = 1;
-    
+
+    if (!motor_online[0])
+        tmprecv[0].u.int16=0;
+    if (!motor_online[1])
+        tmprecv[1].u.int16=0;
+    if (!motor_online[2])
+        tmprecv[2].u.int16=0;
+    if (!motor_online[3])
+        tmprecv[3].u.int16=0;
+
     for(int i=0;i<=3;i++) {
         motor_load[i] = (tmprecv[i].u.int16 >> 9);
 
-        /* make sure ticks[i].u.int16 does not change while we work */
-        __disable_interrupt();
-        
-        int16_t kala1 = tmprecv[i].u.int16 & 0x01ff; // keep 9 bits only
-        if (kala1 & 0x0100)       // if   xxxx xxx1 xxxx xxxx
-            kala1 |= 0xff00 ;     // then 1111 1111 xxxx xxxx
+        int16_t ticks_increment = tmprecv[i].u.int16 & 0x01ff; // keep 9 bits only
+        if (ticks_increment & 0x0100)       // if   xxxx xxx1 xxxx xxxx
+            ticks_increment |= 0xff00 ;     // then 1111 1111 xxxx xxxx
 
-        const int32_t x = (uint32_t)ticks[i].u.int16 + (uint32_t)kala1; 
+        const int32_t x = (uint32_t)ticks[i].u.int16 + (uint32_t)ticks_increment;
         /* Check for possible overflow of INT16 and lit red LED */
         if(x > INT16_MAX || x < INT16_MIN)
             LED5=1;
-        else
-            ticks[i].u.int16=x;
-        __enable_interrupt();
+        else {
+            __disable_interrupt();
+            ticks[i].u.int16+=ticks_increment;
+            __enable_interrupt();
+        }
     }   
 }
 
@@ -143,8 +171,17 @@ send_cur_cmd() {
     tmprecv[2].u.byte[0]=M2RX & 0xff;
     tmprecv[3].u.byte[0]=M3RX & 0xff;
 
+    if (!motor_online[0])
+        tmprecv[0].u.int16=0;
+    if (!motor_online[1])
+        tmprecv[1].u.int16=0;
+    if (!motor_online[2])
+        tmprecv[2].u.int16=0;
+    if (!motor_online[3])
+        tmprecv[3].u.int16=0;
+
     for(int i=0;i<=3;i++)
-        cur_target_speed[i].u.int16 = tmprecv[i].u.int16;
+        cur_target_speed[measurement_idx][i].u.int16 = tmprecv[i].u.int16;
 
 	receive_ticks();
 }
@@ -182,9 +219,17 @@ get_voltage(void) {
 
     CS0=CS1=CS2=CS3 = 1;
 
-    for(int i=0;i<=3;i++) {
-        voltage[i].u.int16 = tmprecv[i].u.int16;
-    }
+    if (!CDONE0)
+        tmprecv[0].u.int16=0;
+    if (!CDONE1)
+        tmprecv[1].u.int16=0;
+    if (!CDONE2)
+        tmprecv[2].u.int16=0;
+    if (!CDONE3)
+        tmprecv[3].u.int16=0;
+
+    for(int i=0;i<=3;i++)
+        voltage[measurement_idx][i].u.int16 = tmprecv[i].u.int16;
 }
 
 static const unsigned char fpga_image[] = {
@@ -205,10 +250,10 @@ main(void) {
     unsigned int milliseconds_since_last_reset=0xffffffffU;
 
     while(1) {
-        LED1 = CDONE0;
-        LED2 = CDONE1;
-        LED3 = CDONE2;
-        LED4 = CDONE3;
+        LED1 = motor_online[0];
+        LED2 = motor_online[1];
+        LED3 = motor_online[2];
+        LED4 = motor_online[3];
 
         /* If any of motor controllers is not ready, reset everything */
         if((!CDONE0 || !CDONE1 || !CDONE2 || !CDONE3) &&
@@ -216,9 +261,6 @@ main(void) {
 			milliseconds_since_last_reset=0;
 
             /*!!! Should reset only these controllers that are not ready! */
-
-            /* We ignore input bytes until FPGA is loaded */
-            __disable_interrupt();
 
             LED1=LED2=LED3=LED4=0;
             RESET0=RESET1=RESET2=RESET3 = 0;
@@ -239,13 +281,33 @@ main(void) {
             udelay(1000);
             LED1=LED2=LED3=LED4=0;
 
-            __enable_interrupt();
+                // Wait until all motors report nonzero voltage
+
+            { for (int i=0;i < 10;i++) {
+                udelay(30*1000);
+                measurement_idx=0;
+                get_voltage();
+                if (voltage[0][0].u.int16 && voltage[0][1].u.int16 &&
+                            voltage[0][2].u.int16 && voltage[0][3].u.int16)
+                    break;
+            }}
+            udelay(30*1000);
             continue;
         }
 
         udelay(3000);
         milliseconds_since_last_reset+=3;
-        send_cur_cmd();
+
         get_voltage();
+        send_cur_cmd();
+
+        measurement_idx++;
+        if (measurement_idx >= 3)
+            measurement_idx=0;
+
+        motor_online[0]=CDONE0 && calc_median3(voltage,0);
+        motor_online[1]=CDONE1 && calc_median3(voltage,1);
+        motor_online[2]=CDONE2 && calc_median3(voltage,2);
+        motor_online[3]=CDONE3 && calc_median3(voltage,3);
     }
 }
