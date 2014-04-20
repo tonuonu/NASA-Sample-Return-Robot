@@ -18342,7 +18342,7 @@ Source: coiltronics_dr_series.pdf</description>
 <part name="U$17" library="tps51222" deviceset="TPS51222RTVT" device=""/>
 <part name="GND19" library="SparkFun" deviceset="GND" device="" value="GND"/>
 <part name="GND22" library="SparkFun" deviceset="GND" device="" value="GND"/>
-<part name="R3" library="rcl" deviceset="R-EU_" device="R0603" value="300k"/>
+<part name="R3" library="rcl" deviceset="R-EU_" device="R0603" value="270k"/>
 <part name="R39" library="rcl" deviceset="R-EU_" device="R0603" value="30k"/>
 <part name="R23" library="rcl" deviceset="R-EU_" device="R0603" value="18k"/>
 <part name="R4" library="rcl" deviceset="R-EU_" device="R0603" value="30k"/>
@@ -18358,8 +18358,8 @@ Source: coiltronics_dr_series.pdf</description>
 <part name="C17" library="rcl" deviceset="C-EU" device="C1210" value="10uF/6.3V"/>
 <part name="GND50" library="SparkFun" deviceset="GND" device=""/>
 <part name="SJ104" library="rcl" deviceset="R-EU_" device="R0603" value="0R"/>
-<part name="R31" library="rcl" deviceset="R-EU_" device="R0603" value="3k16"/>
-<part name="R32" library="rcl" deviceset="R-EU_" device="R0603" value="3k16"/>
+<part name="R31" library="rcl" deviceset="R-EU_" device="R0603" value="3k12"/>
+<part name="R32" library="rcl" deviceset="R-EU_" device="R0603" value="3k12"/>
 <part name="R25" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
 <part name="C16" library="rcl" deviceset="C-EU" device="C0603" value="0,1u"/>
 <part name="R33" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
@@ -18435,7 +18435,7 @@ Source: coiltronics_dr_series.pdf</description>
 <part name="GND48" library="supply1" deviceset="GND" device=""/>
 <part name="GND60" library="supply1" deviceset="GND" device=""/>
 <part name="GND62" library="supply1" deviceset="GND" device=""/>
-<part name="Q1" library="adafruit" deviceset="MOSFET-N" device="REFLOW" value="BSH103"/>
+<part name="Q1" library="adafruit" deviceset="MOSFET-N" device="REFLOW" value="IRLML6344TRPbF"/>
 <part name="GND63" library="supply1" deviceset="GND" device=""/>
 <part name="R27" library="rcl" deviceset="R-EU_" device="R0603" value="430k"/>
 <part name="R28" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
@@ -18443,7 +18443,7 @@ Source: coiltronics_dr_series.pdf</description>
 <part name="R29" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
 <part name="R30" library="rcl" deviceset="R-EU_" device="R0603" value="430k"/>
 <part name="GND65" library="supply1" deviceset="GND" device=""/>
-<part name="Q2" library="adafruit" deviceset="MOSFET-N" device="REFLOW" value="BSH103"/>
+<part name="Q2" library="adafruit" deviceset="MOSFET-N" device="REFLOW" value="IRLML6344TRPbF"/>
 <part name="GND66" library="supply1" deviceset="GND" device=""/>
 <part name="R34" library="rcl" deviceset="R-EU_" device="R0603" value="430k"/>
 <part name="R35" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
@@ -18451,7 +18451,7 @@ Source: coiltronics_dr_series.pdf</description>
 <part name="R36" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
 <part name="R37" library="rcl" deviceset="R-EU_" device="R0603" value="430k"/>
 <part name="GND68" library="supply1" deviceset="GND" device=""/>
-<part name="Q3" library="adafruit" deviceset="MOSFET-N" device="REFLOW" value="BSH103"/>
+<part name="Q3" library="adafruit" deviceset="MOSFET-N" device="REFLOW" value="IRLML6344TRPbF"/>
 <part name="GND69" library="supply1" deviceset="GND" device=""/>
 <part name="R38" library="rcl" deviceset="R-EU_" device="R0603" value="430k"/>
 <part name="R41" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
@@ -18459,7 +18459,7 @@ Source: coiltronics_dr_series.pdf</description>
 <part name="R42" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
 <part name="R43" library="rcl" deviceset="R-EU_" device="R0603" value="430k"/>
 <part name="GND71" library="supply1" deviceset="GND" device=""/>
-<part name="Q4" library="adafruit" deviceset="MOSFET-N" device="REFLOW" value="BSH103"/>
+<part name="Q4" library="adafruit" deviceset="MOSFET-N" device="REFLOW" value="IRLML6344TRPbF"/>
 <part name="GND72" library="supply1" deviceset="GND" device=""/>
 <part name="R44" library="rcl" deviceset="R-EU_" device="R0603" value="430k"/>
 <part name="R45" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>

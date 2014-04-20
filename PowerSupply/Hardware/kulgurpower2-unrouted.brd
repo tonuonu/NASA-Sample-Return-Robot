@@ -6154,7 +6154,7 @@ design rules under a new name.</description>
 <element name="C27" library="rcl" package="C0603" value="0.1" x="38.65" y="16.75" smashed="yes" rot="MR270"/>
 <element name="C28" library="rcl" package="C0603" value="0.1" x="50.25" y="16.75" smashed="yes" rot="MR270"/>
 <element name="U$17" library="tps51222" package="QFN-32" value="TPS51222RTVT" x="83.7215" y="34.5885" rot="R90"/>
-<element name="R3" library="rcl" package="R0603" value="300k" x="86.5446" y="25.6307" smashed="yes" rot="R90"/>
+<element name="R3" library="rcl" package="R0603" value="270k" x="86.5446" y="25.6307" smashed="yes" rot="R90"/>
 <element name="R39" library="rcl" package="R0603" value="30k" x="82.1765" y="39.3427" smashed="yes" rot="R180"/>
 <element name="R23" library="rcl" package="R0603" value="18k" x="85.2725" y="39.3453" smashed="yes" rot="R180"/>
 <element name="R4" library="rcl" package="R0603" value="30k" x="90.268" y="38.4427" smashed="yes" rot="R180"/>
@@ -6167,8 +6167,8 @@ design rules under a new name.</description>
 <element name="C10" library="rcl" package="C0603" value="220n" x="82.7848" y="43.2997" smashed="yes" rot="R180"/>
 <element name="C17" library="rcl" package="C1210" value="10uF/6.3V" x="72.7084" y="35.9885" smashed="yes" rot="R270"/>
 <element name="SJ104" library="rcl" package="R0603" value="0R" x="77.2764" y="32.9714" smashed="yes" rot="MR0"/>
-<element name="R31" library="rcl" package="R0603" value="3k16" x="88.6898" y="29.6644" smashed="yes" rot="R270"/>
-<element name="R32" library="rcl" package="R0603" value="3k16" x="78.8404" y="29.643" smashed="yes" rot="R270"/>
+<element name="R31" library="rcl" package="R0603" value="3k12" x="88.6898" y="29.6644" smashed="yes" rot="R270"/>
+<element name="R32" library="rcl" package="R0603" value="3k12" x="78.8404" y="29.643" smashed="yes" rot="R270"/>
 <element name="R25" library="rcl" package="R0603" value="100k" x="90.2637" y="32.2263" smashed="yes"/>
 <element name="C16" library="rcl" package="C0603" value="0,1u" x="90.27" y="34.299" smashed="yes" rot="R180"/>
 <element name="R33" library="rcl" package="R0603" value="100k" x="77.2689" y="32.2297" smashed="yes"/>
@@ -6273,7 +6273,7 @@ design rules under a new name.</description>
 <element name="R22" library="rcl" package="R0603" value="10k" x="87.65" y="42.35" rot="MR180"/>
 <element name="R24" library="rcl" package="R0603" value="10k" x="76.95" y="42.35" rot="MR180"/>
 <element name="R26" library="rcl" package="R0603" value="10k" x="65.1" y="41.95" rot="MR180"/>
-<element name="Q1" library="adafruit" package="SOT23" value="BSH103" x="21.5" y="12" smashed="yes" rot="R270">
+<element name="Q1" library="adafruit" package="SOT23" value="IRLML6344TRPbF" x="21.5" y="12" smashed="yes" rot="R270">
 <attribute name="NAME" x="23.405" y="13.905" size="1.27" layer="25" rot="R270"/>
 <attribute name="VALUE" x="18.325" y="13.905" size="1.27" layer="27" rot="R270"/>
 </element>
@@ -6281,17 +6281,17 @@ design rules under a new name.</description>
 <element name="R28" library="rcl" package="R0603" value="100k" x="24" y="14.5" smashed="yes" rot="R180"/>
 <element name="R29" library="rcl" package="R0603" value="100k" x="18.5" y="12" smashed="yes" rot="R90"/>
 <element name="R30" library="rcl" package="R0603" value="430k" x="18.5" y="15.5" smashed="yes" rot="R90"/>
-<element name="Q2" library="adafruit" package="SOT23" value="BSH103" x="33.5" y="12" rot="R270"/>
+<element name="Q2" library="adafruit" package="SOT23" value="IRLML6344TRPbF" x="33.5" y="12" rot="R270"/>
 <element name="R34" library="rcl" package="R0603" value="430k" x="29" y="15.5" smashed="yes" rot="R90"/>
 <element name="R35" library="rcl" package="R0603" value="100k" x="36" y="14.5" smashed="yes" rot="R180"/>
 <element name="R36" library="rcl" package="R0603" value="100k" x="30.5" y="12" smashed="yes" rot="R90"/>
 <element name="R37" library="rcl" package="R0603" value="430k" x="30.5" y="15.5" smashed="yes" rot="R90"/>
-<element name="Q3" library="adafruit" package="SOT23" value="BSH103" x="45" y="12" rot="R270"/>
+<element name="Q3" library="adafruit" package="SOT23" value="IRLML6344TRPbF" x="45" y="12" rot="R270"/>
 <element name="R38" library="rcl" package="R0603" value="430k" x="40.5" y="15.5" smashed="yes" rot="R90"/>
 <element name="R41" library="rcl" package="R0603" value="100k" x="47.5" y="14.5" smashed="yes" rot="R180"/>
 <element name="R42" library="rcl" package="R0603" value="100k" x="42" y="12" smashed="yes" rot="R90"/>
 <element name="R43" library="rcl" package="R0603" value="430k" x="42" y="15.5" smashed="yes" rot="R90"/>
-<element name="Q4" library="adafruit" package="SOT23" value="BSH103" x="56.5" y="12" rot="R270"/>
+<element name="Q4" library="adafruit" package="SOT23" value="IRLML6344TRPbF" x="56.5" y="12" rot="R270"/>
 <element name="R44" library="rcl" package="R0603" value="430k" x="52" y="15.5" smashed="yes" rot="R90"/>
 <element name="R45" library="rcl" package="R0603" value="100k" x="59" y="14.5" smashed="yes" rot="R180"/>
 <element name="R46" library="rcl" package="R0603" value="100k" x="53.5" y="12" smashed="yes" rot="R90"/>
