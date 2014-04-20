@@ -58,6 +58,7 @@ __interrupt void _int2(void) {
   
     //LED5=1;  
     recv_bytenum=0;    
+    TX5d=PD_INPUT;
 
     LED5=0;
     /* Clear the interrupt flag. */
