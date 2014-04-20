@@ -32,9 +32,29 @@ volatile unsigned char motor_load[4] = {0,0,0,0};
 volatile struct twobyte_st ticks[4] = {0,0,0,0,0,0,0,0};
 volatile struct twobyte_st cur_cmd_param[4] = {0,0,0,0,0,0,0,0};
 volatile unsigned char cur_cmd[4] = {CMD_SPEED,CMD_SPEED,CMD_SPEED,CMD_SPEED};
-volatile struct twobyte_st voltage[4] = {0,0,0,0,0,0,0,0};
-volatile struct twobyte_st cur_target_speed[4] = {0,0,0,0,0,0,0,0};
 
+static int measurement_idx=0;
+struct twobyte_st voltage[3][4]=
+				{{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0}};
+struct twobyte_st cur_target_speed[3][4]=
+				{{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0}};
+
+static unsigned int motor_online[4]={0,0,0,0};
+
+int16_t calc_median3(const struct twobyte_st values[3][4],
+											const unsigned int motor_idx) {
+    const int16_t v[3]={values[0][motor_idx].u.int16,
+						values[1][motor_idx].u.int16,
+						values[2][motor_idx].u.int16};
+
+    unsigned int median_value_idx=(v[0] < v[1]) ? 1 : 0;
+
+    if (v[2] >= v[median_value_idx])
+        return v[median_value_idx];
+    if (v[2] <= v[1-median_value_idx])
+        return v[1-median_value_idx];
+    return v[2];
+}
 
 static void
 receive_ticks(void) {
@@ -60,13 +80,13 @@ receive_ticks(void) {
     complete_tx();
     CS0=CS1=CS2=CS3 = 1;
 
-    if (!CDONE0 || !voltage[0].u.int16)
+    if (!motor_online[0])
         tmprecv[0].u.int16=0;
-    if (!CDONE1 || !voltage[1].u.int16)
+    if (!motor_online[1])
         tmprecv[1].u.int16=0;
-    if (!CDONE2 || !voltage[2].u.int16)
+    if (!motor_online[2])
         tmprecv[2].u.int16=0;
-    if (!CDONE3 || !voltage[3].u.int16)
+    if (!motor_online[3])
         tmprecv[3].u.int16=0;
 
     for(int i=0;i<=3;i++) {
@@ -151,17 +171,17 @@ send_cur_cmd() {
     tmprecv[2].u.byte[0]=M2RX & 0xff;
     tmprecv[3].u.byte[0]=M3RX & 0xff;
 
-    if (!CDONE0 || !voltage[0].u.int16)
+    if (!motor_online[0])
         tmprecv[0].u.int16=0;
-    if (!CDONE1 || !voltage[1].u.int16)
+    if (!motor_online[1])
         tmprecv[1].u.int16=0;
-    if (!CDONE2 || !voltage[2].u.int16)
+    if (!motor_online[2])
         tmprecv[2].u.int16=0;
-    if (!CDONE3 || !voltage[3].u.int16)
+    if (!motor_online[3])
         tmprecv[3].u.int16=0;
 
     for(int i=0;i<=3;i++)
-        cur_target_speed[i].u.int16 = tmprecv[i].u.int16;
+        cur_target_speed[measurement_idx][i].u.int16 = tmprecv[i].u.int16;
 
 	receive_ticks();
 }
@@ -209,7 +229,7 @@ get_voltage(void) {
         tmprecv[3].u.int16=0;
 
     for(int i=0;i<=3;i++)
-        voltage[i].u.int16 = tmprecv[i].u.int16;
+        voltage[measurement_idx][i].u.int16 = tmprecv[i].u.int16;
 }
 
 static const unsigned char fpga_image[] = {
@@ -265,11 +285,12 @@ main(void) {
 
             { for (int i=0;i < 10;i++) {
                 udelay(30*1000);
+                measurement_idx=0;
                 get_voltage();
-                if (voltage[0].u.int16 && voltage[1].u.int16 &&
-                            voltage[2].u.int16 && voltage[3].u.int16)
+                if (voltage[0][0].u.int16 && voltage[0][1].u.int16 &&
+                            voltage[0][2].u.int16 && voltage[0][3].u.int16)
                     break;
-			}}
+            }}
             udelay(30*1000);
             continue;
         }
@@ -279,5 +300,14 @@ main(void) {
 
         get_voltage();
         send_cur_cmd();
+
+        measurement_idx++;
+        if (measurement_idx >= 3)
+            measurement_idx=0;
+
+        motor_online[0]=CDONE0 && calc_median3(voltage,0);
+        motor_online[1]=CDONE1 && calc_median3(voltage,1);
+        motor_online[2]=CDONE2 && calc_median3(voltage,2);
+        motor_online[3]=CDONE3 && calc_median3(voltage,3);
     }
 }
