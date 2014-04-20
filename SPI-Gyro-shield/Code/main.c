@@ -57,7 +57,7 @@ int16_t calc_median3(const struct twobyte_st values[3][4],
 }
 
 static int is_voltage_valid(const int16_t voltage) {
-    return (voltage && voltage != 0xffff);
+    return (voltage && voltage != (int16_t)0xffff);
 }
 
 static void
