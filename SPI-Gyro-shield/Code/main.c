@@ -56,6 +56,10 @@ int16_t calc_median3(const struct twobyte_st values[3][4],
     return v[2];
 }
 
+static int is_voltage_valid(const int16_t voltage) {
+    return (voltage && voltage != (int16_t)0xffff);
+}
+
 static void
 receive_ticks(void) {
   
@@ -256,8 +260,9 @@ main(void) {
         LED4 = motor_online[3];
 
         /* If any of motor controllers is not ready, reset everything */
-        if((!CDONE0 || !CDONE1 || !CDONE2 || !CDONE3) &&
-									milliseconds_since_last_reset > 5000) {
+        if((!motor_online[0] || !motor_online[1] ||
+								!motor_online[2] || !motor_online[3]) &&
+								milliseconds_since_last_reset > 5000) {
 			milliseconds_since_last_reset=0;
 
             /*!!! Should reset only these controllers that are not ready! */
@@ -281,14 +286,16 @@ main(void) {
             udelay(1000);
             LED1=LED2=LED3=LED4=0;
 
-                // Wait until all motors report nonzero voltage
+                // Wait until all motors report a valid voltage
 
             { for (int i=0;i < 10;i++) {
                 udelay(30*1000);
                 measurement_idx=0;
                 get_voltage();
-                if (voltage[0][0].u.int16 && voltage[0][1].u.int16 &&
-                            voltage[0][2].u.int16 && voltage[0][3].u.int16)
+                if (is_voltage_valid(voltage[0][0].u.int16) &&
+                    is_voltage_valid(voltage[0][1].u.int16) &&
+                    is_voltage_valid(voltage[0][2].u.int16) &&
+                    is_voltage_valid(voltage[0][3].u.int16))
                     break;
             }}
             udelay(30*1000);
@@ -305,9 +312,9 @@ main(void) {
         if (measurement_idx >= 3)
             measurement_idx=0;
 
-        motor_online[0]=CDONE0 && calc_median3(voltage,0);
-        motor_online[1]=CDONE1 && calc_median3(voltage,1);
-        motor_online[2]=CDONE2 && calc_median3(voltage,2);
-        motor_online[3]=CDONE3 && calc_median3(voltage,3);
+        motor_online[0]=CDONE0 && is_voltage_valid(calc_median3(voltage,0));
+        motor_online[1]=CDONE1 && is_voltage_valid(calc_median3(voltage,1));
+        motor_online[2]=CDONE2 && is_voltage_valid(calc_median3(voltage,2));
+        motor_online[3]=CDONE3 && is_voltage_valid(calc_median3(voltage,3));
     }
 }
