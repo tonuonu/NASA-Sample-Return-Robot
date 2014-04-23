@@ -113,7 +113,7 @@ receive_ticks(void) {
 }
 
 static void 
-send_cur_cmd() {
+send_cur_cmd(const int force_cmd=-1,const int force_param=-1) {
     if(RESET5 == 0) {
         return;
     }
@@ -125,20 +125,20 @@ send_cur_cmd() {
     { volatile unsigned char dummy=M3RX; }
 
     CS0=CS1=CS2=CS3 = 0;
-    M0TX=cur_cmd[0] | 0;
-    M1TX=cur_cmd[1] | 1;
-    M2TX=cur_cmd[2] | 2;
-    M3TX=cur_cmd[3] | 3;
+    M0TX=(force_cmd >= 0 ? force_cmd : cur_cmd[0]) | 0;
+    M1TX=(force_cmd >= 0 ? force_cmd : cur_cmd[1]) | 1;
+    M2TX=(force_cmd >= 0 ? force_cmd : cur_cmd[2]) | 2;
+    M3TX=(force_cmd >= 0 ? force_cmd : cur_cmd[3]) | 3;
     
     /* 
      * Use temporary variable to ensure interrupts to not overwrite
      * value while we send it. 
      */
     struct twobyte_st tmp[4];
-    tmp[0].u.int16=cur_cmd_param[0].u.int16;
-    tmp[1].u.int16=cur_cmd_param[1].u.int16;
-    tmp[2].u.int16=cur_cmd_param[2].u.int16;
-    tmp[3].u.int16=cur_cmd_param[3].u.int16;
+    tmp[0].u.int16=(force_cmd >= 0 ? force_param : cur_cmd_param[0].u.int16);
+    tmp[1].u.int16=(force_cmd >= 0 ? force_param : cur_cmd_param[1].u.int16);
+    tmp[2].u.int16=(force_cmd >= 0 ? force_param : cur_cmd_param[2].u.int16);
+    tmp[3].u.int16=(force_cmd >= 0 ? force_param : cur_cmd_param[3].u.int16);
 
     complete_rx();
 
@@ -289,14 +289,18 @@ main(void) {
                 // Wait until all motors report a valid voltage
 
             { for (int i=0;i < 10;i++) {
-                udelay(30*1000);
                 measurement_idx=0;
+
+		        send_cur_cmd(CMD_SPEED,0);	// Work around motor controller
+											//  bug that causes problems
+											//  after sending FPGA image
                 get_voltage();
                 if (is_voltage_valid(voltage[0][0].u.int16) &&
                     is_voltage_valid(voltage[0][1].u.int16) &&
                     is_voltage_valid(voltage[0][2].u.int16) &&
                     is_voltage_valid(voltage[0][3].u.int16))
                     break;
+                udelay(3000);
             }}
             udelay(30*1000);
             continue;
