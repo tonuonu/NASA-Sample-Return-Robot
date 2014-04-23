@@ -288,7 +288,7 @@ main(void) {
 
                 // Wait until all motors report a valid voltage
 
-            { for (int i=0;i < 10;i++) {
+            { for (int i=0;i < 100;i++) {
                 measurement_idx=0;
 
 		        send_cur_cmd(CMD_SPEED,0);	// Work around motor controller
