@@ -231,13 +231,13 @@ get_voltage(void) {
     CS0=CS1=CS2=CS3 = 1;
 
     if (!CDONE0)
-        tmprecv[0].u.int16=0;
+        tmprecv[UART_to_motor_id[0]].u.int16=0;
     if (!CDONE1)
-        tmprecv[1].u.int16=0;
+        tmprecv[UART_to_motor_id[1]].u.int16=0;
     if (!CDONE2)
-        tmprecv[2].u.int16=0;
+        tmprecv[UART_to_motor_id[2]].u.int16=0;
     if (!CDONE3)
-        tmprecv[3].u.int16=0;
+        tmprecv[UART_to_motor_id[3]].u.int16=0;
 
     for(int i=0;i<=3;i++)
         voltage[measurement_idx][i].u.int16 = tmprecv[i].u.int16;
@@ -382,9 +382,16 @@ main(void) {
         if (measurement_idx >= 3)
             measurement_idx=0;
 
-        motor_online[0]=CDONE0 && is_voltage_valid(calc_median3(voltage,0));
-        motor_online[1]=CDONE1 && is_voltage_valid(calc_median3(voltage,1));
-        motor_online[2]=CDONE2 && is_voltage_valid(calc_median3(voltage,2));
-        motor_online[3]=CDONE3 && is_voltage_valid(calc_median3(voltage,3));
+		{ for (int i=0;i < 4;i++)
+	        motor_online[i]=is_voltage_valid(calc_median3(voltage,i)); }
+
+		if (!CDONE0)
+			motor_online[UART_to_motor_id[0]]=0;
+		if (!CDONE1)
+			motor_online[UART_to_motor_id[1]]=0;
+		if (!CDONE2)
+			motor_online[UART_to_motor_id[2]]=0;
+		if (!CDONE3)
+			motor_online[UART_to_motor_id[3]]=0;
     }
 }
