@@ -360,10 +360,11 @@ main(void) {
 
 					for (unsigned int motor_id=0;motor_id < 4;motor_id++) {
 						const unsigned int mask=(1U << motor_id);
-						if ((used_motor_id_bitmask & mask) == 0)
+						if ((used_motor_id_bitmask & mask) == 0) {
 							UART_to_motor_id[UART_idx]=motor_id;
 							used_motor_id_bitmask|=mask;
 							break;
+						}
 					}
 				}}
             }}
