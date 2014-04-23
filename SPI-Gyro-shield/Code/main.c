@@ -26,6 +26,8 @@
 #include "main.h"
 #include "hwsetup.h"
 
+#define IDEAL_VOLTAGE_CODE		((int16_t)(48 + 12*67.65))	// corresponds to 12.0V
+
 struct twobyte_st tmprecv[4] = {0,0,0,0,0,0,0,0};
 
 volatile unsigned char motor_load[4] = {0,0,0,0};
@@ -39,6 +41,7 @@ struct twobyte_st voltage[3][4]=
 struct twobyte_st cur_target_speed[3][4]=
 				{{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0}};
 
+static unsigned int UART_to_motor_id[4]={0,1,2,3};
 static unsigned int motor_online[4]={0,0,0,0};
 
 int16_t calc_median3(const struct twobyte_st values[3][4],
@@ -67,19 +70,19 @@ receive_ticks(void) {
     M0TX=M1TX=M2TX=M3TX = 0;
 
     complete_rx();
-    tmprecv[0].u.byte[1]=M0RX & 0xff;
-    tmprecv[1].u.byte[1]=M1RX & 0xff;
-    tmprecv[2].u.byte[1]=M2RX & 0xff;
-    tmprecv[3].u.byte[1]=M3RX & 0xff;
+    tmprecv[UART_to_motor_id[0]].u.byte[1]=M0RX & 0xff;
+    tmprecv[UART_to_motor_id[1]].u.byte[1]=M1RX & 0xff;
+    tmprecv[UART_to_motor_id[2]].u.byte[1]=M2RX & 0xff;
+    tmprecv[UART_to_motor_id[3]].u.byte[1]=M3RX & 0xff;
 
     complete_pretx();
     M0TX=M1TX=M2TX=M3TX = 0;
 
     complete_rx();
-    tmprecv[0].u.byte[0]=M0RX & 0xff;
-    tmprecv[1].u.byte[0]=M1RX & 0xff;
-    tmprecv[2].u.byte[0]=M2RX & 0xff;
-    tmprecv[3].u.byte[0]=M3RX & 0xff;
+    tmprecv[UART_to_motor_id[0]].u.byte[0]=M0RX & 0xff;
+    tmprecv[UART_to_motor_id[1]].u.byte[0]=M1RX & 0xff;
+    tmprecv[UART_to_motor_id[2]].u.byte[0]=M2RX & 0xff;
+    tmprecv[UART_to_motor_id[3]].u.byte[0]=M3RX & 0xff;
 
     complete_tx();
     CS0=CS1=CS2=CS3 = 1;
@@ -125,11 +128,15 @@ send_cur_cmd(const int force_cmd=-1,const int force_param=-1) {
     { volatile unsigned char dummy=M3RX; }
 
     CS0=CS1=CS2=CS3 = 0;
-    M0TX=(force_cmd >= 0 ? force_cmd : cur_cmd[0]) | 0;
-    M1TX=(force_cmd >= 0 ? force_cmd : cur_cmd[1]) | 1;
-    M2TX=(force_cmd >= 0 ? force_cmd : cur_cmd[2]) | 2;
-    M3TX=(force_cmd >= 0 ? force_cmd : cur_cmd[3]) | 3;
-    
+    M0TX=(force_cmd >= 0 ? force_cmd : cur_cmd[UART_to_motor_id[0]]) |
+													UART_to_motor_id[0];
+    M1TX=(force_cmd >= 0 ? force_cmd : cur_cmd[UART_to_motor_id[1]]) |
+													UART_to_motor_id[1];
+    M2TX=(force_cmd >= 0 ? force_cmd : cur_cmd[UART_to_motor_id[2]]) |
+													UART_to_motor_id[2];
+    M3TX=(force_cmd >= 0 ? force_cmd : cur_cmd[UART_to_motor_id[3]]) |
+													UART_to_motor_id[3];
+
     /* 
      * Use temporary variable to ensure interrupts to not overwrite
      * value while we send it. 
@@ -149,31 +156,31 @@ send_cur_cmd(const int force_cmd=-1,const int force_param=-1) {
 
     complete_pretx();
 
-    M0TX=tmp[0].u.byte[1];
-    M1TX=tmp[1].u.byte[1];
-    M2TX=tmp[2].u.byte[1];
-    M3TX=tmp[3].u.byte[1]; 
+    M0TX=tmp[UART_to_motor_id[0]].u.byte[1];
+    M1TX=tmp[UART_to_motor_id[1]].u.byte[1];
+    M2TX=tmp[UART_to_motor_id[2]].u.byte[1];
+    M3TX=tmp[UART_to_motor_id[3]].u.byte[1]; 
 
     complete_rx();
 
-    tmprecv[0].u.byte[1]=M0RX & 0xff;
-    tmprecv[1].u.byte[1]=M1RX & 0xff;
-    tmprecv[2].u.byte[1]=M2RX & 0xff;
-    tmprecv[3].u.byte[1]=M3RX & 0xff;
+    tmprecv[UART_to_motor_id[0]].u.byte[1]=M0RX & 0xff;
+    tmprecv[UART_to_motor_id[1]].u.byte[1]=M1RX & 0xff;
+    tmprecv[UART_to_motor_id[2]].u.byte[1]=M2RX & 0xff;
+    tmprecv[UART_to_motor_id[3]].u.byte[1]=M3RX & 0xff;
 
     complete_pretx();
 
-    M0TX=tmp[0].u.byte[0];
-    M1TX=tmp[1].u.byte[0];
-    M2TX=tmp[2].u.byte[0];
-    M3TX=tmp[3].u.byte[0];
+    M0TX=tmp[UART_to_motor_id[0]].u.byte[0];
+    M1TX=tmp[UART_to_motor_id[1]].u.byte[0];
+    M2TX=tmp[UART_to_motor_id[2]].u.byte[0];
+    M3TX=tmp[UART_to_motor_id[3]].u.byte[0];
 
     complete_rx();
 
-    tmprecv[0].u.byte[0]=M0RX & 0xff;
-    tmprecv[1].u.byte[0]=M1RX & 0xff;
-    tmprecv[2].u.byte[0]=M2RX & 0xff;
-    tmprecv[3].u.byte[0]=M3RX & 0xff;
+    tmprecv[UART_to_motor_id[0]].u.byte[0]=M0RX & 0xff;
+    tmprecv[UART_to_motor_id[1]].u.byte[0]=M1RX & 0xff;
+    tmprecv[UART_to_motor_id[2]].u.byte[0]=M2RX & 0xff;
+    tmprecv[UART_to_motor_id[3]].u.byte[0]=M3RX & 0xff;
 
     if (!motor_online[0])
         tmprecv[0].u.int16=0;
@@ -199,27 +206,27 @@ get_voltage(void) {
     complete_tx();
     CS0=CS1=CS2=CS3 = 0;
 
-    M0TX=CMD_GET_VOLTAGE | 0;
-    M1TX=CMD_GET_VOLTAGE | 1;
-    M2TX=CMD_GET_VOLTAGE | 2;
-    M3TX=CMD_GET_VOLTAGE | 3;
+    M0TX=CMD_GET_VOLTAGE | UART_to_motor_id[0];
+    M1TX=CMD_GET_VOLTAGE | UART_to_motor_id[1];
+    M2TX=CMD_GET_VOLTAGE | UART_to_motor_id[2];
+    M3TX=CMD_GET_VOLTAGE | UART_to_motor_id[3];
     complete_pretx();
     
     M0TX=M1TX=M2TX=M3TX=0;
     complete_tx();
 
-    tmprecv[0].u.byte[1]=M0RX & 0xff;
-    tmprecv[1].u.byte[1]=M1RX & 0xff;
-    tmprecv[2].u.byte[1]=M2RX & 0xff;
-    tmprecv[3].u.byte[1]=M3RX & 0xff;
+    tmprecv[UART_to_motor_id[0]].u.byte[1]=M0RX & 0xff;
+    tmprecv[UART_to_motor_id[1]].u.byte[1]=M1RX & 0xff;
+    tmprecv[UART_to_motor_id[2]].u.byte[1]=M2RX & 0xff;
+    tmprecv[UART_to_motor_id[3]].u.byte[1]=M3RX & 0xff;
 
     M0TX=M1TX=M2TX=M3TX=0;
     complete_tx();
 
-    tmprecv[0].u.byte[0]=M0RX & 0xff;
-    tmprecv[1].u.byte[0]=M1RX & 0xff;
-    tmprecv[2].u.byte[0]=M2RX & 0xff;
-    tmprecv[3].u.byte[0]=M3RX & 0xff;
+    tmprecv[UART_to_motor_id[0]].u.byte[0]=M0RX & 0xff;
+    tmprecv[UART_to_motor_id[1]].u.byte[0]=M1RX & 0xff;
+    tmprecv[UART_to_motor_id[2]].u.byte[0]=M2RX & 0xff;
+    tmprecv[UART_to_motor_id[3]].u.byte[0]=M3RX & 0xff;
 
     CS0=CS1=CS2=CS3 = 1;
 
@@ -288,19 +295,78 @@ main(void) {
 
                 // Wait until all motors report a valid voltage
 
-            { for (int i=0;i < 100;i++) {
-                measurement_idx=0;
+            { for (int iteration=0;iteration < 300/4;iteration++) {
+				unsigned int penalty[4][4];	// Penalty for various
+											//   UART_to_motor_id[] values
 
-		        send_cur_cmd(CMD_SPEED,0);	// Work around motor controller
-											//  bug that causes problems
-											//  after sending FPGA image
-                get_voltage();
-                if (is_voltage_valid(voltage[0][0].u.int16) &&
-                    is_voltage_valid(voltage[0][1].u.int16) &&
-                    is_voltage_valid(voltage[0][2].u.int16) &&
-                    is_voltage_valid(voltage[0][3].u.int16))
-                    break;
-                udelay(3000);
+				for (unsigned int combination_idx=0;combination_idx < 4;
+														combination_idx++) {
+					{ for (unsigned int i=0;i < 4;i++)
+						UART_to_motor_id[i]=(i + combination_idx) & (4-1); }
+
+	                measurement_idx=0;
+			        send_cur_cmd(CMD_SPEED,0);	// Work around motor controller
+												//  bug that causes problems
+												//  after sending FPGA image
+
+	                get_voltage();
+
+					{ for (unsigned int motor_id=0;motor_id < 4;motor_id++) {
+						const int16_t voltage=
+										voltage[measurement_idx][i].u.int16;
+						const int UART_idx=(4 + i - combination_idx) & (4-1);
+						penalty[UART_idx][motor_id]=
+								is_voltage_valid(voltage) ?
+										(unsigned int)abs(
+											voltage-IDEAL_VOLTAGE_CODE) :
+										0xffffU;
+					}}
+
+	                udelay(1000);
+				}
+
+					// Set UART_to_motor_id[] based on penalty[][]
+
+				unsigned int used_motor_id_bitmask=0;
+
+				{ for (unsigned int UART_idx=0;UART_idx < 4;UART_idx++) {
+					UART_to_motor_id[UART_idx]=0xff;
+
+					unsigned int best_penalty=0xffffU;
+					for (unsigned int motor_id=0;motor_id < 4;motor_id++) {
+
+						if ((used_motor_id_bitmask & (1U << motor_id)) != 0)
+							continue;
+
+						if (best_penalty > penalty[UART_idx][motor_id]) {
+							best_penalty = penalty[UART_idx][motor_id];
+							UART_to_motor_id[UART_idx]=motor_id;
+						}
+					}
+
+					if (UART_to_motor_id[UART_idx] < 4)
+						used_motor_id_bitmask|=
+										1U << UART_to_motor_id[UART_idx];
+				}}
+
+				if (used_motor_id_bitmask == (1U << 4)-1)
+					break;
+
+					// Set fallback UART_to_motor_id[] for UARTs that appear
+					//   to have no working motor controller attached
+
+				{ for (unsigned int UART_idx=0;UART_idx < 4;UART_idx++) {
+					if (UART_to_motor_id[UART_idx] < 4)
+						continue;	// UART_to_motor_id[] is already set
+
+					for (unsigned int motor_id=0;motor_id < 4;motor_id++) {
+						const unsigned int mask=(1U << motor_id);
+						if ((used_motor_id_bitmask & mask) == 0)
+							UART_to_motor_id[UART_idx]=motor_id;
+							used_motor_id_bitmask|=mask;
+							break;
+					}
+				}}
             }}
             udelay(30*1000);
             continue;
