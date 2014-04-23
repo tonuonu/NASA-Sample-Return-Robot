@@ -312,15 +312,13 @@ main(void) {
 	                get_voltage();
 
 					{ for (unsigned int motor_id=0;motor_id < 4;motor_id++) {
-						const int16_t voltage=
+						const int16_t v=
 								voltage[measurement_idx][motor_id].u.int16;
 						const int UART_idx=
 									(4 + motor_id - combination_idx) & (4-1);
-						penalty[UART_idx][motor_id]=
-								is_voltage_valid(voltage) ?
-										(unsigned int)abs(
-											voltage-IDEAL_VOLTAGE_CODE) :
-										0xffffU;
+						penalty[UART_idx][motor_id]=is_voltage_valid(v) ?
+									(unsigned int)abs(v-IDEAL_VOLTAGE_CODE) :
+									0xffffU;
 					}}
 
 	                udelay(1000);
