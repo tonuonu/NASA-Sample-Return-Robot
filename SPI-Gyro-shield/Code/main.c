@@ -116,7 +116,7 @@ receive_ticks(void) {
 }
 
 static void 
-send_cur_cmd(const int force_cmd=-1,const int force_param=-1) {
+send_cur_cmd(const int force_cmd,const int force_param) {
     if(RESET5 == 0) {
         return;
     }
@@ -313,8 +313,9 @@ main(void) {
 
 					{ for (unsigned int motor_id=0;motor_id < 4;motor_id++) {
 						const int16_t voltage=
-										voltage[measurement_idx][i].u.int16;
-						const int UART_idx=(4 + i - combination_idx) & (4-1);
+								voltage[measurement_idx][motor_id].u.int16;
+						const int UART_idx=
+									(4 + motor_id - combination_idx) & (4-1);
 						penalty[UART_idx][motor_id]=
 								is_voltage_valid(voltage) ?
 										(unsigned int)abs(
@@ -376,7 +377,7 @@ main(void) {
         milliseconds_since_last_reset+=3;
 
         get_voltage();
-        send_cur_cmd();
+        send_cur_cmd(-1,-1);
 
         measurement_idx++;
         if (measurement_idx >= 3)
