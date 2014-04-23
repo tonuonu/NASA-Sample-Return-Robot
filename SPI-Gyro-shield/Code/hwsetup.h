@@ -53,9 +53,9 @@ void HardwareSetup(void);
 #define RESET3d      pd0_0
 
 #define CDONE0       p0_7
-#define CDONE1       p0_6
-#define CDONE2       p0_5
-#define CDONE3       p0_4
+#define CDONE1       p0_4
+#define CDONE2       p0_6
+#define CDONE3       p0_5
 
 #define MOTOR_ERROR   p5_6
 #define MOTOR_ERRORd   pd5_6
