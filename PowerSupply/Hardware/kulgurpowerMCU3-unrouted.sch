@@ -21061,32 +21061,30 @@ Source: 3M</description>
 <pinref part="C20" gate="G$1" pin="1"/>
 </segment>
 </net>
-<net name="N$5" class="0">
-<segment>
-<pinref part="U1" gate="G$1" pin="CLKIN"/>
-<wire x1="134.62" y1="119.38" x2="116.84" y2="119.38" width="0.1524" layer="91"/>
-<label x="121.92" y="119.38" size="1.778" layer="95"/>
-</segment>
-</net>
 <net name="N$7" class="0">
 <segment>
 <pinref part="U2" gate="G$1" pin="CLKIN"/>
 <wire x1="134.62" y1="66.04" x2="114.3" y2="66.04" width="0.1524" layer="91"/>
 <label x="121.92" y="66.04" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="N$26" class="0">
-<segment>
+<pinref part="U1" gate="G$1" pin="CLKIN"/>
+<wire x1="134.62" y1="119.38" x2="116.84" y2="119.38" width="0.1524" layer="91"/>
+<label x="121.92" y="119.38" size="1.778" layer="95"/>
 <pinref part="U1" gate="G$1" pin="FSYNC"/>
-<wire x1="134.62" y1="121.92" x2="68.58" y2="121.92" width="0.1524" layer="91"/>
+<wire x1="134.62" y1="121.92" x2="116.84" y2="121.92" width="0.1524" layer="91"/>
+<wire x1="116.84" y1="121.92" x2="68.58" y2="121.92" width="0.1524" layer="91"/>
 <wire x1="68.58" y1="121.92" x2="68.58" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="68.58" y1="96.52" x2="68.58" y2="71.12" width="0.1524" layer="91"/>
 <wire x1="68.58" y1="71.12" x2="68.58" y2="68.58" width="0.1524" layer="91"/>
 <pinref part="U2" gate="G$1" pin="FSYNC"/>
-<wire x1="68.58" y1="68.58" x2="134.62" y2="68.58" width="0.1524" layer="91"/>
+<wire x1="68.58" y1="68.58" x2="114.3" y2="68.58" width="0.1524" layer="91"/>
 <pinref part="U$4" gate="G$1" pin="OUT"/>
+<wire x1="114.3" y1="68.58" x2="134.62" y2="68.58" width="0.1524" layer="91"/>
 <wire x1="60.96" y1="96.52" x2="68.58" y2="96.52" width="0.1524" layer="91"/>
 <junction x="68.58" y="96.52"/>
+<wire x1="116.84" y1="119.38" x2="116.84" y2="121.92" width="0.1524" layer="91"/>
+<wire x1="114.3" y1="66.04" x2="114.3" y2="68.58" width="0.1524" layer="91"/>
+<junction x="114.3" y="68.58"/>
+<junction x="116.84" y="121.92"/>
 </segment>
 </net>
 </nets>
