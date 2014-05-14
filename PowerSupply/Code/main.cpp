@@ -115,7 +115,20 @@ int main() {
             done=false;
             mems_realtime=false;
         }
-        
+#if 0
+        /* Temporary HW validation code */
+        if(mode==E_GYRO) {
+            if(PORT3.PIDR.BIT.B4==1) {
+                OUT1_EN = MAX1614_ON;
+                OUT2_EN = MAX1614_ON; 
+                OUT3_EN = MAX1614_ON;
+            } else {
+                OUT1_EN = MAX1614_OFF;
+                OUT2_EN = MAX1614_OFF; 
+                OUT3_EN = MAX1614_OFF;
+            }
+        }        
+#endif
     }
 }
 
