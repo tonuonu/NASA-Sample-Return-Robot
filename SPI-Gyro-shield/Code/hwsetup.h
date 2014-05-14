@@ -53,9 +53,9 @@ void HardwareSetup(void);
 #define RESET3d      pd0_0
 
 #define CDONE0       p0_7
-#define CDONE1       p0_6
-#define CDONE2       p0_5
-#define CDONE3       p0_4
+#define CDONE1       p0_4
+#define CDONE2       p0_6
+#define CDONE3       p0_5
 
 #define MOTOR_ERROR   p5_6
 #define MOTOR_ERRORd   pd5_6
@@ -68,7 +68,6 @@ void HardwareSetup(void);
 #define CS0d         pd6_0
 #define CS0          p6_0
 #define CS0s         p6_0s
-#define CLOCK0d      pd6_1
 #define CLOCK0       p6_1
 #define CLOCK0d      pd6_1
 #define CLOCK0s      p6_1s
@@ -78,48 +77,45 @@ void HardwareSetup(void);
 #define TX0s         p6_3s
 #define TX0d         pd6_3
 
-// SPI6, motor 1
-#define TX6          p4_7
-#define RX6          p4_6
-#define TX6s         p4_7s
-#define RX6s         p4_6s
-#define TX6d         pd4_7
-#define RX6d         pd4_6
-#define CLOCK6       p4_5
-#define CLOCK6d      pd4_5
-#define CLOCK6s      p4_5s
-#define CS3d         pd7_3
-#define CS3          p7_3
-#define CS3s         p7_3s
-
-// SPI3, motor 2
-#define CLOCK3       p4_1
-#define CLOCK3d      pd4_1
-#define CLOCK3s      p4_1s
+// SPI3, motor 1
 #define CS1d         pd4_0
 #define CS1          p4_0
 #define CS1s         p4_0s
-
-#define TX3          p4_3
-#define TX3s         p4_3s
-#define TX3d         pd4_3
+#define CLOCK3       p4_1
+#define CLOCK3d      pd4_1
+#define CLOCK3s      p4_1s
 #define RX3          p4_2
 #define RX3s         p4_2s
 #define RX3d         pd4_2
+#define TX3          p4_3
+#define TX3s         p4_3s
+#define TX3d         pd4_3
 
-
-// SPI4, motor 3
+// SPI4, motor 2
 #define CS2         p9_4
 #define CS2d        pd9_4
 #define CLOCK4      p9_5
-#define CLOCK4s     p9_5s
 #define CLOCK4d     pd9_5
+#define CLOCK4s     p9_5s
+#define RX4         p9_7
+#define RX4s        p9_7s
 #define TX4         p9_6
 #define TX4s        p9_6s
 #define TX4d        pd9_6
 
-#define RX4         p9_7
-#define RX4s        p9_7s
+// SPI6, motor 3
+#define CS3d         pd7_3
+#define CS3          p7_3
+#define CS3s         p7_3s
+#define CLOCK6       p4_5
+#define CLOCK6d      pd4_5
+#define CLOCK6s      p4_5s
+#define RX6          p4_6
+#define RX6s         p4_6s
+#define RX6d         pd4_6
+#define TX6          p4_7
+#define TX6s         p4_7s
+#define TX6d         pd4_7
 
 // Serial 5
 
