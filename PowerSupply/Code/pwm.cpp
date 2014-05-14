@@ -170,10 +170,10 @@ void Init_PWM(void) {
     TPUA.TSYR.BIT.SYNC2=1; // --""--
     TPUA.TSYR.BIT.SYNC3=1; // --""--
   
-    TPU0.TCR.BIT.TPSC=1; // input PCLK/4
-    TPU1.TCR.BIT.TPSC=1; // --""--
-    TPU2.TCR.BIT.TPSC=1; // --""--
-    TPU3.TCR.BIT.TPSC=1; // --""--
+    TPU0.TCR.BIT.TPSC=0; // input PCLK/1
+    TPU1.TCR.BIT.TPSC=0; // --""--
+    TPU2.TCR.BIT.TPSC=0; // --""--
+    TPU3.TCR.BIT.TPSC=0; // --""--
 
     TPU0.TCR.BIT.CKEG=0; // Count only falling edges
     TPU1.TCR.BIT.CKEG=0; // --""--
@@ -219,26 +219,26 @@ void Init_PWM(void) {
 
     // TPU0.TIER.BIT.TCIEU; // Cool interrupt stuff
   
-    // 48Mhz/4/400 == 30000Hz
+    // 48Mhz/4/40 == 30000Hz
     /* Set a period */
    
-#define length0 1
+#define length0 0 // 0 means no PWM, 1..10 length
 #define length1 0
-#define length2 1
+#define length2 0
 #define length3 0
   
 #if 1 // we just play around now
-    TPU3.TGRA = 100-length3;
-    TPU3.TGRB = 100;
+    TPU3.TGRA = 10-length3;
+    TPU3.TGRB = 10;
 
-    TPU2.TGRA = 200-length2;
-    TPU2.TGRB = 200;
+    TPU2.TGRA = 20-length2;
+    TPU2.TGRB = 20;
 
-    TPU1.TGRA = 300-length1;
-    TPU1.TGRB = 300;
+    TPU1.TGRA = 30-length1;
+    TPU1.TGRB = 30;
 
-    TPU0.TGRA = 400-length0;
-    TPU0.TGRB = 400;
+    TPU0.TGRA = 40-length0;
+    TPU0.TGRB = 40;
 #else // this will be in final code for safety
     TPU3.TGRA = 0;
     TPU3.TGRB = 0;
@@ -249,8 +249,8 @@ void Init_PWM(void) {
     TPU1.TGRA = 0;
     TPU1.TGRB = 0;
 
-    TPU0.TGRA = 400;
-    TPU0.TGRB = 400;
+    TPU0.TGRA = 40;
+    TPU0.TGRB = 40;
 #endif
   
     SYSTEM.PRCR.WORD = 0xA503;

@@ -86,26 +86,24 @@ void Init_ADC12Repeat(void) {
   MPC.PWPR.BIT.PFSWE=0;
   MPC.PWPR.BIT.B0WI=1;
   
-  /* ADC clock = PCLK/8, continuous scan mode */
-  // S12AD.ADCSR.BYTE |= 0x40;
-  S12AD.ADCSR.BIT.CKS=0; /*  0: PCLK/8
-  1: PCLK/4
-  2: PCLK/2
-  3: PCLK
-  */
+  /* 
+   * 0: PCLK/8
+   * 1: PCLK/4
+   * 2: PCLK/2
+   * 3: PCLK
+   */
+  S12AD.ADCSR.BIT.CKS = 0; 
   S12AD.ADCSR.BIT.ADCS=1; // 0 single scan, 1 continuous
   
   /* Selects AN000..AN007 */
-  S12AD.ADANS0.WORD = 0x00FF;
   S12AD.ADANS0.BIT.ANS0=0x00FF;
-
+  
   /* Set the sampling cycle to 255 states (approximately 5 us) */
   S12AD.ADSSTR01.BIT.SST1=255;
-  S12AD.ADSSTR23.BIT.SST2=255;
 
   S12AD.ADADS0.BIT.ADS0=0x00FF; // AN000...AN007 addition mode on
   S12AD.ADADS1.BIT.ADS1=0x0000; // AN016... we no not care
-  S12AD.ADADC.BIT.ADC=3;// convert and add 4 times
+  S12AD.ADADC.BIT.ADC=3; // convert and add 4 times
   S12AD.ADCER.BIT.ACE = 1; // Clear automatically after data is read
   
   /* Start ADC */

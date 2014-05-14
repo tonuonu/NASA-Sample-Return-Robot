@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013 Tonu Samuel
+ *  Copyright (c) 2013, 2014 Tonu Samuel
  *  All rights reserved.
  *
  *  This file is part of robot "Kuukulgur".
@@ -52,49 +52,49 @@ volatile uint32_t gDelay_Counter = 0;
 * Return value  : none
 ******************************************************************************/
 void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode) {
-  /* Clear the timer's count */
-  gDelay_Counter = 0;
+    /* Clear the timer's count */
+    gDelay_Counter = 0;
     
-  /* Check if microseconds delay is required */
-  if(unit == 'u') {
-    /* Select the PCLK clock division as PCLK/8 = 6MHz */ 
-    CMT2.CMCR.BIT.CKS = 0x0;
+    /* Check if microseconds delay is required */
+    if(unit == 'u') {
+        /* Select the PCLK clock division as PCLK/8 = 6MHz */ 
+        CMT2.CMCR.BIT.CKS = 0x0;
     
-    /* Store a copy of the user delay value to gPeriodic_Delay */
-    gPeriodic_Delay = user_delay * 6;
+        /* Store a copy of the user delay value to gPeriodic_Delay */
+        gPeriodic_Delay = user_delay * 6;
   
-    /* Specify the timer period */
-    CMT2.CMCOR = gPeriodic_Delay;
-  }
+        /* Specify the timer period */
+        CMT2.CMCOR = gPeriodic_Delay;
+    }
   
-  /* Check if milliseconds delay is required */
-  if(unit == 'm') {
-    /* Select the PCLK clock division as PCLK/128 = 375KHz */ 
-    CMT2.CMCR.BIT.CKS = 0x2;
+    /* Check if milliseconds delay is required */
+    if(unit == 'm') {
+        /* Select the PCLK clock division as PCLK/128 = 375KHz */ 
+        CMT2.CMCR.BIT.CKS = 0x2;
 
-    /* Stor a copy of the user delay value to gPeriodic_Delay */
-    gPeriodic_Delay = user_delay * 375;
+        /* Store a copy of the user delay value to gPeriodic_Delay */
+        gPeriodic_Delay = user_delay * 375;
 
-    /* Specify the timer period */
-    CMT2.CMCOR = gPeriodic_Delay;
-  }
+        /* Specify the timer period */
+        CMT2.CMCOR = gPeriodic_Delay;
+    }
   
-  /* Enable the compare match interrupt */
-  CMT2.CMCR.BIT.CMIE = 1;
+    /* Enable the compare match interrupt */
+    CMT2.CMCR.BIT.CMIE = 1;
 
-  /* Start CMT2 count */
-  CMT.CMSTR1.BIT.STR2 = 1;
+    /* Start CMT2 count */
+    CMT.CMSTR1.BIT.STR2 = 1;
 
-  /* Skip the following instructions if a periodic timer is required */
-  if((timer_mode != PERIODIC_MODE)) {
-    /* Wait for the timer to timeout */
-    while((gDelay_Counter != gPeriodic_Delay)) {
-      /* Wait */
-    }  
+    /* Skip the following instructions if a periodic timer is required */
+    if((timer_mode != PERIODIC_MODE)) {
+        /* Wait for the timer to timeout */
+        while((gDelay_Counter != gPeriodic_Delay)) {
+            /* Wait */
+        }  
 
-    /* Stop CMT2 count */
-    CMT.CMSTR1.BIT.STR2 = 0;
-  }      
+        /* Stop CMT2 count */
+        CMT.CMSTR1.BIT.STR2 = 0;
+    }      
 }
 
 
@@ -103,7 +103,8 @@ void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode) {
 __interrupt void Excep_CMTU1_CMT2(void) {
     LED7 =LED_ON;
   
-    /* Resistor divider made from 33k and 100k 
+    /*
+     * Resistor divider made from 33k and 100k 
      * Actual voltage is 133/33=4.03 times higher than ADC reading.
      * So when reference is 3.3V, maximum ADC reading is 133k/33k*3.3V=13.3V
      * Because we have 12bit ADC, formula for voltage is 13.3/(2^12-1)*reading
@@ -115,7 +116,8 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     adc[2] =  (float)(S12AD.ADDR2>>4)*VCOEFF; // VBAT2_AD
     adc[3] =  (float)(S12AD.ADDR3>>4)*VCOEFF; // VBAT3_AD
   
-    /* ACS712 20A version outputs 100mV for each A
+    /*
+     * ACS712 20A version outputs 100mV for each A
      * Center is at VCC/2, so 5V/2=2.5V
      * Theoretical maximum current we can measure is 2.5/0.1=25A?
      * Zero current point is (2^12-1)/3.3*2.5
@@ -124,7 +126,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
      * For every amper change is 4095/3.3*0.1=~124.09 units on ADC
      */
 #define ICOEFF (4095.0/3.3*   0.1*-1)
-#define IZBASE (   4095.0/3.3*2.36  )
+#define IZBASE (   4095.0/3.3*2.53  )
     adc[4] =  ((float)(S12AD.ADDR4>>4)-IZBASE)/ICOEFF; // IBAT0_AD
     adc[5] =  ((float)(S12AD.ADDR5>>4)-IZBASE)/ICOEFF; // IBAT1_AD
     adc[6] =  ((float)(S12AD.ADDR6>>4)-IZBASE)/ICOEFF; // IBAT2_AD
@@ -136,29 +138,41 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     /*
      * IMON1 and IMON2 are current measuring outputs of TPS51222
      * The measure voltage drop over output inductor and amplyify it by 50.
-     * For Bourns SRP1250-4R7M DCR is 15 milliohm (0.015 ohm) max.
-     * Ohms law states I = U/R.
+     * For Bourns SRP1250-4R7M actual DCR is ~10 milliohm (15 mohm max by 
+     * datasheet) or 0.008 ohm. Ohm's law states I = U/R.
      * In our ADC maximum reading of 1023 means 3.3V. 3.3V/50= 0.066V and this  
      * is maximum drop we can measure on inductor. 
-     * I = 0.066V / 0.015ohm = 4.4A 
-     * Additionally there is a resistor divider on board from 10k and 3k9. 
-     * This means we need to multiply value by ~3.564
+     * I = 0.066V / 0.008ohm = 8.25A 
+     * Additionally there is a resistor divider on board from 10k and 3k12. 
+     * This means we need to multiply value by ~1.0312
+     * Measured current is not exact as inductor actualy drop may differ.
+     * PGOOD indicates if power supply actually works. If not, current always
+     * shows maximum value.
      */
-    imon1 = (float) AD.ADDRC / 1023.0 * 4.4 * ((10.0+3.9)/3.9);
-    imon2 = (float) AD.ADDRD / 1023.0 * 4.4 * ((10.0+3.9)/3.9);
-    
-    if(imon2 > 5.0) { // Excess current on steering power supply
-        LED_RED = LED_ON;
+    if(PGOOD1) {
+        imon1 = (float) AD.ADDRC / 1023.0 * (0.066 / 0.010) * ((10.0+3.12)/3.12);
+        imon1max = imon1 > imon1max ? imon1 : imon1max;
     } else {
-        LED_RED = LED_OFF;
+        imon1 = 0.0f;
     }
-    imon1max = imon1 > imon1max ? imon1 : imon1max;
-    imon2max = imon2 > imon2max ? imon2 : imon2max;
+
+    if(PGOOD2) {
+        imon2 = (float) AD.ADDRD / 1023.0 * (0.066 / 0.010) * ((10.0+3.12)/3.12);
+        imon2max = imon2 > imon2max ? imon2 : imon2max;
+        if(imon2 > 5.0) { // Excess current on steering power supply
+            LED_RED = LED_ON;
+        } else {
+            LED_RED = LED_OFF;
+        }
+    } else {
+        imon2 = 0.0f;
+    }
     
-#define CURRENT_MAX     3.0
+    
+#define CURRENT_MAX     10.0
 #define CURRENT_MIN     -3.0
-#define VOLTAGE_MAX     12.6
-#define VOLTAGE_MIN     9.5    
+#define VOLTAGE_MAX     12.6 * 1.1 // Allow some overhead before forcing shut off
+#define VOLTAGE_MIN     9.5  * 0.9
 
     int BAT0_error=0;
     int BAT1_error=0;
@@ -166,59 +180,124 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     int BAT3_error=0;
 
     char buf[65];
-
+        
     /* check for voltages */   
-    if(BAT0_EN==MAX1614_ON && (adc[0] > VOLTAGE_MAX || adc[0] < VOLTAGE_MIN)) { // BAT0
+    if(adc[0] > VOLTAGE_MAX || adc[0] < VOLTAGE_MIN) { // BAT0
+        uint8_t flag=BAT0_EN;
         BAT0_EN=MAX1614_OFF; // Turn off MOSFET
         BAT0_error=1;
-        snprintf(buf,sizeof(buf),"E:BAT0:%.2fV",adc[0]);
-        logerror(buf);
+        if(flag==MAX1614_ON) {
+            snprintf(buf,sizeof(buf),"E:BAT0:%.2fV",adc[0]);
+            logerror(buf);
+        }
     }
-    if(BAT1_EN==MAX1614_ON && (adc[1] > VOLTAGE_MAX || adc[1] < VOLTAGE_MIN)) { // BAT1
+    if(adc[1] > VOLTAGE_MAX || adc[1] < VOLTAGE_MIN) { // BAT1
+        uint8_t flag=BAT1_EN;
         BAT1_EN=MAX1614_OFF; // Turn off MOSFET
         BAT1_error=1;
-        snprintf(buf,sizeof(buf),"E:BAT1:%.2fV",adc[1]);
-        logerror(buf);
+        if(flag==MAX1614_ON) {
+            snprintf(buf,sizeof(buf),"E:BAT1:%.2fV",adc[1]);
+            logerror(buf);
+        }
     }
-    if(BAT2_EN==MAX1614_ON && (adc[2] > VOLTAGE_MAX || adc[2] < VOLTAGE_MIN)) { // BAT2
+    if(adc[2] > VOLTAGE_MAX || adc[2] < VOLTAGE_MIN) { // BAT2
+        uint8_t flag=BAT2_EN;
         BAT2_EN=MAX1614_OFF; // Turn off MOSFET
         BAT2_error=1;
-        snprintf(buf,sizeof(buf),"E:BAT2:%.2fV",adc[2]);
-        logerror(buf);
+        if(flag==MAX1614_ON) {
+            snprintf(buf,sizeof(buf),"E:BAT2:%.2fV",adc[2]);
+            logerror(buf);
+        }
     }
-    if(BAT3_EN==MAX1614_ON && (adc[3] > VOLTAGE_MAX || adc[3] < VOLTAGE_MIN)) { // BAT3
+    if(adc[3] > VOLTAGE_MAX || adc[3] < VOLTAGE_MIN) { // BAT3
+        uint8_t flag=BAT3_EN;
         BAT3_EN=MAX1614_OFF; // Turn off MOSFET
         BAT3_error=1;
-        snprintf(buf,sizeof(buf),"E:BAT3:%.2fV",adc[3]);
-        logerror(buf);
+        if(flag==MAX1614_ON) {
+            snprintf(buf,sizeof(buf),"E:BAT3:%.2fV",adc[3]);
+            logerror(buf);
+        }
     }
 
+    /* Find out which is maximum current on active batteries. */
+    float maxcurrent=0.0;
+    maxcurrent=maxcurrent < adc[4] ? adc[4] : maxcurrent; 
+    maxcurrent=maxcurrent < adc[5] ? adc[5] : maxcurrent; 
+    maxcurrent=maxcurrent < adc[6] ? adc[6] : maxcurrent; 
+    maxcurrent=maxcurrent < adc[7] ? adc[7] : maxcurrent; 
+
+    // make sure consumption is big enough to rule out too small values
+    if(maxcurrent > 1.0f) {
+        if(adc[4] < 0.5f) // Input is enabled but battery is not connected
+            BAT0_EN=MAX1614_OFF; // Turn off MOSFET
+        if(adc[5] < 0.5f) // Input is enabled but battery is not connected
+            BAT1_EN=MAX1614_OFF; // Turn off MOSFET
+        if(adc[6] < 0.5f) // Input is enabled but battery is not connected
+            BAT2_EN=MAX1614_OFF; // Turn off MOSFET
+        if(adc[7] < 0.5f) // Input is enabled but battery is not connected
+            BAT3_EN=MAX1614_OFF; // Turn off MOSFET
+    }
+    
     /* check for battery currents */   
-    if(BAT0_EN==MAX1614_ON && (adc[4] > CURRENT_MAX || adc[4] < CURRENT_MIN)) { // BAT0
+    if(adc[4] > CURRENT_MAX || adc[4] < CURRENT_MIN) { // BAT0
+        uint8_t flag=BAT0_EN;
         BAT0_EN=MAX1614_OFF; // Turn off MOSFET
         BAT0_error=1;
-        snprintf(buf,sizeof(buf),"E:BAT0:%.2fA",adc[4]);
-        logerror(buf);
+        if(flag==MAX1614_ON) {
+            snprintf(buf,sizeof(buf),"E:BAT0:%.2fA",adc[4]);
+            logerror(buf);
+        }
     }
-    if(BAT1_EN==MAX1614_ON && (adc[5] > CURRENT_MAX || adc[5] < CURRENT_MIN)) { // BAT1
+    if(adc[5] > CURRENT_MAX || adc[5] < CURRENT_MIN) { // BAT1
+        uint8_t flag=BAT1_EN;
         BAT1_EN=MAX1614_OFF; // Turn off MOSFET
         BAT1_error=1;
-        snprintf(buf,sizeof(buf),"E:BAT1:%.2fA",adc[5]);
-        logerror(buf);
+        if(flag==MAX1614_ON) {
+            snprintf(buf,sizeof(buf),"E:BAT1:%.2fA",adc[5]);
+            logerror(buf);
+        }
     }
-    if(BAT2_EN==MAX1614_ON && (adc[6] > CURRENT_MAX || adc[6] < CURRENT_MIN)) { // BAT2
+    if(adc[6] > CURRENT_MAX || adc[6] < CURRENT_MIN) { // BAT2
+        uint8_t flag=BAT2_EN;
         BAT2_EN=MAX1614_OFF; // Turn off MOSFET
         BAT2_error=1;
-        snprintf(buf,sizeof(buf),"E:BAT2:%.2fA",adc[6]);
-        logerror(buf);
+        if(flag==MAX1614_ON) {
+            snprintf(buf,sizeof(buf),"E:BAT2:%.2fA",adc[6]);
+            logerror(buf);
+        }
     }
-    if(BAT3_EN==MAX1614_ON && (adc[7] > CURRENT_MAX || adc[7] < CURRENT_MIN)) { // BAT3
+    if(adc[7] > CURRENT_MAX || adc[7] < CURRENT_MIN) { // BAT3
+        uint8_t flag=BAT3_EN;
         BAT3_EN=MAX1614_OFF; // Turn off MOSFET
         BAT3_error=1;
-        snprintf(buf,sizeof(buf),"E:BAT3:%.2fA",adc[7]);
-        logerror(buf);
+        if(flag==MAX1614_ON) {
+            snprintf(buf,sizeof(buf),"E:BAT3:%.2fA",adc[7]);
+            logerror(buf);
+        }
     }    
-
+    
+    /* Enable inputs which had no problems */
+    if(!BAT0_error && BAT0_EN==MAX1614_OFF) {
+        snprintf(buf,sizeof(buf),"I:BAT0:%.2fV",adc[0]);
+        logerror(buf);
+        BAT0_EN=MAX1614_ON;
+    }
+    if(!BAT1_error && BAT1_EN==MAX1614_OFF) {
+        snprintf(buf,sizeof(buf),"I:BAT1:%.2fV",adc[1]);
+        logerror(buf);
+        BAT1_EN=MAX1614_ON;
+    }
+    if(!BAT2_error && BAT2_EN==MAX1614_OFF) {
+        snprintf(buf,sizeof(buf),"I:BAT2:%.2fV",adc[2]);
+        logerror(buf);
+        BAT2_EN=MAX1614_ON;
+    }
+    if(!BAT3_error && BAT3_EN==MAX1614_OFF) {
+        snprintf(buf,sizeof(buf),"I:BAT3:%.2fV",adc[3]);
+        logerror(buf);
+        BAT3_EN=MAX1614_ON;
+    }
+    
     int PWM0,PWM1,PWM2,PWM3;
     /* Check if adapter voltage exceeds any battery voltage. 
        If yes, we can charge! */

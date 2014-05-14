@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2013 Tonu Samuel
+ *  Copyright (c) 2013, 2014 Tonu Samuel
  *  All rights reserved.
  *
  *  This file is part of robot "Kuukulgur".
@@ -635,7 +635,7 @@ mode_e_supply(void) {
         if(OUT4_EN == 1 && ENABLE_PWR==1) {
             OUT4_EN=0;
             OUT5_EN=0;
-            ENABLE_PWR=0;
+           // ENABLE_PWR=0;
         } else if(ENABLE_PWR==0) {
             ENABLE_PWR=1;
         } else {
@@ -674,6 +674,8 @@ mode_e_gyro(void) {
 static void 
 mode_e_bat(void) {
     char buf[SCREENWIDTH+1]; 
+    snprintf(buf,sizeof(buf),"mode switch %d",PORT3.PIDR.BIT.B4);
+    OLED_Show_String(  1,buf, 0, 5*8);
     snprintf(buf,sizeof(buf),"steering %3.1fA (max %3.1fA)",imon2,imon2max);
     OLED_Show_String(  1,buf, 0, 6*8);
 #define BAT_MISSING_THRESHOLD (2.5f*3.f) 
@@ -699,34 +701,36 @@ mode_e_bat(void) {
         } else {
             statustext="Normal";
         }
-        char *status2;
+        
+        char *status[4];
         switch(i) {
         case 0:
             if(BAT0_EN==MAX1614_ON)
-                status2="EN ";
+                status[0]="EN ";
             else
-                status2="DIS";
+                status[0]="DIS";
             break;
         case 1:
             if(BAT1_EN==MAX1614_ON)
-                status2="EN ";
+                status[1]="EN ";
             else
-                status2="DIS";
+                status[1]="DIS";
             break;
         case 2:
             if(BAT2_EN==MAX1614_ON)
-                status2="EN ";
+                status[2]="EN ";
             else
-                status2="DIS";
+                status[2]="DIS";
             break;
         case 3:
             if(BAT3_EN==MAX1614_ON)
-                status2="EN ";
+                status[3]="EN ";
             else
-                status2="DIS";
+                status[3]="DIS";
             break;
         }
-        snprintf(buf,sizeof(buf),"%d: %4.1fV %5.1fA %7s%3.0f%% %3s",i,adc[i],adc[i+4],statustext,percent,status2);
+        
+        snprintf(buf,sizeof(buf),"%d: %4.1fV %5.1fA %7s%3.0f%% %3s",i,adc[i],adc[i+4],statustext,percent,status[i]);
         OLED_Show_String(  1, buf, 0, (i+1)*8);
     }  
 }
@@ -799,7 +803,7 @@ Init_OLED() {
     OLED_Fill_RAM(0x00);
     OLED_Set_Display_On_Off(0x01);			   // Display On (0x00/0x01)
     OLED_Show_Logo();
-    __delay_cycles(100UL*1000UL*1000UL); // 1s delay    
+    __delay_cycles(10UL*1000UL*1000UL); // 0.1s delay    
 
 }
 

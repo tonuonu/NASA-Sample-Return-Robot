@@ -31,6 +31,14 @@
 void HardwareSetup(void) {
   ConfigureOperatingFrequency();
   ConfigureOutputPorts();
+  
+  /* Set P3_4 (mode switch) as an input */
+  PORT3.PDR.BIT.B4 = 0;
+  PORT3.PMR.BIT.B4 = 0;
+  /* Enable pullup */
+  PORT3.PCR.BIT.B4 = 1;
+
+  
   ConfigureInterrupts();
   EnablePeripheralModules();
 }

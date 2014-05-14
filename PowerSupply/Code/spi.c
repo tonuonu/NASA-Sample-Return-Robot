@@ -28,6 +28,7 @@
 #include "usb_hal.h"
 #include "usb.h"
 #include "usb_cdc.h"
+#include "intrinsics.h"
 
 
 volatile int16_t  gyro0[3] = {0,0,0};
@@ -132,12 +133,12 @@ Init_Gyros(void) {
      * In some weird reason this reset breaks everything 
      * Fix if you can.
      */ 
-    // sendspi16cmd(MPUREG_PWR_MGMT_1,0x80); // reset
-    // __delay_cycles(100UL*100000UL); // 100ms delay from GYRO reset is mandatory to wait
+    sendspi16cmd(MPUREG_PWR_MGMT_1,0x80); // reset
+    __delay_cycles(100UL*100000UL); // 100ms delay from GYRO reset is mandatory to wait
 
-    sendspi16cmd(MPUREG_PWR_MGMT_1,0x00); // wake up    
+    sendspi16cmd(MPUREG_PWR_MGMT_1,0x05); // wake up and set 19.2MHz reference clock
     sendspi16cmd(MPUREG_USER_CTRL, BIT_I2C_IF_DIS); // Disable I2C. 
-    sendspi16cmd(MPUREG_PWR_MGMT_1,0x03); // Z axis is reference.
+//    sendspi16cmd(MPUREG_PWR_MGMT_1,0x05); // 19.2MHz reference.
     sendspi16cmd(MPUREG_PWR_MGMT_2,0x00); // ?
     sendspi16cmd(MPUREG_GYRO_CONFIG,BITS_FS_500DPS); 
     sendspi16cmd(MPUREG_ACCEL_CONFIG,BITS_FS_4G);
