@@ -18347,8 +18347,8 @@ Source: coiltronics_dr_series.pdf</description>
 <part name="R23" library="rcl" deviceset="R-EU_" device="R0603" value="18k"/>
 <part name="R4" library="rcl" deviceset="R-EU_" device="R0603" value="30k"/>
 <part name="R5" library="rcl" deviceset="R-EU_" device="R0603" value="30k"/>
-<part name="R21" library="rcl" deviceset="R-EU_" device="R0603" value="120k"/>
-<part name="R40" library="rcl" deviceset="R-EU_" device="R0603" value="270k"/>
+<part name="R21" library="rcl" deviceset="R-EU_" device="R0603" value="180k"/>
+<part name="R40" library="rcl" deviceset="R-EU_" device="R0603" value="180k"/>
 <part name="C5" library="rcl" deviceset="C-EU" device="C1210" value="10u"/>
 <part name="GND25" library="SparkFun" deviceset="GND" device=""/>
 <part name="C21" library="rcl" deviceset="C-EU" device="C0603" value="0,1u"/>
@@ -18359,10 +18359,10 @@ Source: coiltronics_dr_series.pdf</description>
 <part name="GND50" library="SparkFun" deviceset="GND" device=""/>
 <part name="SJ104" library="rcl" deviceset="R-EU_" device="R0603" value="0R"/>
 <part name="R31" library="rcl" deviceset="R-EU_" device="R0603" value="10k"/>
-<part name="R32" library="rcl" deviceset="R-EU_" device="R0603" value="3k12"/>
+<part name="R32" library="rcl" deviceset="R-EU_" device="R0603" value="10k"/>
 <part name="R25" library="rcl" deviceset="R-EU_" device="R0603" value="3k12"/>
 <part name="C16" library="rcl" deviceset="C-EU" device="C0603" value="0,1u"/>
-<part name="R33" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
+<part name="R33" library="rcl" deviceset="R-EU_" device="R0603" value="3k12"/>
 <part name="C20" library="rcl" deviceset="C-EU" device="C0603" value="0,1u"/>
 <part name="SJ114" library="rcl" deviceset="R-EU_" device="R0603" value="0R"/>
 <part name="SJ100" library="rcl" deviceset="R-EU_" device="R0603" value="0R"/>
@@ -21010,9 +21010,9 @@ D4 avoids flowing LiPo voltage to 19V socket.</text>
 <text x="147.32" y="35.56" size="2.54" layer="91">3,3V 10mA</text>
 <text x="71.12" y="76.2" size="2.54" layer="91">5v 100mA</text>
 <text x="35.56" y="-12.7" size="1.778" layer="91">R1 = (VOUT -1.0) * R2
-120 = 4 * 30</text>
+180 = 6 * 30</text>
 <text x="109.22" y="-12.7" size="1.778" layer="91">R1 = (VOUT -1.0) * R2
-270 = 9 * 30</text>
+180 = 6 * 30</text>
 </plain>
 <instances>
 <instance part="U$17" gate="G$1" x="83.82" y="27.94"/>
