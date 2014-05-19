@@ -82,6 +82,9 @@ shell(uint32_t _NumBytes, const uint8_t* _Buffer) {
             }
         } else if(strcmp((char*)shellbuf,"cat /mems/realtime")==0) {
             mems_realtime=true;
+        } else if(strcmp((char*)shellbuf,"cat /switch")==0) {
+            char *buf= (PORT3.PIDR.BIT.B4==1) ? "1\n" : "0\n";
+            USBCDC_Write_Async(strlen((char*)buf),(uint8_t*)buf , CBDoneWrite);
         } else if(strncmp((char*)shellbuf,"date ",5)==0) {
             int day,month,year,weekday;
             int hour,minute,second;
