@@ -61,7 +61,7 @@ int main() {
     ENABLE_PWR_DIR=1; // Make it output AFTER to avoid power glitch.
     
     OUT1_EN = MAX1614_OFF; // Configure all power supply main outputs   
-    OUT2_EN = MAX1614_OFF; 
+    OUT2_EN = MAX1614_ON; // Enable PC
     OUT3_EN = MAX1614_OFF;
     OUT1_EN_DIR = 1;
     OUT2_EN_DIR = 1;

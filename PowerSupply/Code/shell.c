@@ -106,6 +106,12 @@ shell(uint32_t _NumBytes, const uint8_t* _Buffer) {
                 TPUA.TSTR.BIT.CST5=0; // stop counter
                 /* Protection on */
                 SYSTEM.PRCR.WORD = 0xA500;
+        } else if(strncmp((char*)shellbuf,"setpower ",9)==0) {
+            int power1,power2,power3;
+            sscanf((char*)shellbuf+9,"%d %d %d",&power1,&power2,&power3);
+            OUT1_EN = power1 ? MAX1614_ON : MAX1614_OFF;
+            OUT2_EN = power2 ? MAX1614_ON : MAX1614_OFF;
+            OUT3_EN = power3 ? MAX1614_ON : MAX1614_OFF;
         } else if(strncmp((char*)shellbuf,"setsteering ",12)==0) {
             int leftsteering,rightsteering;
             sscanf((char*)shellbuf+12,"%d %d",&leftsteering,&rightsteering);
