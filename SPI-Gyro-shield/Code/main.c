@@ -115,10 +115,10 @@ receive_ticks(void) {
     }   
 }
 
-static bool
+static int
 send_cur_cmd(const int force_cmd,const int force_param) {
     if(RESET5 == 0) {
-        return false;
+        return 0;
     }
     complete_tx(); // make sure we are not transmitting garbage already
 
@@ -134,14 +134,14 @@ send_cur_cmd(const int force_cmd,const int force_param) {
     struct twobyte_st tmp[4];
 	unsigned char cmds[4];
 
-	bool all_motors_stopped=true;
+	int all_motors_stopped=1;
 	{ for (int i=0;i < 4;i++) {
 		cmds[i]=(force_cmd >= 0 ? force_cmd :
 				cur_cmd[UART_to_motor_id[i]]) | UART_to_motor_id[i];
 	    tmp[i].u.int16=(force_cmd >= 0 ? force_param :
 											cur_cmd_param[i].u.int16);
 		if (cmds[i] != CMD_SPEED || tmp[i].u.int16 != 0)
-			all_motors_stopped=false;
+			all_motors_stopped=0;
 		}}
 
     CS0=CS1=CS2=CS3 = 0;
@@ -264,7 +264,7 @@ main(void) {
     volatile unsigned short dummy=u5rb;
 
     unsigned int milliseconds_since_last_reset=0xffffffffU;
-	bool all_motors_stopped=true;
+	int all_motors_stopped=1;
 
     while(1) {
         LED1 = motor_online[0];
