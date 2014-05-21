@@ -104,7 +104,7 @@ receive_ticks(void) {
             ticks_increment |= 0xff00 ;     // then 1111 1111 xxxx xxxx
 
         const int32_t x = (uint32_t)ticks[i].u.int16 + (uint32_t)ticks_increment;
-        /* Check for possible overflow of INT16 and lit red LED */
+        /* Check for possible overflow of INT16 and light red LED */
         if(x > INT16_MAX || x < INT16_MIN)
             LED5=1;
         else {
@@ -138,7 +138,7 @@ send_cur_cmd(const int force_cmd,const int force_param) {
 													UART_to_motor_id[3];
 
     /* 
-     * Use temporary variable to ensure interrupts to not overwrite
+     * Use temporary variable to ensure interrupts do not overwrite
      * value while we send it. 
      */
     struct twobyte_st tmp[4];
