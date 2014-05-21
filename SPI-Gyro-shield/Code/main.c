@@ -115,10 +115,10 @@ receive_ticks(void) {
     }   
 }
 
-static void 
+static bool
 send_cur_cmd(const int force_cmd,const int force_param) {
     if(RESET5 == 0) {
-        return;
+        return false;
     }
     complete_tx(); // make sure we are not transmitting garbage already
 
@@ -127,25 +127,29 @@ send_cur_cmd(const int force_cmd,const int force_param) {
     { volatile unsigned char dummy=M2RX; }
     { volatile unsigned char dummy=M3RX; }
 
-    CS0=CS1=CS2=CS3 = 0;
-    M0TX=(force_cmd >= 0 ? force_cmd : cur_cmd[UART_to_motor_id[0]]) |
-													UART_to_motor_id[0];
-    M1TX=(force_cmd >= 0 ? force_cmd : cur_cmd[UART_to_motor_id[1]]) |
-													UART_to_motor_id[1];
-    M2TX=(force_cmd >= 0 ? force_cmd : cur_cmd[UART_to_motor_id[2]]) |
-													UART_to_motor_id[2];
-    M3TX=(force_cmd >= 0 ? force_cmd : cur_cmd[UART_to_motor_id[3]]) |
-													UART_to_motor_id[3];
-
     /* 
      * Use temporary variable to ensure interrupts do not overwrite
      * value while we send it. 
      */
     struct twobyte_st tmp[4];
-    tmp[0].u.int16=(force_cmd >= 0 ? force_param : cur_cmd_param[0].u.int16);
-    tmp[1].u.int16=(force_cmd >= 0 ? force_param : cur_cmd_param[1].u.int16);
-    tmp[2].u.int16=(force_cmd >= 0 ? force_param : cur_cmd_param[2].u.int16);
-    tmp[3].u.int16=(force_cmd >= 0 ? force_param : cur_cmd_param[3].u.int16);
+	unsigned char cmds[4];
+
+	bool all_motors_stopped=true;
+	{ for (int i=0;i < 4;i++) {
+		cmds[i]=(force_cmd >= 0 ? force_cmd :
+				cur_cmd[UART_to_motor_id[i]]) | UART_to_motor_id[i];
+	    tmp[i].u.int16=(force_cmd >= 0 ? force_param :
+											cur_cmd_param[i].u.int16);
+		if (cmds[i] != CMD_SPEED || tmp[i].u.int16 != 0)
+			all_motors_stopped=false;
+		}}
+
+    CS0=CS1=CS2=CS3 = 0;
+
+    M0TX=cmds[0];
+    M1TX=cmds[1];
+    M2TX=cmds[2];
+    M3TX=cmds[3];
 
     complete_rx();
 
@@ -195,6 +199,7 @@ send_cur_cmd(const int force_cmd,const int force_param) {
         cur_target_speed[measurement_idx][i].u.int16 = tmprecv[i].u.int16;
 
 	receive_ticks();
+	return all_motors_stopped;
 }
 
 static void 
@@ -259,6 +264,7 @@ main(void) {
     volatile unsigned short dummy=u5rb;
 
     unsigned int milliseconds_since_last_reset=0xffffffffU;
+	bool all_motors_stopped=true;
 
     while(1) {
         LED1 = motor_online[0];
@@ -269,7 +275,8 @@ main(void) {
         /* If any of motor controllers is not ready, reset everything */
         if((!motor_online[0] || !motor_online[1] ||
 								!motor_online[2] || !motor_online[3]) &&
-								milliseconds_since_last_reset > 5000) {
+								milliseconds_since_last_reset > 30*1000 &&
+								all_motors_stopped) {
 			milliseconds_since_last_reset=0;
 
             /*!!! Should reset only these controllers that are not ready! */
@@ -373,10 +380,10 @@ main(void) {
         }
 
         udelay(3000);
-        milliseconds_since_last_reset+=3;
+        milliseconds_since_last_reset+=2*3;	// compensate for 2x slowdown due to ISRs
 
         get_voltage();
-        send_cur_cmd(-1,-1);
+        all_motors_stopped=send_cur_cmd(-1,-1);
 
         measurement_idx++;
         if (measurement_idx >= 3)
