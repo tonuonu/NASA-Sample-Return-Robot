@@ -139,7 +139,7 @@ send_cur_cmd(const int force_cmd,const int force_param) {
 		cmds[i]=(force_cmd >= 0 ? force_cmd :
 				cur_cmd[UART_to_motor_id[i]]) | UART_to_motor_id[i];
 	    tmp[i].u.int16=(force_cmd >= 0 ? force_param :
-											cur_cmd_param[i].u.int16);
+							cur_cmd_param[UART_to_motor_id[i]].u.int16);
 		if (cmds[i] != CMD_SPEED || tmp[i].u.int16 != 0)
 			all_motors_stopped=0;
 		}}
@@ -160,10 +160,10 @@ send_cur_cmd(const int force_cmd,const int force_param) {
 
     complete_pretx();
 
-    M0TX=tmp[UART_to_motor_id[0]].u.byte[1];
-    M1TX=tmp[UART_to_motor_id[1]].u.byte[1];
-    M2TX=tmp[UART_to_motor_id[2]].u.byte[1];
-    M3TX=tmp[UART_to_motor_id[3]].u.byte[1]; 
+    M0TX=tmp[0].u.byte[1];
+    M1TX=tmp[1].u.byte[1];
+    M2TX=tmp[2].u.byte[1];
+    M3TX=tmp[3].u.byte[1]; 
 
     complete_rx();
 
@@ -174,10 +174,10 @@ send_cur_cmd(const int force_cmd,const int force_param) {
 
     complete_pretx();
 
-    M0TX=tmp[UART_to_motor_id[0]].u.byte[0];
-    M1TX=tmp[UART_to_motor_id[1]].u.byte[0];
-    M2TX=tmp[UART_to_motor_id[2]].u.byte[0];
-    M3TX=tmp[UART_to_motor_id[3]].u.byte[0];
+    M0TX=tmp[0].u.byte[0];
+    M1TX=tmp[1].u.byte[0];
+    M2TX=tmp[2].u.byte[0];
+    M3TX=tmp[3].u.byte[0];
 
     complete_rx();
 
