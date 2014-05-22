@@ -136,12 +136,12 @@ send_cur_cmd(const int force_cmd,const int force_param) {
 
 	int all_motors_stopped=1;
 	{ for (int i=0;i < 4;i++) {
-		cmds[i]=(force_cmd >= 0 ? force_cmd :
-				cur_cmd[UART_to_motor_id[i]]) | UART_to_motor_id[i];
+		cmds[i]=(force_cmd >= 0 ? force_cmd : cur_cmd[UART_to_motor_id[i]]);
 	    tmp[i].u.int16=(force_cmd >= 0 ? force_param :
 							cur_cmd_param[UART_to_motor_id[i]].u.int16);
 		if (cmds[i] != CMD_SPEED || tmp[i].u.int16 != 0)
 			all_motors_stopped=0;
+		cmds[i]|=UART_to_motor_id[i];
 		}}
 
     CS0=CS1=CS2=CS3 = 0;
