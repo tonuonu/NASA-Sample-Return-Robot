@@ -159,7 +159,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     if(PGOOD2) {
         imon2 = (float) AD.ADDRD / 1023.0 * (0.066 / 0.010) * ((10.0+3.12)/3.12);
         imon2max = imon2 > imon2max ? imon2 : imon2max;
-        if(imon2 > 5.0) { // Excess current on steering power supply
+        if(imon2 > 10.0) { // Excess current on steering power supply
             LED_RED = LED_ON;
         } else {
             LED_RED = LED_OFF;
@@ -167,10 +167,10 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     } else {
         imon2 = 0.0f;
     }
+
     
-    
-#define CURRENT_MAX     10.0
-#define CURRENT_MIN     -3.0
+#define CURRENT_MAX     16.0
+#define CURRENT_MIN     -10.0
 #define VOLTAGE_MAX     12.6 * 1.1 // Allow some overhead before forcing shut off
 #define VOLTAGE_MIN     9.5  * 0.9
 
@@ -180,6 +180,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     int BAT3_error=0;
 
     char buf[65];
+#if 0
         
     /* check for voltages */   
     if(adc[0] > VOLTAGE_MAX || adc[0] < VOLTAGE_MIN) { // BAT0
@@ -275,7 +276,8 @@ __interrupt void Excep_CMTU1_CMT2(void) {
             logerror(buf);
         }
     }    
-    
+#endif
+      
     /* Enable inputs which had no problems */
     if(!BAT0_error && BAT0_EN==MAX1614_OFF) {
         snprintf(buf,sizeof(buf),"I:BAT0:%.2fV",adc[0]);
@@ -297,7 +299,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
         logerror(buf);
         BAT3_EN=MAX1614_ON;
     }
-    
+#if 0    
     int PWM0,PWM1,PWM2,PWM3;
     /* Check if adapter voltage exceeds any battery voltage. 
        If yes, we can charge! */
@@ -332,7 +334,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
         }
     }
     /* Voltages are less critical */        
-
+#endif
     /* update gyroscope and accelerometer values */ 
     read_gyro();
 
