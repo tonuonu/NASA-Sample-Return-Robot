@@ -6159,7 +6159,7 @@ design rules under a new name.</description>
 <element name="R23" library="rcl" package="R0603" value="18k" x="85.2725" y="39.3453" smashed="yes" rot="R180"/>
 <element name="R4" library="rcl" package="R0603" value="30k" x="90.268" y="38.4427" smashed="yes" rot="R180"/>
 <element name="R5" library="rcl" package="R0603" value="30k" x="77.2929" y="38.4604" smashed="yes"/>
-<element name="R21" library="rcl" package="R0603" value="180k" x="90.2688" y="36.3686" smashed="yes"/>
+<element name="R21" library="rcl" package="R0603" value="120k" x="90.2688" y="36.3686" smashed="yes"/>
 <element name="R40" library="rcl" package="R0603" value="180k" x="77.2749" y="36.3829" smashed="yes" rot="R180"/>
 <element name="C5" library="rcl" package="C1210" value="10u" x="83.6737" y="24.4193" smashed="yes" rot="R90"/>
 <element name="C21" library="rcl" package="C0603" value="0,1u" x="81.396" y="28.2134" smashed="yes" rot="R180"/>

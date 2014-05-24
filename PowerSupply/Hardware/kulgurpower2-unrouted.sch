@@ -18347,7 +18347,7 @@ Source: coiltronics_dr_series.pdf</description>
 <part name="R23" library="rcl" deviceset="R-EU_" device="R0603" value="18k"/>
 <part name="R4" library="rcl" deviceset="R-EU_" device="R0603" value="30k"/>
 <part name="R5" library="rcl" deviceset="R-EU_" device="R0603" value="30k"/>
-<part name="R21" library="rcl" deviceset="R-EU_" device="R0603" value="180k"/>
+<part name="R21" library="rcl" deviceset="R-EU_" device="R0603" value="120k"/>
 <part name="R40" library="rcl" deviceset="R-EU_" device="R0603" value="180k"/>
 <part name="C5" library="rcl" deviceset="C-EU" device="C1210" value="10u"/>
 <part name="GND25" library="SparkFun" deviceset="GND" device=""/>
@@ -21010,7 +21010,7 @@ D4 avoids flowing LiPo voltage to 19V socket.</text>
 <text x="147.32" y="35.56" size="2.54" layer="91">3,3V 10mA</text>
 <text x="71.12" y="76.2" size="2.54" layer="91">5v 100mA</text>
 <text x="35.56" y="-12.7" size="1.778" layer="91">R1 = (VOUT -1.0) * R2
-180 = 6 * 30</text>
+120 = 4 * 30</text>
 <text x="109.22" y="-12.7" size="1.778" layer="91">R1 = (VOUT -1.0) * R2
 180 = 6 * 30</text>
 </plain>
