@@ -99,12 +99,13 @@ void Init_ADC12Repeat(void) {
   S12AD.ADANS0.BIT.ANS0=0x00FF;
   
   /* Set the sampling cycle to 255 states (approximately 5 us) */
-  S12AD.ADSSTR01.BIT.SST1=255;
+  S12AD.ADSSTR01.BIT.SST1=20;
 
   S12AD.ADADS0.BIT.ADS0=0x00FF; // AN000...AN007 addition mode on
   S12AD.ADADS1.BIT.ADS1=0x0000; // AN016... we no not care
-  S12AD.ADADC.BIT.ADC=3; // convert and add 4 times
-  S12AD.ADCER.BIT.ACE = 1; // Clear automatically after data is read
+  S12AD.ADADC.BIT.ADC=0; // convert and add 1 time
+//  S12AD.ADADC.BIT.ADC=3; // convert and add 4 times
+//  S12AD.ADCER.BIT.ACE = 1; // Clear automatically after data is read
   
   /* Start ADC */
   S12AD.ADCSR.BIT.ADST = 1;
@@ -112,7 +113,8 @@ void Init_ADC12Repeat(void) {
   AD.ADCSR.BIT.ADST = 0; // stop conversion
   AD.ADCSR.BIT.CH   = 3; // enable AN0..AN3 
   AD.ADCR.BIT.MODE  = 2; // continuous scan mode
-  AD.ADCR.BIT.CKS   = 0; // clock is PCLK/8
+  //AD.ADCR.BIT.CKS   = 0; // clock is PCLK/8
+  AD.ADCR.BIT.CKS   = 3; // clock is PCLK/1
   AD.ADCR.BIT.TRGS  = 0; // software trigger  
   AD.ADCR2.BIT.DPSEL = 0; // Flush-right
   AD.ADCSR.BIT.ADST = 1; // start conversion

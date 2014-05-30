@@ -1841,6 +1841,9 @@
     <name>$PROJ_DIR$\interrupt-main.cpp</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\led.c</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\log.c</name>
   </file>
   <file>

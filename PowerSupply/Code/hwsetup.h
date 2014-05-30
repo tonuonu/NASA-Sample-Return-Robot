@@ -57,6 +57,7 @@ void ConfigureInterrupts(void);
 void EnablePeripheralModules(void);
 /* Hardware setup function declaration */
 void HardwareSetup(void);
+void Init_DAC(void);
 
 /* End of multiple inclusion prevention macro */
 #endif

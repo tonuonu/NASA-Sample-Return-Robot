@@ -85,7 +85,7 @@ int main() {
      * This is sort of high priority "main loop" for us.
      * Low priority things can go into usual main loop.
      */
-    Timer_Delay(1, 'm', PERIODIC_MODE);
+    Timer_Delay(100, 'u', PERIODIC_MODE);
       
     __enable_interrupt();  
     __delay_cycles(96UL*2000UL); // 2000us delay    

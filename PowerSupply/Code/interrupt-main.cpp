@@ -35,7 +35,7 @@
 #include "rskrx630def.h"
 #include "iorx630.h"
 #include "stdbool.h"
-
+#include "led.h"
 
 /* Dclare a variable to hold the periodic delay specified */
 volatile uint32_t gPeriodic_Delay;
@@ -111,10 +111,10 @@ __interrupt void Excep_CMTU1_CMT2(void) {
      * 13.3/(2^12)*4095=13.3V etc
      */
 #define VCOEFF (((100.0+33.0)/33.0*3.3)/(4095.0))
-    adc[0] =  (float)(S12AD.ADDR0>>4)*VCOEFF; // VBAT0_AD 
-    adc[1] =  (float)(S12AD.ADDR1>>4)*VCOEFF; // VBAT1_AD
-    adc[2] =  (float)(S12AD.ADDR2>>4)*VCOEFF; // VBAT2_AD
-    adc[3] =  (float)(S12AD.ADDR3>>4)*VCOEFF; // VBAT3_AD
+    adc[0] =  (float)(S12AD.ADDR0>>2)*VCOEFF; // VBAT0_AD 
+    adc[1] =  (float)(S12AD.ADDR1>>2)*VCOEFF; // VBAT1_AD
+    adc[2] =  (float)(S12AD.ADDR2>>2)*VCOEFF; // VBAT2_AD
+    adc[3] =  (float)(S12AD.ADDR3>>2)*VCOEFF; // VBAT3_AD
   
     /*
      * ACS712 20A version outputs 100mV for each A
@@ -127,10 +127,10 @@ __interrupt void Excep_CMTU1_CMT2(void) {
      */
 #define ICOEFF (4095.0/3.3*   0.1*-1)
 #define IZBASE (   4095.0/3.3*2.53  )
-    adc[4] =  ((float)(S12AD.ADDR4>>4)-IZBASE)/ICOEFF; // IBAT0_AD
-    adc[5] =  ((float)(S12AD.ADDR5>>4)-IZBASE)/ICOEFF; // IBAT1_AD
-    adc[6] =  ((float)(S12AD.ADDR6>>4)-IZBASE)/ICOEFF; // IBAT2_AD
-    adc[7] =  ((float)(S12AD.ADDR7>>4)-IZBASE)/ICOEFF; // IBAT3_AD
+    adc[4] =  ((float)(S12AD.ADDR4>>2)-IZBASE)/ICOEFF; // IBAT0_AD
+    adc[5] =  ((float)(S12AD.ADDR5>>2)-IZBASE)/ICOEFF; // IBAT1_AD
+    adc[6] =  ((float)(S12AD.ADDR6>>2)-IZBASE)/ICOEFF; // IBAT2_AD
+    adc[7] =  ((float)(S12AD.ADDR7>>2)-IZBASE)/ICOEFF; // IBAT3_AD
 #define VCOEFF2 (((680.0+100.0)/100.0*3.3)/(1023.0))
     // AN0 is external adapter input
     adapter = (float) AD.ADDRA*VCOEFF2;
@@ -160,14 +160,17 @@ __interrupt void Excep_CMTU1_CMT2(void) {
         imon2 = (float) AD.ADDRD / 1023.0 * (0.066 / 0.010) * ((10.0+3.12)/3.12);
         imon2max = imon2 > imon2max ? imon2 : imon2max;
         if(imon2 > 10.0) { // Excess current on steering power supply
+            LED_GRN = LED_OFF;
             LED_RED = LED_ON;
+            static int da=0;
+            da= da == 0 ? 0xffff : 0;
+            DA.DADR1=da;
         } else {
             LED_RED = LED_OFF;
         }
     } else {
         imon2 = 0.0f;
     }
-
     
 #define CURRENT_MAX     16.0
 #define CURRENT_MIN     -10.0
@@ -180,7 +183,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     int BAT3_error=0;
 
     char buf[65];
-#if 0
+#if 1
         
     /* check for voltages */   
     if(adc[0] > VOLTAGE_MAX || adc[0] < VOLTAGE_MIN) { // BAT0
@@ -299,6 +302,8 @@ __interrupt void Excep_CMTU1_CMT2(void) {
         logerror(buf);
         BAT3_EN=MAX1614_ON;
     }
+    
+    
 #if 0    
     int PWM0,PWM1,PWM2,PWM3;
     /* Check if adapter voltage exceeds any battery voltage. 
@@ -337,6 +342,16 @@ __interrupt void Excep_CMTU1_CMT2(void) {
 #endif
     /* update gyroscope and accelerometer values */ 
     read_gyro();
-
+    static int cnt=0;
+    static int da=0;
+    if(cnt++<1000) {
+        da= da == 0 ? 0xffff : 0;
+        DA.DADR1=da;
+    } else {
+        if(cnt>10000)
+            cnt=0;
+    }
+    
+    LED_RGB_set(RGB_BLUE);
     LED7 =LED_OFF;
 }

@@ -27,6 +27,7 @@
 #include "oled.h"
 #include "switch.h"
 #include "hwsetup.h"
+#include "led.h"
 
 void HardwareSetup(void) {
   ConfigureOperatingFrequency();
@@ -41,6 +42,7 @@ void HardwareSetup(void) {
   
   ConfigureInterrupts();
   EnablePeripheralModules();
+  Init_DAC();
 }
 
 void ConfigureOperatingFrequency(void) {      
@@ -136,6 +138,52 @@ void ConfigureOutputPorts(void) {
     LED_RED = LED_OFF;
     LED_GRN = LED_OFF;
     LED_BLU = LED_OFF;
+
+
+
+}
+
+void Init_DAC(void)
+{
+    /* Protection off */
+    SYSTEM.PRCR.WORD = 0xA503;
+    
+    /* PWPR.PFSWE write protect off */
+    MPC.PWPR.BYTE = 0x00u;    
+    
+    /* PFS register write protect off */
+    MPC.PWPR.BYTE = 0x40u;    
+    
+    /* Cancel the DAC module clock stop mode */
+    MSTP_DA = 0;
+    
+    /* Set DAC output pin, P01, to output */
+    PORT0.PDR.BIT.B5 = 0u;
+    
+    /* Set DAC output pin, P01, from general I/O to peripheral controlled. */
+    PORT0.PMR.BIT.B5 = 0u;
+    
+    /* Set DAC output pin, P01, to an analog pin */
+    MPC.P05PFS.BIT.ASEL = 1u;
+        
+    /* Enable ADC & DAC synchronization */
+    DA.DAADSCR.BYTE = 0x01u;
+    
+    /* Configure DAC data register to align right (lsb = bit0) */
+    DA.DADPR.BYTE = 0x00u;
+        
+    /* Enable DAC channel DA1 */
+    DA.DACR.BIT.DAOE1 = 1u; 
+    
+    /* Set DAC data register to 0x0000 for first conversion */
+    DA.DADR1 = 0x0000;
+     
+    /* Protection on */
+    SYSTEM.PRCR.WORD = 0xA500u;
+    
+    /* Turn on PFS register write protect */
+    MPC.PWPR.BYTE = 0x80u;    
+        
 }
 
 void ConfigureInterrupts(void) {

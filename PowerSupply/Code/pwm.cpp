@@ -29,6 +29,8 @@
 #include "iorx630.h"
 #include "switch.h"
 #include "pwm.h"
+#include "log.h"
+#include "led.h"
 #include <stdint.h>
 
 /* Callback function prototype for switch presses */
@@ -405,11 +407,7 @@ __interrupt void Excep_MTU3_TGIA3(void)
   MTU3.TGRB = 4800;
   switch(counter) {
   case 0:
-//      LED0 ^=1;
-//      LED_RED =1;
-      LED_GRN ^=1;
-//      LED_BLU =1;
-
+      LED_RGB_blink();
       counter++;
       break;
   case 2:

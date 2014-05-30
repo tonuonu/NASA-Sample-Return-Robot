@@ -9,8 +9,6 @@
 #include "iorx630.h"
 
 /* General Values */
-#define LED_ON      (1)
-#define LED_OFF      (0)
 #define SET_BIT_HIGH  (1)
 #define SET_BIT_LOW    (0)
 #define SET_BYTE_HIGH  (0xFF)
@@ -31,10 +29,6 @@
 #define  LED5      PORT2.PODR.BIT.B5
 #define  LED6      PORT2.PODR.BIT.B6
 #define  LED7      PORT2.PODR.BIT.B7
-
-#define  LED_GRN      PORT1.PODR.BIT.B3
-#define  LED_BLU      PORT1.PODR.BIT.B5
-#define  LED_RED      PORT1.PODR.BIT.B7
 
 /* LED data direction */
 #define LED0_PORT_DIR  PORT2.PDR.BIT.B0
