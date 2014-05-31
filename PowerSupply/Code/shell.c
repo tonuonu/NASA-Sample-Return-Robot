@@ -19,7 +19,6 @@
  *
  */
 
-
 #include "iorx630.h"
 #include "rskrx630def.h"
 #include "intrinsics.h"
@@ -33,6 +32,7 @@
 #include "usb_hal.h"
 #include "usb_cdc.h"
 #include "usb.h"
+#include "adc12repeat.h"
 
 #define SHELLBUFLEN 1024
 
@@ -46,7 +46,7 @@ shell(uint32_t _NumBytes, const uint8_t* _Buffer) {
     strncat((char *)shellbuf,(char *)_Buffer,_NumBytes);
     char * enter=strchr((char *)shellbuf,13); // search for "Enter"
     char * ctrlc=strchr((char *)shellbuf,3); // search for "Ctrl-C"
-    char * bs=strchr((char *)shellbuf,3); // search for "backspace"
+    char * bs   =strchr((char *)shellbuf,3); // search for "backspace"
     char * error="";
     if(ctrlc) {
         mems_realtime=false;
@@ -85,6 +85,19 @@ shell(uint32_t _NumBytes, const uint8_t* _Buffer) {
         } else if(strcmp((char*)shellbuf,"cat /switch")==0) {
             char *buf= (PORT3.PIDR.BIT.B4==1) ? "1\n" : "0\n";
             USBCDC_Write_Async(strlen((char*)buf),(uint8_t*)buf , CBDoneWrite);
+        } else if(strcmp((char*)shellbuf,"cat /power/status")==0) {
+//            char *buf= (PORT3.PIDR.BIT.B4==1) ? "1\n" : "0\n";
+           char buf[256];
+           snprintf(buf,sizeof(buf),"\r\n"
+                    "BAT0:%.2fV %.2fA\r\n"
+                    "BAT1:%.2fV %.2fA\r\n"
+                    "BAT2:%.2fV %.2fA\r\n"
+                    "BAT3:%.2fV %.2fA\r\n"
+                    ,adc[0],adc[4]
+                    ,adc[1],adc[5]
+                    ,adc[2],adc[6]
+                    ,adc[3],adc[7]);
+           USBCDC_Write_Async(strlen((char*)buf),(uint8_t*)buf , CBDoneWrite);
         } else if(strncmp((char*)shellbuf,"date ",5)==0) {
             int day,month,year,weekday;
             int hour,minute,second;

@@ -31,6 +31,7 @@
 #include "usb_cdc.h"
 #include "usb.h"
 #include "log.h"
+#include "led.h"
 #include "rskrx630def.h"
 
 
@@ -186,7 +187,7 @@ void USB_CDC_APP_Main(void)
 ***********************************************************************************/
 void 
 CBDoneRead(USB_ERR _err, uint32_t _NumBytes) {  
-LED2=LED_ON;  
+    LED2=LED_ON;  
 /*Toggle buffers - as now the empty buffer has been filled
   by this read completing*/
   if(g_pBuffEmpty == g_Buffer2)
