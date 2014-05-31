@@ -26,6 +26,7 @@
 #define RGB_BLUE   0,0,1
 #define RGB_PINK   1,0,1
 #define RGB_WHITE  1,1,1
+#define RGB_NONE   0,0,0
 
 #define LED_ON      (1)
 #define LED_OFF      (0)
