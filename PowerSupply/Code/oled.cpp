@@ -674,7 +674,7 @@ mode_e_gyro(void) {
 static void 
 mode_e_bat(void) {
     char buf[SCREENWIDTH+1]; 
-    snprintf(buf,sizeof(buf),"mode switch %d",PORT3.PIDR.BIT.B4);
+    snprintf(buf,sizeof(buf),"mode switch %d, adapter %.1f",PORT3.PIDR.BIT.B4,adapter);
     OLED_Show_String(  1,buf, 0, 5*8);
     snprintf(buf,sizeof(buf),"steering %3.1fA (max %3.1fA)",imon2,imon2max);
     OLED_Show_String(  1,buf, 0, 6*8);
@@ -702,35 +702,44 @@ mode_e_bat(void) {
             statustext="Normal";
         }
         
+        float current=adc[i+4];
         char *status[4];
         switch(i) {
         case 0:
             if(BAT0_EN==MAX1614_ON)
                 status[0]="EN ";
-            else
+            else {
                 status[0]="DIS";
+                current=0.0f;
+            }
             break;
         case 1:
             if(BAT1_EN==MAX1614_ON)
                 status[1]="EN ";
-            else
+            else {
                 status[1]="DIS";
+                current=0.0f;
+            }
             break;
         case 2:
             if(BAT2_EN==MAX1614_ON)
                 status[2]="EN ";
-            else
+            else {
                 status[2]="DIS";
+                current=0.0f;
+            }
             break;
         case 3:
             if(BAT3_EN==MAX1614_ON)
                 status[3]="EN ";
-            else
+            else {
                 status[3]="DIS";
+                current=0.0f;
+            }
             break;
         }
         
-        snprintf(buf,sizeof(buf),"%d: %4.1fV %5.1fA %7s%3.0f%% %3s",i,adc[i],adc[i+4],statustext,percent,status[i]);
+        snprintf(buf,sizeof(buf),"%d: %4.1fV %5.1fA %7s%3.0f%% %3s",i,adc[i],current,statustext,percent,status[i]);
         OLED_Show_String(  1, buf, 0, (i+1)*8);
     }  
 }
