@@ -74,6 +74,15 @@
 #define OUT4_EN PORT5.PODR.BIT.B3
 #define OUT5_EN PORT0.PODR.BIT.B7
 
+#define SKIP0  PORTA.PODR.BIT.B1
+#define SKIP1  PORTA.PODR.BIT.B2
+#define SKIP2  PORTA.PODR.BIT.B3
+#define SKIP3  PORTA.PODR.BIT.B5
+
+#define SKIP0_DIR  PORTA.PDR.BIT.B1
+#define SKIP1_DIR  PORTA.PDR.BIT.B2
+#define SKIP2_DIR  PORTA.PDR.BIT.B3
+#define SKIP3_DIR  PORTA.PDR.BIT.B5
 
 /* Delay units */
 #define uS        'u'
