@@ -97,12 +97,9 @@ void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode) {
     }      
 }
 
-
-
 #pragma vector=VECT_CMT2_CMI2
 __interrupt void Excep_CMTU1_CMT2(void) {
     LED7 =LED_ON;
-  
     /*
      * Resistor divider made from 33k and 100k 
      * Actual voltage is 133/33=4.03 times higher than ADC reading.
@@ -127,10 +124,14 @@ __interrupt void Excep_CMTU1_CMT2(void) {
      */
 #define ICOEFF (4095.0/3.3*   0.1*-1)
 #define IZBASE (   4095.0/3.3*2.53  )
-    adc[4] =  ((float)(S12AD.ADDR4>>2)-IZBASE)/ICOEFF; // IBAT0_AD
-    adc[5] =  ((float)(S12AD.ADDR5>>2)-IZBASE)/ICOEFF; // IBAT1_AD
-    adc[6] =  ((float)(S12AD.ADDR6>>2)-IZBASE)/ICOEFF; // IBAT2_AD
-    adc[7] =  ((float)(S12AD.ADDR7>>2)-IZBASE)/ICOEFF; // IBAT3_AD
+    adc[4] = 0.8*adc[4] + 0.2*((float)(S12AD.ADDR4>>2)-IZBASE)/ICOEFF; // IBAT0_AD
+    adc[5] = 0.8*adc[5] + 0.2*((float)(S12AD.ADDR5>>2)-IZBASE)/ICOEFF; // IBAT1_AD
+    adc[6] = 0.8*adc[6] + 0.2*((float)(S12AD.ADDR6>>2)-IZBASE)/ICOEFF; // IBAT2_AD
+    adc[7] = 0.8*adc[7] + 0.2*((float)(S12AD.ADDR7>>2)-IZBASE)/ICOEFF; // IBAT3_AD
+    /*
+     * Every volt on AD input 1023.0/3.3 
+     * Resistor divider 680k and 100k makes (680.0+100.0)/100.0
+     */
 #define VCOEFF2 (((680.0+100.0)/100.0*3.3)/(1023.0))
     // AN0 is external adapter input
     adapter = (float) AD.ADDRA*VCOEFF2;
@@ -160,13 +161,14 @@ __interrupt void Excep_CMTU1_CMT2(void) {
         imon2 = (float) AD.ADDRD / 1023.0 * (0.066 / 0.010) * ((10.0+3.12)/3.12);
         imon2max = imon2 > imon2max ? imon2 : imon2max;
         if(imon2 > 10.0) { // Excess current on steering power supply
-            LED_GRN = LED_OFF;
-            LED_RED = LED_ON;
+            //LED_GRN = LED_OFF;
+            //LED_RED = LED_ON;
             static int da=0;
-            da= da == 0 ? 0xffff : 0;
+            //da= da == 0 ? 0xffff : 0;
+            da ^= 0xffff;
             DA.DADR1=da;
         } else {
-            LED_RED = LED_OFF;
+            //LED_RED = LED_OFF;
         }
     } else {
         imon2 = 0.0f;
@@ -175,7 +177,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
 #define CURRENT_MAX     16.0
 #define CURRENT_MIN     -10.0
 #define VOLTAGE_MAX     12.6 * 1.1 // Allow some overhead before forcing shut off
-#define VOLTAGE_MIN     9.5  * 0.9
+#define VOLTAGE_MIN     9.0  * 0.9
 
     int BAT0_error=0;
     int BAT1_error=0;
@@ -304,41 +306,129 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     }
     
     
-#if 0    
-    int PWM0,PWM1,PWM2,PWM3;
+#if 0
+    static int PWM0=0,PWM1=0,PWM2=0,PWM3=0;
     /* Check if adapter voltage exceeds any battery voltage. 
        If yes, we can charge! */
-    if(adapter > adc[0] || adapter > adc[1] || adapter > adc[2] || adapter > adc[3] ) {
-        if(adapter > adc[0]) {
-            if(adc[4] > (CURRENT_MAX*0.9) && adc[0] < 4.20) { // ">" is right because charging current is negative
-                PWM0+=1; // Increase charging
-            } else if(adc[4] > (CURRENT_MAX*0.9)) { // Current is high, reduce PWM
-                PWM0-=1; // 
-            }
+    
+    if(adapter > adc[0] && adc[0] > 8.0f /* 8V = if any battery at all */) {
+        /* 
+         * Intensify charging is voltage is under 12.6V and current is low.
+         * Charging current is negative, this is why ">" is ok 
+         */
+        LED_RGB_set(RGB_BLUE);
+        if(adc[0] >= VOLTAGE_MAX) {
+            PWM3=0;
+            LED_RGB_set(RGB_YELLOW);
+        } else if(adc[4] > CURRENT_MIN) { 
+            PWM3++; // Increase charging
+            LED_RGB_set(RGB_RED);
+        } else if(adc[4] < CURRENT_MIN) { // Current is high, reduce PWM
+            PWM3--; // 
+            LED_RGB_set(RGB_GREEN);
         }
-        if(adapter > adc[1]) {
-            if(adc[5] > (CURRENT_MAX*0.9) && adc[1] < 4.20) { // ">" is right because charging current is negative
-                PWM1+=1; // Increase charging
-            } else if(adc[5] > (CURRENT_MAX*0.9)) { // Current is high, reduce PWM
-                PWM1-=1; // 
-            }
-        }
-        if(adapter > adc[2]) {
-            if(adc[6] > (CURRENT_MAX*0.9) && adc[2] < 4.20) { // ">" is right because charging current is negative
-                PWM2+=1; // Increase charging
-            } else if(adc[6] > (CURRENT_MAX*0.9)) { // Current is high, reduce PWM
-                PWM2-=1; // 
-            }
-        }
-        if(adapter > adc[3]) {
-            if(adc[7] > (CURRENT_MAX*0.9) && adc[3] < 4.20) { // ">" is right because charging current is negative
-                PWM3+=1; // Increase charging
-            } else if(adc[7] > (CURRENT_MAX*0.9)) { // Current is high, reduce PWM
-                PWM3-=1; // 
-            }
-        }
+    } else {
+    //  LED_RGB_set(RGB_PINK);
     }
-    /* Voltages are less critical */        
+
+    
+    if(adapter > adc[1] && adc[1] > 8.0f /* 8V = is any battery at all */) {
+        /* 
+         * Intensify charging is voltage is under 12.6V and current is low.
+         * Charging current is negative, this is why ">" is ok 
+         */
+        LED_RGB_set(RGB_BLUE);
+        if(adc[1] >= VOLTAGE_MAX) {
+            PWM3=0;
+            LED_RGB_set(RGB_YELLOW);
+        } else if(adc[5] > CURRENT_MIN) { 
+            PWM3++; // Increase charging
+            LED_RGB_set(RGB_RED);
+        } else if(adc[5] < CURRENT_MIN) { // Current is high, reduce PWM
+            PWM3--; // 
+            LED_RGB_set(RGB_GREEN);
+        }
+    } else {
+    //  LED_RGB_set(RGB_PINK);
+    }
+
+    
+    if(adapter > adc[2] && adc[2] > 8.0f /* 8V = is any battery at all */) {
+        /* 
+         * Intensify charging is voltage is under 12.6V and current is low.
+         * Charging current is negative, this is why ">" is ok 
+         */
+        LED_RGB_set(RGB_BLUE);
+        if(adc[2] >= VOLTAGE_MAX) {
+            PWM3=0;
+            LED_RGB_set(RGB_YELLOW);
+        } else if(adc[6] > CURRENT_MIN) { 
+            PWM3++; // Increase charging
+            LED_RGB_set(RGB_RED);
+        } else if(adc[6] < CURRENT_MIN) { // Current is high, reduce PWM
+            PWM3--; // 
+            LED_RGB_set(RGB_GREEN);
+        }
+    } else {
+//      LED_RGB_set(RGB_PINK);
+    }
+
+
+    if(adapter > adc[3] && adc[3] > 8.0f /* 8V = is any battery at all */) {
+        /* 
+         * Intensify charging is voltage is under 12.6V and current is low.
+         * Charging current is negative, this is why ">" is ok 
+         */
+        LED_RGB_set(RGB_BLUE);
+        if(adc[3] >= VOLTAGE_MAX) {
+            PWM3=0;
+            LED_RGB_set(RGB_YELLOW);
+        } else if(adc[7] > CURRENT_MIN) { 
+            PWM3++; // Increase charging
+            LED_RGB_set(RGB_RED);
+        } else if(adc[7] < CURRENT_MIN) { // Current is high, reduce PWM
+            PWM3--; // 
+            LED_RGB_set(RGB_GREEN);
+        }
+    } else {
+  //    LED_RGB_set(RGB_PINK);
+    }
+    
+    PWM0 = PWM0 > 10 ? 10 : PWM0;
+    PWM1 = PWM1 > 10 ? 10 : PWM1;
+    PWM2 = PWM2 > 10 ? 10 : PWM2;
+    PWM3 = PWM3 > 10 ? 10 : PWM3;
+
+    PWM0 = PWM0 < 0 ? 0 : PWM0;
+    PWM1 = PWM1 < 0 ? 0 : PWM1;
+    PWM2 = PWM2 < 0 ? 0 : PWM2;
+    PWM3 = PWM3 < 0 ? 0 : PWM3;
+
+    /* 
+     * if PWM is enabled, enable CSD97374Q4M chip by applying 0 to !SKIPx pin
+     * If PWM is disabled, make !SKIPx pin into high impendance (input).
+     */
+    SKIP0=0;
+    SKIP1=0;
+    SKIP2=0;
+    SKIP3=0;
+    SKIP0_DIR= PWM0 ? 1 : 0;
+    SKIP1_DIR= PWM1 ? 1 : 0;
+    SKIP2_DIR= PWM2 ? 1 : 0;
+    SKIP3_DIR= PWM3 ? 1 : 0;
+        
+    TPU3.TGRA = 10-PWM3;
+    TPU3.TGRB = 10;
+
+    TPU2.TGRA = 20-PWM2;
+    TPU2.TGRB = 20;
+
+    TPU1.TGRA = 30-PWM1;
+    TPU1.TGRB = 30;
+
+    TPU0.TGRA = 40-PWM0;
+    TPU0.TGRB = 40;
+
 #endif
     /* update gyroscope and accelerometer values */ 
     read_gyro();
@@ -352,6 +442,6 @@ __interrupt void Excep_CMTU1_CMT2(void) {
             cnt=0;
     }
     
-    LED_RGB_set(RGB_BLUE);
+//    LED_RGB_set(RGB_BLUE);
     LED7 =LED_OFF;
 }
