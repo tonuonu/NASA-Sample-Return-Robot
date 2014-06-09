@@ -28,6 +28,7 @@
 #include <stdarg.h>
 #include "main.h"
 #include "SPI.h"
+#include "UART.h"
 
 
 volatile struct statuses status;
@@ -44,10 +45,11 @@ ConfigureOperatingFrequency(char mode) {
     pm3 = 0x60; // peripheral clock 48MHz
     prc0 = 0;
     prc2 = 1;
-//    *(unsigned short *) &plc0 = 0x0226; // 48MHz, PLL = 96MHz
-    *(unsigned short *) &plc0 = 0x0104; // 48MHz, PLL = 96MHz
+    *(unsigned short *) &plc0 = 0x0226; // 48MHz, PLL = 96MHz
+//    *(unsigned short *) &plc0 = 0x0104; // 50MHz, PLL = 100MHz
     prc2 = 0;
-    base_freq = 25000000;
+    base_freq = 24000000;
+//    base_freq = 25000000;
 
     for (i = 0; i < 0x8000u; i++);                         /* Add delay
                                                             * for PLL to
@@ -152,5 +154,8 @@ HardwareSetup(void) {
 
     /* Interface to Arduino, slave */
     SPI5_Init();
+
+    /* Debug 3Mbps UART */
+    UART1_Init();
 
 }

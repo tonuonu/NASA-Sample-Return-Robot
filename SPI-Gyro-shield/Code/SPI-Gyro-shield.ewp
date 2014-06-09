@@ -1648,6 +1648,9 @@
   <file>
     <name>$PROJ_DIR$\SPI6.c</name>
   </file>
+  <file>
+    <name>$PROJ_DIR$\UART1.c</name>
+  </file>
 </project>
 
 

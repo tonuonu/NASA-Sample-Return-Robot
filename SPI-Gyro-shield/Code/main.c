@@ -25,8 +25,11 @@
 #include <string.h>
 #include "main.h"
 #include "hwsetup.h"
+#include "UART.h"
 
 #define IDEAL_VOLTAGE_CODE		((int16_t)(48 + 12*67.65))	// corresponds to 12.0V
+
+//define DEBUG_MOTO
 
 struct twobyte_st tmprecv[4] = {0,0,0,0,0,0,0,0};
 
@@ -43,6 +46,9 @@ struct twobyte_st cur_target_speed[3][4]=
 
 static unsigned int UART_to_motor_id[4]={0,1,2,3};
 static unsigned int motor_online[4]={0,0,0,0};
+
+struct twobyte_st dbg_pid[4] = {0,0,0,0};
+struct twobyte_st dbg_switch[4] = {0,0,0,0};
 
 int16_t calc_median3(const struct twobyte_st values[3][4],
 											const unsigned int motor_idx) {
@@ -84,8 +90,50 @@ receive_ticks(void) {
     tmprecv[UART_to_motor_id[2]].u.byte[0]=M2RX & 0xff;
     tmprecv[UART_to_motor_id[3]].u.byte[0]=M3RX & 0xff;
 
+#ifdef DEBUG_MOTO
+    complete_pretx();
+    M0TX=M1TX=M2TX=M3TX = 0;
+
+    complete_rx();
+    dbg_pid[UART_to_motor_id[0]].u.byte[1]=M0RX & 0xff;
+    dbg_pid[UART_to_motor_id[1]].u.byte[1]=M1RX & 0xff;
+    dbg_pid[UART_to_motor_id[2]].u.byte[1]=M2RX & 0xff;
+    dbg_pid[UART_to_motor_id[3]].u.byte[1]=M3RX & 0xff;
+
+    complete_pretx();
+    M0TX=M1TX=M2TX=M3TX = 0;
+
+    complete_rx();
+    dbg_pid[UART_to_motor_id[0]].u.byte[0]=M0RX & 0xff;
+    dbg_pid[UART_to_motor_id[1]].u.byte[0]=M1RX & 0xff;
+    dbg_pid[UART_to_motor_id[2]].u.byte[0]=M2RX & 0xff;
+    dbg_pid[UART_to_motor_id[3]].u.byte[0]=M3RX & 0xff;
+
+    complete_pretx();
+    M0TX=M1TX=M2TX=M3TX = 0;
+
+    complete_rx();
+    dbg_switch[UART_to_motor_id[0]].u.byte[1]=M0RX & 0xff;
+    dbg_switch[UART_to_motor_id[1]].u.byte[1]=M1RX & 0xff;
+    dbg_switch[UART_to_motor_id[2]].u.byte[1]=M2RX & 0xff;
+    dbg_switch[UART_to_motor_id[3]].u.byte[1]=M3RX & 0xff;    
+
+    complete_pretx();
+    M0TX=M1TX=M2TX=M3TX = 0;
+
+    complete_rx();
+    dbg_switch[UART_to_motor_id[0]].u.byte[0]=M0RX & 0xff;
+    dbg_switch[UART_to_motor_id[1]].u.byte[0]=M1RX & 0xff;
+    dbg_switch[UART_to_motor_id[2]].u.byte[0]=M2RX & 0xff;
+    dbg_switch[UART_to_motor_id[3]].u.byte[0]=M3RX & 0xff;    
+#endif
+    
     complete_tx();
     CS0=CS1=CS2=CS3 = 1;
+
+#ifdef DEBUG_MOTO
+    UART1_Dump(cur_target_speed[measurement_idx], tmprecv, dbg_pid, dbg_switch);
+#endif
 
     if (!motor_online[0])
         tmprecv[0].u.int16=0;

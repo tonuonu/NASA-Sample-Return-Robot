@@ -149,6 +149,17 @@ void HardwareSetup(void);
 
 #define SPI_DELAY (1)
 
+
+// Serial 1 (debug output)
+
+#define TX1         p6_7
+#define TX1s        p6_7s
+#define TX1d        pd6_7
+#define RX1         p6_6
+#define RX1d        pd6_6
+#define RX1s        p6_6s
+
+
 struct statuses {
     char sek_flag;
 };
