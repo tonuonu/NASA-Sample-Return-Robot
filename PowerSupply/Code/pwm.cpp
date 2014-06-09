@@ -159,10 +159,10 @@ void Init_PWM(void) {
     /* Protection off */
     SYSTEM.PRCR.WORD = 0xA503;
 
-    TPUA.TSTR.BIT.CST0=0;// stop clock
-    TPUA.TSTR.BIT.CST1=0;// stop clock
-    TPUA.TSTR.BIT.CST2=0;// stop clock
-    TPUA.TSTR.BIT.CST3=0;// stop clock
+    TPUA.TSTR.BIT.CST0=0; // stop clock
+    TPUA.TSTR.BIT.CST1=0; // stop clock
+    TPUA.TSTR.BIT.CST2=0; // stop clock
+    TPUA.TSTR.BIT.CST3=0; // stop clock
   
     /* Protection on */
     SYSTEM.PRCR.WORD = 0xA500;

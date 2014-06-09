@@ -103,8 +103,9 @@ void Init_ADC12Repeat(void) {
 
   S12AD.ADADS0.BIT.ADS0=0x00FF; // AN000...AN007 addition mode on
   S12AD.ADADS1.BIT.ADS1=0x0000; // AN016... we no not care
-  S12AD.ADADC.BIT.ADC=0; // convert and add 1 time
-//  S12AD.ADADC.BIT.ADC=3; // convert and add 4 times
+//  S12AD.ADADC.BIT.ADC=1; // convert and add 2 time
+//  S12AD.ADADC.BIT.ADC=0; // convert and add 1 time
+  S12AD.ADADC.BIT.ADC=3; // convert and add 4 times
 //  S12AD.ADCER.BIT.ACE = 1; // Clear automatically after data is read
   
   /* Start ADC */
