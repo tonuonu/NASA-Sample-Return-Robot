@@ -97,6 +97,24 @@ void Timer_Delay(uint32_t user_delay, uint8_t unit, uint8_t timer_mode) {
     }      
 }
 
+#define test(a) test_if_dangerous(__LINE__,a)
+
+static void
+test_if_dangerous(int lineno, int boolean) {
+    int numinputs=BAT0_EN + BAT1_EN + BAT2_EN + BAT3_EN;
+      
+    if(numinputs == 1 && boolean) {      
+        LED_RGB_set(RGB_RED);
+        LED_RGB_blink();
+        refresh();
+        char buf[64];
+        snprintf(buf,sizeof(buf),"--> lineno %d, numinputs %d <--",lineno,numinputs);
+        OLED_Show_String(  1,buf, 0, 5*8);
+        for(;;);
+    }
+}
+
+
 #pragma vector=VECT_CMT2_CMI2
 __interrupt void Excep_CMTU1_CMT2(void) {
     LED7 =LED_ON;
@@ -108,10 +126,10 @@ __interrupt void Excep_CMTU1_CMT2(void) {
      * 13.3/(2^12)*4095=13.3V etc
      */
 #define VCOEFF (((100.0+33.0)/33.0*3.3)/(4095.0))
-    adc[0] =  (float)(S12AD.ADDR0>>2)*VCOEFF; // VBAT0_AD 
-    adc[1] =  (float)(S12AD.ADDR1>>2)*VCOEFF; // VBAT1_AD
-    adc[2] =  (float)(S12AD.ADDR2>>2)*VCOEFF; // VBAT2_AD
-    adc[3] =  (float)(S12AD.ADDR3>>2)*VCOEFF; // VBAT3_AD
+    adc[0] =  (float)(S12AD.ADDR0>>4)*VCOEFF; // VBAT0_AD 
+    adc[1] =  (float)(S12AD.ADDR1>>4)*VCOEFF; // VBAT1_AD
+    adc[2] =  (float)(S12AD.ADDR2>>4)*VCOEFF; // VBAT2_AD
+    adc[3] =  (float)(S12AD.ADDR3>>4)*VCOEFF; // VBAT3_AD
   
     /*
      * ACS712 20A version outputs 100mV for each A
@@ -124,10 +142,10 @@ __interrupt void Excep_CMTU1_CMT2(void) {
      */
 #define ICOEFF (4095.0/3.3*   0.1*-1)
 #define IZBASE (   4095.0/3.3*2.53  )
-    adc[4] = 0.8*adc[4] + 0.2*((float)(S12AD.ADDR4>>2)-IZBASE)/ICOEFF; // IBAT0_AD
-    adc[5] = 0.8*adc[5] + 0.2*((float)(S12AD.ADDR5>>2)-IZBASE)/ICOEFF; // IBAT1_AD
-    adc[6] = 0.8*adc[6] + 0.2*((float)(S12AD.ADDR6>>2)-IZBASE)/ICOEFF; // IBAT2_AD
-    adc[7] = 0.8*adc[7] + 0.2*((float)(S12AD.ADDR7>>2)-IZBASE)/ICOEFF; // IBAT3_AD
+    adc[4] = 0.8*adc[4] + 0.2*((float)(S12AD.ADDR4>>4)-IZBASE)/ICOEFF; // IBAT0_AD
+    adc[5] = 0.8*adc[5] + 0.2*((float)(S12AD.ADDR5>>4)-IZBASE)/ICOEFF; // IBAT1_AD
+    adc[6] = 0.8*adc[6] + 0.2*((float)(S12AD.ADDR6>>4)-IZBASE)/ICOEFF; // IBAT2_AD
+    adc[7] = 0.8*adc[7] + 0.2*((float)(S12AD.ADDR7>>4)-IZBASE)/ICOEFF; // IBAT3_AD
     /*
      * Every volt on AD input 1023.0/3.3 
      * Resistor divider 680k and 100k makes (680.0+100.0)/100.0
@@ -139,10 +157,6 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     /*
      * IMON1 and IMON2 are current measuring outputs of TPS51222
      * The measure voltage drop over output inductor and amplyify it by 50.
-     * For Bourns SRP1250-4R7M actual DCR is ~10 milliohm (15 mohm max by 
-     * datasheet) or 0.008 ohm. Ohm's law states I = U/R.
-     * In our ADC maximum reading of 1023 means 3.3V. 3.3V/50= 0.066V and this  
-     * is maximum drop we can measure on inductor. 
      * I = 0.066V / 0.008ohm = 8.25A 
      * Additionally there is a resistor divider on board from 10k and 3k12. 
      * This means we need to multiply value by ~1.0312
@@ -161,21 +175,41 @@ __interrupt void Excep_CMTU1_CMT2(void) {
         imon2 = (float) AD.ADDRD / 1023.0 * (0.066 / 0.010) * ((10.0+3.12)/3.12);
         imon2max = imon2 > imon2max ? imon2 : imon2max;
         if(imon2 > 10.0) { // Excess current on steering power supply
-            //LED_GRN = LED_OFF;
-            //LED_RED = LED_ON;
             static int da=0;
-            //da= da == 0 ? 0xffff : 0;
             da ^= 0xffff;
             DA.DADR1=da;
-        } else {
-            //LED_RED = LED_OFF;
         }
     } else {
         imon2 = 0.0f;
     }
     
+    if(!PGOOD1 || !PGOOD2) {
+        static int restart=0;
+        switch(restart) {
+        case 10000:
+            LED_RGB_set(RGB_RED);
+            ENABLE_PWR=0;
+            OUT4_EN=0;
+            OUT5_EN=0;
+            break;
+        case 20000:
+            LED_RGB_set(RGB_YELLOW);
+            ENABLE_PWR=1;
+            OUT4_EN=1;
+            OUT5_EN=1;
+            break;
+        case 30000:
+            restart=-1;
+        }
+        restart++; 
+      
+      
+    } else {
+        LED_RGB_set(RGB_BLUE);
+    }
+    
 #define CURRENT_MAX     16.0
-#define CURRENT_MIN     -10.0
+#define CURRENT_MIN     -4.0
 #define VOLTAGE_MAX     12.6 * 1.1 // Allow some overhead before forcing shut off
 #define VOLTAGE_MIN     9.0  * 0.9
 
@@ -190,6 +224,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     /* check for voltages */   
     if(adc[0] > VOLTAGE_MAX || adc[0] < VOLTAGE_MIN) { // BAT0
         uint8_t flag=BAT0_EN;
+        test(BAT0_EN!=MAX1614_OFF);
         BAT0_EN=MAX1614_OFF; // Turn off MOSFET
         BAT0_error=1;
         if(flag==MAX1614_ON) {
@@ -199,6 +234,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     }
     if(adc[1] > VOLTAGE_MAX || adc[1] < VOLTAGE_MIN) { // BAT1
         uint8_t flag=BAT1_EN;
+        test(BAT1_EN!=MAX1614_OFF);
         BAT1_EN=MAX1614_OFF; // Turn off MOSFET
         BAT1_error=1;
         if(flag==MAX1614_ON) {
@@ -208,6 +244,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     }
     if(adc[2] > VOLTAGE_MAX || adc[2] < VOLTAGE_MIN) { // BAT2
         uint8_t flag=BAT2_EN;
+        test(BAT2_EN!=MAX1614_OFF);
         BAT2_EN=MAX1614_OFF; // Turn off MOSFET
         BAT2_error=1;
         if(flag==MAX1614_ON) {
@@ -217,6 +254,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     }
     if(adc[3] > VOLTAGE_MAX || adc[3] < VOLTAGE_MIN) { // BAT3
         uint8_t flag=BAT3_EN;
+        test(BAT3_EN!=MAX1614_OFF);
         BAT3_EN=MAX1614_OFF; // Turn off MOSFET
         BAT3_error=1;
         if(flag==MAX1614_ON) {
@@ -234,19 +272,28 @@ __interrupt void Excep_CMTU1_CMT2(void) {
 
     // make sure consumption is big enough to rule out too small values
     if(maxcurrent > 1.0f) {
-        if(adc[4] < 0.5f) // Input is enabled but battery is not connected
+        if(adc[4] < 0.5f) { // Input is enabled but battery is not connected          
+            test(BAT0_EN!=MAX1614_OFF);
             BAT0_EN=MAX1614_OFF; // Turn off MOSFET
-        if(adc[5] < 0.5f) // Input is enabled but battery is not connected
+        }
+        if(adc[5] < 0.5f) { // Input is enabled but battery is not connected
+            test(BAT1_EN!=MAX1614_OFF);
             BAT1_EN=MAX1614_OFF; // Turn off MOSFET
-        if(adc[6] < 0.5f) // Input is enabled but battery is not connected
+        }
+        if(adc[6] < 0.5f) { // Input is enabled but battery is not connected
+            test(BAT2_EN!=MAX1614_OFF);
             BAT2_EN=MAX1614_OFF; // Turn off MOSFET
-        if(adc[7] < 0.5f) // Input is enabled but battery is not connected
+        }
+        if(adc[7] < 0.5f) { // Input is enabled but battery is not connected
+            test(BAT3_EN!=MAX1614_OFF);
             BAT3_EN=MAX1614_OFF; // Turn off MOSFET
+        }
     }
     
     /* check for battery currents */   
     if(adc[4] > CURRENT_MAX || adc[4] < CURRENT_MIN) { // BAT0
         uint8_t flag=BAT0_EN;
+        test(BAT0_EN!=MAX1614_OFF);
         BAT0_EN=MAX1614_OFF; // Turn off MOSFET
         BAT0_error=1;
         if(flag==MAX1614_ON) {
@@ -256,6 +303,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     }
     if(adc[5] > CURRENT_MAX || adc[5] < CURRENT_MIN) { // BAT1
         uint8_t flag=BAT1_EN;
+        test(BAT1_EN!=MAX1614_OFF);
         BAT1_EN=MAX1614_OFF; // Turn off MOSFET
         BAT1_error=1;
         if(flag==MAX1614_ON) {
@@ -265,6 +313,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     }
     if(adc[6] > CURRENT_MAX || adc[6] < CURRENT_MIN) { // BAT2
         uint8_t flag=BAT2_EN;
+        test(BAT2_EN!=MAX1614_OFF);
         BAT2_EN=MAX1614_OFF; // Turn off MOSFET
         BAT2_error=1;
         if(flag==MAX1614_ON) {
@@ -274,6 +323,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     }
     if(adc[7] > CURRENT_MAX || adc[7] < CURRENT_MIN) { // BAT3
         uint8_t flag=BAT3_EN;
+        test(BAT3_EN!=MAX1614_OFF);
         BAT3_EN=MAX1614_OFF; // Turn off MOSFET
         BAT3_error=1;
         if(flag==MAX1614_ON) {
@@ -304,7 +354,6 @@ __interrupt void Excep_CMTU1_CMT2(void) {
         logerror(buf);
         BAT3_EN=MAX1614_ON;
     }
-    
     
 #if 0
     static int PWM0=0,PWM1=0,PWM2=0,PWM3=0;
@@ -351,7 +400,6 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     } else {
     //  LED_RGB_set(RGB_PINK);
     }
-
     
     if(adapter > adc[2] && adc[2] > 8.0f /* 8V = is any battery at all */) {
         /* 
@@ -436,7 +484,7 @@ __interrupt void Excep_CMTU1_CMT2(void) {
     static int da=0;
     if(cnt++<1000) {
         da= da == 0 ? 0xffff : 0;
-        DA.DADR1=da;
+//        DA.DADR1=da;
     } else {
         if(cnt>10000)
             cnt=0;
