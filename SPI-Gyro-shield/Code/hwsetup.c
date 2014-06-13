@@ -119,7 +119,7 @@ MotorIO_Init(void) {
     RESET2d = PD_OUTPUT;
     RESET3d = PD_OUTPUT;
 
-#if 0
+#if 1
     RESET0=1;
     RESET1=1;
     RESET2=1;

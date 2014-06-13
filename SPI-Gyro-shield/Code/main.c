@@ -26,17 +26,21 @@
 #include "main.h"
 #include "hwsetup.h"
 #include "UART.h"
+#include "SPI.h"
 
 #define IDEAL_VOLTAGE_CODE		((int16_t)(48 + 12*67.65))	// corresponds to 12.0V
 
 //define DEBUG_MOTO
+#define LOG_LEN 3072
 
 struct twobyte_st tmprecv[4] = {0,0,0,0,0,0,0,0};
 
 volatile unsigned char motor_load[4] = {0,0,0,0};
 volatile struct twobyte_st ticks[4] = {0,0,0,0,0,0,0,0};
-volatile struct twobyte_st cur_cmd_param[4] = {0,0,0,0,0,0,0,0};
-volatile unsigned char cur_cmd[4] = {CMD_SPEED,CMD_SPEED,CMD_SPEED,CMD_SPEED};
+volatile struct twobyte_st cur_cmd_param[4] = {0,0x80,0,0x80,0,0x80,0,0x80};
+volatile unsigned char cur_cmd[4] = {CMD_ACCELERATION,CMD_ACCELERATION,CMD_ACCELERATION,CMD_ACCELERATION};
+//volatile struct twobyte_st cur_cmd_param[4] = {0,0,0,0,0,0,0,0};
+//volatile unsigned char cur_cmd[4] = {CMD_SPEED,CMD_SPEED,CMD_SPEED,CMD_SPEED};
 
 static int measurement_idx=0;
 struct twobyte_st voltage[3][4]=
@@ -49,6 +53,20 @@ static unsigned int motor_online[4]={0,0,0,0};
 
 struct twobyte_st dbg_pid[4] = {0,0,0,0};
 struct twobyte_st dbg_switch[4] = {0,0,0,0};
+struct twobyte_st dbg_curr[4] = {0,0,0,0};
+struct twobyte_st calib_data[64][4];
+static int calib_i[4][3] = {{-15,16,-4},{5,-1,-6},{8,12,15},{-6,-16,-7}};//Kõu
+//static int calib_i[4][3] = {{9,-16,-6},{1,-15,-10},{-7,-6,-16},{-3,-16,-11}};//Öö
+//static int calib_i[4][3] = {{-16,6,-16},{-16,-16,-16},{-16,-11,-16},{15,-16,-16}};//Säde
+static int calib_t[4] = {33,78,96,111};
+unsigned char log_cmd[LOG_LEN][4];
+struct twobyte_st log_param[LOG_LEN][4];
+static int16_t log_time[LOG_LEN];
+static char log_state[LOG_LEN];
+int16_t cur_time = 0;
+int log_ptr = 0;
+int log_cnt = 0;
+char log_active = 0;
 
 int16_t calc_median3(const struct twobyte_st values[3][4],
 											const unsigned int motor_idx) {
@@ -126,13 +144,30 @@ receive_ticks(void) {
     dbg_switch[UART_to_motor_id[1]].u.byte[0]=M1RX & 0xff;
     dbg_switch[UART_to_motor_id[2]].u.byte[0]=M2RX & 0xff;
     dbg_switch[UART_to_motor_id[3]].u.byte[0]=M3RX & 0xff;    
+    complete_pretx();
+    M0TX=M1TX=M2TX=M3TX = 0;
+
+    complete_rx();
+    dbg_curr[UART_to_motor_id[0]].u.byte[1]=M0RX & 0xff;
+    dbg_curr[UART_to_motor_id[1]].u.byte[1]=M1RX & 0xff;
+    dbg_curr[UART_to_motor_id[2]].u.byte[1]=M2RX & 0xff;
+    dbg_curr[UART_to_motor_id[3]].u.byte[1]=M3RX & 0xff;    
+
+    complete_pretx();
+    M0TX=M1TX=M2TX=M3TX = 0;
+
+    complete_rx();
+    dbg_curr[UART_to_motor_id[0]].u.byte[0]=M0RX & 0xff;
+    dbg_curr[UART_to_motor_id[1]].u.byte[0]=M1RX & 0xff;
+    dbg_curr[UART_to_motor_id[2]].u.byte[0]=M2RX & 0xff;
+    dbg_curr[UART_to_motor_id[3]].u.byte[0]=M3RX & 0xff;    
 #endif
     
     complete_tx();
     CS0=CS1=CS2=CS3 = 1;
 
 #ifdef DEBUG_MOTO
-    UART1_Dump(cur_target_speed[measurement_idx], tmprecv, dbg_pid, dbg_switch);
+    UART1_Dump(cur_target_speed[measurement_idx], tmprecv, dbg_pid, dbg_switch, dbg_curr);
 #endif
 
     if (!motor_online[0])
@@ -163,11 +198,43 @@ receive_ticks(void) {
     }   
 }
 
+void
+dump_log(void) {
+  int ptr = log_ptr;
+  char buf[64];
+
+  sprintf(buf, "\n%d:\n", cur_time);
+  for (int j=0; j<strlen(buf); j++)
+    UART1_Char(buf[j]);
+
+  for (int i=0; i<log_cnt; i++) {
+    UART1_DumpLog(log_time[ptr], log_cmd[ptr], log_param[ptr], log_state[ptr]);
+    if (++ptr >= LOG_LEN)
+      ptr = 0;
+  }
+}
+
 static int
 send_cur_cmd(const int force_cmd,const int force_param) {
     if(RESET5 == 0) {
         return 0;
     }
+    char motor_map = motor_online[0] | (motor_online[1]<<1) | (motor_online[2]<<2) | (motor_online[3]<<3);
+    if (log_active || (motor_map==0xf)) {
+      for (int i=0; i<4; i++) {
+        log_cmd[log_ptr][i] = cur_cmd[i];
+        log_param[log_ptr][i].u.int16 = cur_cmd_param[i].u.int16;
+        log_time[log_ptr] = cur_time;
+        log_state[log_ptr] = motor_map;
+      }
+      if (++log_ptr >= LOG_LEN)
+        log_ptr = 0;
+      if (log_cnt < LOG_LEN)
+        log_cnt++;
+    }
+    log_active = motor_map==0xf;
+    cur_time++;
+    
     complete_tx(); // make sure we are not transmitting garbage already
 
     { volatile unsigned char dummy=M0RX; }
@@ -296,12 +363,200 @@ get_voltage(void) {
         voltage[measurement_idx][i].u.int16 = tmprecv[i].u.int16;
 }
 
+static void 
+calibrate(void) {
+  
+    if(RESET5 == 0) {
+        return;
+    }
+    
+    for (int i=0; i<16; i++)
+      for (int j=0; j<4; j++)
+        for (int m=0; m<4; m++)
+          calib_data[4*i+j][m].u.int16 = 1024*((i&7)>5 ? 0 : calib_i[m][(i>>1)&3])+calib_t[j];
+    
+    complete_tx();
+    CS0=CS1=CS2=CS3 = 0;
+
+    M0TX=CMD_CALIBRATE | UART_to_motor_id[0];
+    M1TX=CMD_CALIBRATE | UART_to_motor_id[1];
+    M2TX=CMD_CALIBRATE | UART_to_motor_id[2];
+    M3TX=CMD_CALIBRATE | UART_to_motor_id[3];
+    complete_pretx();
+    
+    for (int i=0; i<64; i++) {
+      M0TX=calib_data[i][UART_to_motor_id[0]].u.byte[1];
+      M1TX=calib_data[i][UART_to_motor_id[1]].u.byte[1];
+      M2TX=calib_data[i][UART_to_motor_id[2]].u.byte[1];
+      M3TX=calib_data[i][UART_to_motor_id[3]].u.byte[1];
+      complete_pretx();
+      M0TX=calib_data[i][UART_to_motor_id[0]].u.byte[0];
+      M1TX=calib_data[i][UART_to_motor_id[1]].u.byte[0];
+      M2TX=calib_data[i][UART_to_motor_id[2]].u.byte[0];
+      M3TX=calib_data[i][UART_to_motor_id[3]].u.byte[0];
+      complete_pretx();
+    }
+    complete_tx();
+    { volatile unsigned char dummy=M0RX; }
+    { volatile unsigned char dummy=M1RX; }
+    { volatile unsigned char dummy=M2RX; }
+    { volatile unsigned char dummy=M3RX; }
+    CS0=CS1=CS2=CS3 = 1;
+}
+
 static const unsigned char fpga_image[] = {
 #include "motor-control-fpga-image.hpp"
     0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,
     0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,  
 };
 
+static void 
+init_fpga(int nr) {
+  switch (nr) {
+    case 0:
+      // Controller in socket "0"
+      u0brg =  (unsigned char)(((base_freq)/(1*MOTORS_PROG_SPEED))-1);
+      LED1=0;
+      RESET0=0;
+      CS0=0;
+      udelay(2000); // at least 800us
+      RESET0=1;
+      udelay(2000); // at least 800us
+      LED1=1;
+      { for(int i=0;i<sizeof(fpga_image);i++) {
+          while (ti_u0c1 == 0);
+          M0TX=fpga_image[i];
+      } }
+      complete_tx();
+      udelay(100);
+      CS0=1;
+      udelay(100);
+      LED1=0;
+      
+      u0brg =  (unsigned char)(((base_freq)/(1*MOTORS_SPI_SPEED))-1);
+      for (int i=0; i<4; i++) {
+        complete_tx(); // make sure we are not transmitting garbage already
+        { volatile unsigned char dummy=M0RX; }
+        CS0=0;
+        M0TX=CMD_ACCELERATION | (i&3);
+        complete_pretx();
+        M0TX=0x80;
+        complete_pretx();
+        M0TX=0;
+        complete_tx();
+        { volatile unsigned char dummy=M0RX; }
+        CS0=1;
+      }
+      break;
+    case 1:
+      // Controller in socket "1"
+      u3brg =  (unsigned char)(((base_freq)/(1*MOTORS_PROG_SPEED))-1);
+      LED2=0;
+      RESET1=0;
+      CS1=0;
+      udelay(1000); // at least 800us
+      RESET1=1;
+      udelay(1000); // at least 800us
+      LED2=1;
+      { for(int i=0;i<sizeof(fpga_image);i++) {
+          while (ti_u3c1 == 0);
+          M1TX=fpga_image[i];
+      } }
+      complete_tx();
+      udelay(100);
+      CS1=1;
+      udelay(100);
+      LED2=0;
+      
+      u3brg =  (unsigned char)(((base_freq)/(1*MOTORS_SPI_SPEED))-1);
+      for (int i=0; i<4; i++) {
+        complete_tx(); // make sure we are not transmitting garbage already
+        { volatile unsigned char dummy=M0RX; }
+        CS1=0;
+        M1TX=CMD_ACCELERATION | (i&3);
+        complete_pretx();
+        M1TX=0x80;
+        complete_pretx();
+        M1TX=0;
+        complete_tx();
+        { volatile unsigned char dummy=M1RX; }
+        CS1=1;
+      }
+      break;
+    case 2:
+      // Controller in socket "2"
+      u4brg =  (unsigned char)(((base_freq)/(1*MOTORS_PROG_SPEED))-1);
+      LED3=0;
+      RESET2=0;
+      CS2=0;
+      udelay(2000); // at least 800us
+      RESET2=1;
+      udelay(2000); // at least 800us
+      LED3=1;
+      { for(int i=0;i<sizeof(fpga_image);i++) {
+          while (ti_u4c1 == 0);
+          M2TX=fpga_image[i];
+      } }
+      complete_tx();
+      udelay(100);
+      CS2=1;
+      udelay(100);
+      LED3=0;
+      
+      u4brg =  (unsigned char)(((base_freq)/(1*MOTORS_SPI_SPEED))-1);
+      for (int i=0; i<4; i++) {
+        complete_tx(); // make sure we are not transmitting garbage already
+        { volatile unsigned char dummy=M0RX; }
+        CS1=0;
+        M2TX=CMD_ACCELERATION | (i&3);
+        complete_pretx();
+        M2TX=0x80;
+        complete_pretx();
+        M2TX=0;
+        complete_tx();
+        { volatile unsigned char dummy=M2RX; }
+        CS2=1;
+      }
+      break;
+    case 3:
+      // Controller in socket "3"
+      u6brg =  (unsigned char)(((base_freq)/(1*MOTORS_PROG_SPEED))-1);
+      LED4=0;
+      RESET3=0;
+      CS3=0;
+      udelay(2000); // at least 800us
+      RESET3=1;
+      udelay(2000); // at least 800us
+      LED4=1;
+      { for(int i=0;i<sizeof(fpga_image);i++) {
+          while (ti_u6c1 == 0);
+          M3TX=fpga_image[i];
+      } }
+      complete_tx();
+      udelay(100);
+      CS3=1;
+      udelay(100);
+      LED4=0;
+      
+      u6brg =  (unsigned char)(((base_freq)/(1*MOTORS_SPI_SPEED))-1);
+      for (int i=0; i<4; i++) {
+        complete_tx(); // make sure we are not transmitting garbage already
+        { volatile unsigned char dummy=M0RX; }
+        CS3=0;
+        M3TX=CMD_ACCELERATION | (i&3);
+        complete_pretx();
+        M3TX=0x80;
+        complete_pretx();
+        M3TX=0;
+        complete_tx();
+        { volatile unsigned char dummy=M3RX; }
+        CS3=1;
+      }
+      break;
+  }
+}
+
+  
 int
 main(void) {
     HardwareSetup();
@@ -321,13 +576,14 @@ main(void) {
         LED4 = motor_online[3];
 
         /* If any of motor controllers is not ready, reset everything */
-        if((!motor_online[0] || !motor_online[1] ||
+        if ((!motor_online[0] || !motor_online[1] ||
 								!motor_online[2] || !motor_online[3]) &&
 								milliseconds_since_last_reset > 30*1000 &&
 								all_motors_stopped) {
 			milliseconds_since_last_reset=0;
+            dump_log();
 
-            /*!!! Should reset only these controllers that are not ready! */
+            /*!!! Should reset only these controllers that are not ready!
 
             LED1=LED2=LED3=LED4=0;
             RESET0=RESET1=RESET2=RESET3 = 0;
@@ -343,12 +599,31 @@ main(void) {
             }
             complete_tx();
 
-            udelay(1000);
+            udelay(100);
             CS0=CS1=CS2=CS3 = 1;
-            udelay(1000);
+            udelay(100);
             LED1=LED2=LED3=LED4=0;
 
-                // Wait until all motors report a valid voltage
+            // Send setspeed 0 to all controllers, without thinking
+            
+			for (unsigned int combination_idx=0;combination_idx < 4;
+													combination_idx++) {
+				{ for (unsigned int i=0;i < 4;i++)
+					UART_to_motor_id[i]=(i + combination_idx) & (4-1); }
+            
+                measurement_idx=0;
+		        send_cur_cmd(CMD_SPEED,0);	// Work around motor controller
+                                            //  bug that causes problems
+											//  after sending FPGA image
+            } */
+            
+            init_fpga(0);
+            init_fpga(1);
+            init_fpga(2);
+            init_fpga(3);
+            udelay(1800);
+            
+            // Wait until all motors report a valid voltage
 
             { for (int iteration=0;iteration < 300/4;iteration++) {
 				unsigned int penalty[4][4];	// Penalty for various
@@ -360,7 +635,7 @@ main(void) {
 						UART_to_motor_id[i]=(i + combination_idx) & (4-1); }
 
 	                measurement_idx=0;
-			        send_cur_cmd(CMD_SPEED,0);	// Work around motor controller
+			        //send_cur_cmd(CMD_SPEED,0);	// Work around motor controller
 												//  bug that causes problems
 												//  after sending FPGA image
 
@@ -423,6 +698,7 @@ main(void) {
 					}
 				}}
             }}
+            calibrate();
             udelay(30*1000);
             continue;
         }

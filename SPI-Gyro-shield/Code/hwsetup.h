@@ -45,12 +45,12 @@ void HardwareSetup(void);
 
 #define RESET0       p0_3
 #define RESET0d      pd0_3
-#define RESET1       p0_2
-#define RESET1d      pd0_2
-#define RESET2       p0_1
-#define RESET2d      pd0_1
-#define RESET3       p0_0
-#define RESET3d      pd0_0
+#define RESET1       p0_0
+#define RESET1d      pd0_0
+#define RESET2       p0_2
+#define RESET2d      pd0_2
+#define RESET3       p0_1
+#define RESET3d      pd0_1
 
 #define CDONE0       p0_7
 #define CDONE1       p0_4

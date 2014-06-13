@@ -20,6 +20,9 @@
  */
 
 #define MOTORS_SPI_SPEED 4000000
+#define MOTORS_PROG_SPEED 10000000
+
+#define ENABLE_ARDUINO 1
 
 /* Four motor ports */
 void SPI0_Init(void); 

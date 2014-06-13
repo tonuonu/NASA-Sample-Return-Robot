@@ -32,7 +32,7 @@ void UART1_Char(char c) {
   u1tb = c;
 }
 
-void UART1_Dump(struct twobyte_st w1[4], struct twobyte_st w2[4], struct twobyte_st w3[4], struct twobyte_st w4[4]) {
+void UART1_Dump(struct twobyte_st w1[4], struct twobyte_st w2[4], struct twobyte_st w3[4], struct twobyte_st w4[4], struct twobyte_st w5[4]) {
   for (int i=0; i<4; i++) {
     if (i>0)
       UART1_Char(' ');
@@ -43,7 +43,31 @@ void UART1_Dump(struct twobyte_st w1[4], struct twobyte_st w2[4], struct twobyte
     for (int j=0; j<strlen(buf); j++)
       UART1_Char(buf[j]);
   }
+  for (int i=0; i<4; i++) {
+    char buf[64];
+    sprintf(buf, " %02x%02x", w5[i].u.byte[1], w5[i].u.byte[0] );
+    for (int j=0; j<strlen(buf); j++)
+      UART1_Char(buf[j]);
+  }
   UART1_Char('\n');
+}
+
+void UART1_DumpLog(int16_t w1, unsigned char w2[4], struct twobyte_st w3[4], char w4) {
+  char buf[64];
+  
+  sprintf(buf, "%d:", w1 );
+  for (int j=0; j<strlen(buf); j++)
+    UART1_Char(buf[j]);
+  
+  for (int i=0; i<4; i++) {
+    sprintf(buf, " %02x %02x%02x", w2[i], w3[i].u.byte[1], w3[i].u.byte[0] );
+    for (int j=0; j<strlen(buf); j++)
+      UART1_Char(buf[j]);
+  }
+  
+  sprintf(buf, " %x%x%x%x\n", (w4>>3)&1, (w4>>2)&1, (w4>>1)&1, w4&1 );
+  for (int j=0; j<strlen(buf); j++)
+    UART1_Char(buf[j]);
 }
 
 void

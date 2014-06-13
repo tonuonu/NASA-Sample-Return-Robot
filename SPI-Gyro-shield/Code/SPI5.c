@@ -39,7 +39,7 @@ __fast_interrupt void uart5_receive(void) {
     unsigned int transmit_byte=0xffff;		// Invalid byte value
     volatile unsigned char recvbyte=u5rb & 0xff;	// Reading u5rb enables receive for next byte
 
-    if(CS5==0) {
+    if((CS5==0) && ENABLE_ARDUINO) {
         static unsigned char tmp;
         struct twobyte_st tmp2;
  
